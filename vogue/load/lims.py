@@ -5,19 +5,30 @@ from datetime import datetime as dt
 lims = Lims(BASEURI,USERNAME,PASSWORD)
 
 
-class MongoPlots():
-    def __init__(self):
-        self.recieved_to_delivered = {}
-        self.received_samples_per_mont = {}
-
-class MongoSample():
-    def __init__(self,lims_sample_id):
-        self.lims_id = lims_sample_id
-        self.mongo_sample = {'lims_id':lims_sample_id}
-        self.lims_sample = Sample(lims,id = lims_sample_id)
+class MongoSample(dict):
+    def __init__(self,lims_sample):
+        self.lims_id = lims_sample.id
+        self.mongo_sample = {'lims_id' : lims_sample.id}
+        self.lims_sample = lims_sample
         self.udfs = self.lims_sample.udf
-        self.udf_keys = ['Strain', 'Family'] #FamilyID
+        self.udf_keys = ['Strain', 'Family', 'Source'] #FamilyID
         self.only_in_cg = ["ordered_at", "invoiced_at"]
+        self.application_tag = self.lims_sample.udf.get("Sequencing Analysis")
+        self._build()
+
+
+    def _build(self):
+        self.get_sample_level_data()
+        self.get_concantration_and_nr_defrosts()
+        self.get_final_conc_and_amount_dna()
+        self.get_microbial_library_concentration()
+        self.get_library_size_pre_hyb()
+        self.get_library_size_post_hyb()
+        self.get_sequenced_date()
+        self.get_received_date()
+        self.get_prepared_date()
+        self.get_delivery_date()
+        self.get_times()
 
     def get_sample_level_data(self):
         for key in  self.udf_keys:
@@ -112,43 +123,138 @@ class MongoSample():
             except:
                 pass
 
+    def _get_latest_input_artifact(self, step):
+        """returns the input artifact related to self.lims_id and the step that was latest run.
+        
+        Args:
+            step(int):
+        
+        Returns:
+            askld(): asl 
+        """
+        artifacts = lims.get_artifacts(samplelimsid = self.lims_id, process_type = step) 
+        date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
+        if date_art_list:
+            date_art_list.sort()
+            latest_outart = date_art_list[-1]
+            for inart in latest_outart[1].input_artifact_list():
+                if self.lims_id in [sample.id for sample in inart.samples]:
+                    return inart                  
+        return None
+
+    def _get_latest_output_artifact(self, step):
+        """returns the input artifact related to self.lims_id and the step that was latest run.
+        
+        Args:
+            step(int):
+        
+        Returns:
+            askld(): asl 
+        """
+
+        artifacts = lims.get_artifacts(samplelimsid = self.lims_id, process_type = step,
+                                        type = 'Analyte') 
+        date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
+        if date_art_list:
+            date_art_list.sort()
+            latest_outart = date_art_list[-1]
+            return latest_outart[1]               
+        return None
+
     def get_concantration_and_nr_defrosts(self):
-        """Method to get nr lot_nr defrosts and concentration for a sample"""
+
+        if not self.application_tag[0:6] in ['WGSPCF', 'WGTPCF']:
+            return
+
         lot_nr_step = 'CG002 - End repair Size selection A-tailing and Adapter ligation (TruSeq PCR-free DNA)'
         concentration_step = 'CG002 - Aggregate QC (Library Validation)'
         lot_nr_udf = 'Lot no: TruSeq DNA PCR-Free Sample Prep Kit'
         concentration_udf = 'Concentration (nM)'
 
-        lot_nr_arts = lims.get_artifacts(samplelimsid = self.lims_id, process_type = lot_nr_step)
-        concentration_arts = lims.get_artifacts(samplelimsid = self.lims_id, process_type = concentration_step)
-        
-        if concentration_arts and lot_nr_arts:
-            latest_process = concentration_arts[0].parent_process
-            latest_outart = None
-            latest_inart = None
-            for art in concentration_arts:
-                inarts = art.input_artifact_list()
-                if latest_process.date_run <= art.parent_process.date_run:
-                    latest_process = art.parent_process
-                    latest_outart = art
-                    for inart in inarts:
-                        if self.lims_id in [sample.id for sample in inart.samples]:
-                            latest_inart = inart
-                            break
-            concentration = latest_inart.udf[concentration_udf]
-            lotnr = latest_inart.parent_process.udf[lot_nr_udf]
+        concentration_art = self._get_latest_input_artifact(concentration_step)
 
-            defrosts = lims.get_processes(type=lot_nr_step, udf={lot_nr_udf : lotnr})
-            
+        if concentration_art:
+            concentration = concentration_art.udf.get(concentration_udf)
+            lotnr = concentration_art.parent_process.udf.get(lot_nr_udf)
+            defrosts = lims.get_processes(type=lot_nr_step, udf={lot_nr_udf : lotnr}) 
             defrosts_before_latest_process = []
-            for defrost in defrosts:
-                if defrost.date_run <= latest_inart.parent_process.date_run:
-                    defrosts_before_latest_process.append(defrost)
-            nr_defrosts_before_latest_process = len(defrosts_before_latest_process)
-            if concentration and nr_defrosts_before_latest_process:
-                self.mongo_sample['nr_defrosts'] = nr_defrosts_before_latest_process
-                self.mongo_sample['concentration-nr_defrosts'] = concentration
 
+            for defrost in defrosts:
+                if defrost.date_run <= concentration_art.parent_process.date_run:
+                    defrosts_before_latest_process.append(defrost)
+
+            nr_defrosts_before_latest_process = len(defrosts_before_latest_process)
+            
+            self.mongo_sample['nr_defrosts'] = nr_defrosts_before_latest_process or None
+            self.mongo_sample['concentration-nr_defrosts'] = concentration or None
+            self.mongo_sample['lot_nr'] = lotnr or None
+
+
+    def get_final_conc_and_amount_dna(self):
+
+        if not self.application_tag[0:6] in ['WGSLIF', 'WGTLIF']:
+            return
+
+        amount_udf = 'Amount (ng)'
+        concentration_udf = 'Concentration (nM)'
+        concentration_step = 'CG002 - Aggregate QC (Library Validation)'
+        amount_step = 'CG002 - Aggregate QC (DNA)'
+
+        concentration_art = self._get_latest_input_artifact(concentration_step)
+
+        if concentration_art:
+
+            amount_art = None
+            step = concentration_art.parent_process
+            while step and not amount_art:
+                art = self._get_latest_input_artifact(step.type.name)
+                if amount_step in [p.type.name for p in lims.get_processes(inputartifactlimsid=art.id)]:
+                    amount_art = art
+                step = art.parent_process
+        
+            self.mongo_sample['amount'] = amount_art.udf.get(amount_udf) if amount_art else None
+            self.mongo_sample['concentration-amount'] = concentration_art.udf.get(concentration_udf)
+
+
+    def get_microbial_library_concentration(self):
+
+        if not self.application_tag[3:5] == 'NX':
+            return
+
+        concentration_step = 'CG002 - Aggregate QC (Library Validation)'
+        concentration_udf = 'Concentration (nM)'
+
+        concentration_art = self._get_latest_input_artifact(concentration_step)
+
+        if concentration_art:
+            self.mongo_sample['concentration-microbial'] = concentration_art.udf.get(concentration_udf)
+
+
+
+    def get_library_size_pre_hyb(self):
+        if not self.application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
+            return
+
+        size_step = 'CG002 - Amplify Adapter-Ligated Library (SS XT)'
+        size_udf = 'Size (bp)'
+
+        size_art = self._get_latest_output_artifact(size_step)
+
+        if size_art:
+            self.mongo_sample['sizs_bp_pre_hyb'] = size_art.udf.get(size_udf)
+
+
+    def get_library_size_post_hyb(self):
+        if not self.application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
+            return
+
+        size_step = 'CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'
+        size_udf = 'Size (bp)'
+
+        size_art = self._get_latest_output_artifact(size_step)
+
+        if size_art:
+            self.mongo_sample['sizs_bp_post_hyb'] = size_art.udf.get(size_udf)
 
 
                 
