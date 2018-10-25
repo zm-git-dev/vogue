@@ -1,0 +1,7 @@
+click
+bumpversion
+pyyaml
+pymongo
+genologics
+yapf
+flask
