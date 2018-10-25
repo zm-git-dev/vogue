@@ -1,5 +1,5 @@
 from genologics.lims import Lims
-from genologics.entities import Sample
+from genologics.entities import Sample, Artifact
 from genologics.config import BASEURI,USERNAME,PASSWORD
 from datetime import datetime as dt
 lims = Lims(BASEURI,USERNAME,PASSWORD)
@@ -12,10 +12,8 @@ class MongoSample(dict):
         self.lims_sample = lims_sample
         self.udfs = self.lims_sample.udf
         self.udf_keys = ['Strain', 'Family', 'Source'] #FamilyID
-        self.only_in_cg = ["ordered_at", "invoiced_at"]
         self.application_tag = self.lims_sample.udf.get("Sequencing Analysis")
         self._build()
-
 
     def _build(self):
         self.get_sample_level_data()
@@ -36,6 +34,7 @@ class MongoSample(dict):
                 self.mongo_sample[key] = self.udfs[key]
 
     def get_sequenced_date(self):
+        """Get the date when a sample passed sequencing."""
         #process_type = 'CG002 - Sequence Aggregation' unsure wich we should use acually
         process_types = ['CG002 - Illumina Sequencing (HiSeq X)','CG002 - Illumina Sequencing (Illumina SBS)']
         udf = 'Passed Sequencing QC'
@@ -84,6 +83,7 @@ class MongoSample(dict):
             self.mongo_sample["delivered_at"] = min(artifact.parent_process.udf['Date delivered'] for artifact in artifacts).isoformat()
 
     def get_times(self):
+        """Get time between different time stamps."""
 #        if ["delivered_at", "invoiced_at"] <= self.mongo_sample.keys():
 #            try:
 #                delivered_to_invoiced = self.mongo_sample["invoiced_at"] - self.mongo_sample["delivered_at"]
@@ -123,15 +123,8 @@ class MongoSample(dict):
             except:
                 pass
 
-    def _get_latest_input_artifact(self, step):
-        """returns the input artifact related to self.lims_id and the step that was latest run.
-        
-        Args:
-            step(int):
-        
-        Returns:
-            askld(): asl 
-        """
+    def _get_latest_input_artifact(self, step: str) -> Artifact:
+        """Returns the input artifact related to self.lims_id and the step that was latest run."""
         artifacts = lims.get_artifacts(samplelimsid = self.lims_id, process_type = step) 
         date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
         if date_art_list:
@@ -142,15 +135,8 @@ class MongoSample(dict):
                     return inart                  
         return None
 
-    def _get_latest_output_artifact(self, step):
-        """returns the input artifact related to self.lims_id and the step that was latest run.
-        
-        Args:
-            step(int):
-        
-        Returns:
-            askld(): asl 
-        """
+    def _get_latest_output_artifact(self, step: str) -> Artifact:
+        """Returns the output artifact related to self.lims_id and the step that was latest run."""
 
         artifacts = lims.get_artifacts(samplelimsid = self.lims_id, process_type = step,
                                         type = 'Analyte') 
@@ -162,6 +148,11 @@ class MongoSample(dict):
         return None
 
     def get_concantration_and_nr_defrosts(self):
+        """Find the latest artifact that passed through a concentration_step and get its concentration_udf.
+        Then go back in history to the latest lot_nr_step and get the lot_nr_udf from that step. --> lot_nr
+        Then find all steps where the lot_nr was used. --> defrosts
+        Then pick out those steps that were performed before our lot_nr_step. --> defrosts_before_latest_process
+        Count defrosts_before_latest_process. --> nr_defrosts"""
 
         if not self.application_tag[0:6] in ['WGSPCF', 'WGTPCF']:
             return
@@ -191,6 +182,8 @@ class MongoSample(dict):
 
 
     def get_final_conc_and_amount_dna(self):
+        """Find the latest artifact that passed through a concentration_step and get its concentration_udf.
+        Then go back in history to the latest amount_step and get the amount_udf"""
 
         if not self.application_tag[0:6] in ['WGSLIF', 'WGTLIF']:
             return
@@ -217,6 +210,8 @@ class MongoSample(dict):
 
 
     def get_microbial_library_concentration(self):
+        """Check only samples with mictobial application tag.
+        Get concentration_udf from concentration_step."""
 
         if not self.application_tag[3:5] == 'NX':
             return
@@ -232,6 +227,9 @@ class MongoSample(dict):
 
 
     def get_library_size_pre_hyb(self):
+        """Check only 'Targeted enrichment exome/panels'.
+        Get size_udf from size_step."""
+
         if not self.application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
             return
 
@@ -245,6 +243,9 @@ class MongoSample(dict):
 
 
     def get_library_size_post_hyb(self):
+        """Check only 'Targeted enrichment exome/panels'.
+        Get size_udf from size_step."""
+
         if not self.application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
             return
 

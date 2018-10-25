@@ -18,6 +18,46 @@ class VougeAdapter(MongoAdapter):
     def __init__(self,lims_sample_id):
         self.sample_collection = self.db.sample
     
+    def connect(self, db_uri, debug=False):
+        """Configure connection to a SQL database.
+         .. versionadded:: 2.1.0
+         Args:
+            db_uri (str): path/URI to the database to connect to
+            debug (Optional[bool]): whether to output logging information
+        """
+        
+        # connect to the mongo database
+        if db_uri == "mongodb://":
+            db_uri = "mongodb://localhost:27017"
+            LOG.info('Set uri to %s', db_uri)
+        
+        db_name = 'chanjo'
+        if not 'mock' in db_uri:
+            uri_info = uri_parser.parse_uri(db_uri)
+            db_name = uri_info['database'] or db_name
+            
+        self.uri = db_uri
+        self.client = get_client(uri=db_uri)
+        
+        self.setup(db_name=db_name)
+
+
+    def setup(self, db_name='chanjo'):
+        """Overrides the basic setup method"""
+        if self.client == None:
+            raise SyntaxError("No client available")
+        
+        if self.db is None:
+            self.db = self.client[db_name]
+         self.db_name = db_name
+        self.session = Session(self.db)
+        
+        self.transcripts_collection = self.db.transcript
+        self.sample_collection = self.db.sample
+        self.transcript_stat_collection = self.db.transcript_stat
+        
+        
+
     
     def add_sample(mongo_sample):
         """Adds a sample to the database
@@ -29,7 +69,15 @@ class VougeAdapter(MongoAdapter):
             inserted_id(str)
         """
         # Code to add a sample
+        
         new_id = self.sample_collection.insert_one(mongo_sample).inserted_id
+
+
+
+
+
+
+
 
 
 def build_sample(sample):
