@@ -2,7 +2,7 @@ import pymongo
 from pymongo import MongoClient
 client = MongoClient('localhost', 27017)
 db = client.trending
-from vogue.load.lims import MongoSample
+from vogue.load.lims import build_sample
 from argparse import ArgumentParser
 
 from mongo_adapter import (MongoAdapter, get_client)
@@ -49,7 +49,7 @@ class VougeAdapter(MongoAdapter):
         
         if self.db is None:
             self.db = self.client[db_name]
-         self.db_name = db_name
+        self.db_name = db_name
         self.session = Session(self.db)
         
         self.transcripts_collection = self.db.transcript
@@ -80,19 +80,18 @@ class VougeAdapter(MongoAdapter):
 
 
 
-def build_sample(sample):
-    MS = MongoSample(sample)
-
-    new_id = db.sample.insert_one(MS.mongo_sample).inserted_id
+def build(sample):
+    mongo_sample = build_sample(sample)
+    new_id = db.sample.insert_one(mongo_sample).inserted_id
 
 def build_all():
     for sample in lims.get_samples():
-        build_sample(sample)
+        build(sample)
 
 def main(args):
     if args.sample_id:
         sample = Sample(lims, id = args.sample_id)
-        build_sample(sample)
+        build(sample)
     else:
         build_all()        
 
