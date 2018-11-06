@@ -4,19 +4,27 @@ from vogue.load.sample import load_lims_sample, dry_run, load_all_samples
 
 @click.command("lims", short_help = "load lims into db.")
 @click.option('-s', '--sample-lims-id', help = 'Input sample lims id')
-@click.option('--load-all/-no-load-all', default = False, help = 'Loads all lims sample ids')
-@click.option('--load-sample/--no-load-sample', default = False, show_default = True,
+@click.option('--load-all/--no-load-all', default = False, help = 'Loads all lims sample ids')
+@click.option('--dry/--no-dry', default = True, show_default = True,
                 help = 'Load from sample or not. (dry-run)')
 @click.pass_context
 
-def lims(context, sample_lims_id, load_sample, load_all):
+
+def lims(context, sample_lims_id, dry, load_all):
     """Read and load lims data for a given sample id"""
     adapter = context.obj['adapter']
+    if dry:
+        click.echo(f"Dry run...bla bla\n {adapter.db}")
+        if sample_lims_id:
+            click.echo(f"Will build and load lims sample {sample_lims_id}:")
+            dry_run(adapter, sample_lims_id)
+        if load_all:
+            click.echo(f"Will build and load all lims samples.")
+        return
+
     if load_all:
         load_all_samples(adapter)
-    else:
-        if load_sample:
-            load_lims_sample(adapter, sample_lims_id)
-        else:
-            click.echo(f"Dry run...bla bla {adapter.db_name}")
-            dry_run(adapter, sample_lims_id)
+        return
+  
+
+    load_lims_sample(adapter, sample_lims_id)
