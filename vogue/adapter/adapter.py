@@ -35,6 +35,6 @@ class VougeAdapter(MongoAdapter):
             LOG.info(f"No updates for sample {lims_id}.")
 
 
-    def delte_sample(self):
+    def delete_sample(self):
         return None
 
