@@ -1,3 +1,4 @@
+import logging
 import click
 from vogue.load.sample import load_one_sample, dry_run, load_all_samples
 LOG = logging.getLogger(__name__)
