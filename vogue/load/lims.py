@@ -5,29 +5,6 @@ from datetime import datetime as dt
 import operator
 lims = Lims(BASEURI,USERNAME,PASSWORD)
 
-def get_sequence_date(sample_id: str, artifacts: list, udfs: dict):
-    #process_type = 'CG002 - Sequence Aggregation' unsure wich we should use acually
-    process_types = ['CG002 - Illumina Sequencing (HiSeq X)','CG002 - Illumina Sequencing (Illumina SBS)'] 
-    udf = 'Passed Sequencing QC'
-
-    if not sample.udf.get(udf):
-        return None #testa!
-    
-    if not artifacts:
-        return None #testa!
-    
-    final_date = None
-    for art in artifacts:
-        if not art.parent_process.type.name in process_types:
-            continue
-        if not final_date:
-            final_date = art.parent_process.date_run
-            continue
-        if art.parent_process.date_run > final_date:
-            final_date = art.parent_process.date_run
-    
-    return final_date #testa!
-
 def get_sequenced_date(sample: Sample)-> dt.date:
     """Get the date when a sample passed sequencing."""
 
@@ -270,7 +247,7 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str) -> int:
         return None
 
 
-def build_sample(sample: Sample)-> dict: #def build_sample(sample: Sample, lims: Lims)-> dict:
+def build_sample(sample: Sample)-> dict:
     """Parse lims sample"""
     application_tag = sample.udf.get('Sequencing Analysis')
 
