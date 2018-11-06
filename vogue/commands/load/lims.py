@@ -1,5 +1,5 @@
 import click
-from vogue.load.sample import load_lims_sample, dry_run, load_all_samples
+from vogue.load.sample import load_one_sample, dry_run, load_all_samples
 
 
 @click.command("lims", short_help = "load lims into db.")
@@ -27,4 +27,4 @@ def lims(context, sample_lims_id, dry, load_all):
         return
   
 
-    load_lims_sample(adapter, sample_lims_id)
+    load_one_sample(adapter, sample_lims_id)
