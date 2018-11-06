@@ -2,8 +2,31 @@ from genologics.lims import Lims
 from genologics.entities import Sample, Artifact
 from genologics.config import BASEURI,USERNAME,PASSWORD
 from datetime import datetime as dt
+import operator
 lims = Lims(BASEURI,USERNAME,PASSWORD)
 
+def get_sequence_date(sample_id: str, artifacts: list, udfs: dict):
+    #process_type = 'CG002 - Sequence Aggregation' unsure wich we should use acually
+    process_types = ['CG002 - Illumina Sequencing (HiSeq X)','CG002 - Illumina Sequencing (Illumina SBS)'] 
+    udf = 'Passed Sequencing QC'
+
+    if not sample.udf.get(udf):
+        return None #testa!
+    
+    if not artifacts:
+        return None #testa!
+    
+    final_date = None
+    for art in artifacts:
+        if not art.parent_process.type.name in process_types:
+            continue
+        if not final_date:
+            final_date = art.parent_process.date_run
+            continue
+        if art.parent_process.date_run > final_date:
+            final_date = art.parent_process.date_run
+    
+    return final_date #testa!
 
 def get_sequenced_date(sample: Sample)-> dt.date:
     """Get the date when a sample passed sequencing."""
@@ -113,7 +136,7 @@ def _get_latest_input_artifact(step: str, lims_id: str) -> Artifact:
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = step) 
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
     if date_art_list:
-        date_art_list.sort()
+        date_art_list.sort(key = operator.itemgetter(0))
         latest_outart = date_art_list[-1]
         for inart in latest_outart[1].input_artifact_list():
             if lims_id in [sample.id for sample in inart.samples]:
@@ -247,11 +270,11 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str) -> int:
         return None
 
 
-def build_sample(sample: Sample)-> dict:
+def build_sample(sample: Sample)-> dict: #def build_sample(sample: Sample, lims: Lims)-> dict:
     """Parse lims sample"""
     application_tag = sample.udf.get('Sequencing Analysis')
 
-    mongo_sample = {'lims_id' : sample.id}
+    mongo_sample = {'_id' : sample.id}
     mongo_sample['family'] = sample.udf.get('Family')
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
