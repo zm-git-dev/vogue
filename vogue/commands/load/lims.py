@@ -1,6 +1,6 @@
 import click
 from vogue.load.sample import load_one_sample, dry_run, load_all_samples
-
+LOG = logging.getLogger(__name__)
 
 @click.command("lims", short_help = "load lims into db.")
 @click.option('-s', '--sample-lims-id', help = 'Input sample lims id')
