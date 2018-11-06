@@ -5,7 +5,7 @@ from vogue.load.sample import load_one_sample, dry_run, load_all_samples
 @click.command("lims", short_help = "load lims into db.")
 @click.option('-s', '--sample-lims-id', help = 'Input sample lims id')
 @click.option('--load-all/--no-load-all', default = False, help = 'Loads all lims sample ids')
-@click.option('--dry/--no-dry', default = True, show_default = True,
+@click.option('--dry-run', is_flag=True, help='If dry run')
                 help = 'Load from sample or not. (dry-run)')
 @click.pass_context
 
