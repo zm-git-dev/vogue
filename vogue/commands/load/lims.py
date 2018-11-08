@@ -1,3 +1,4 @@
+import logging
 import click
 from vogue.load.sample import load_one_sample, load_all_samples
 
