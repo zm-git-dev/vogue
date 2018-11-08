@@ -11,7 +11,6 @@ class VougeAdapter(MongoAdapter):
 
         if self.client is None:
             raise SyntaxError("No client is available")
-
         self.db = self.client[db_name]
         self.sample_collection = self.db.sample
         LOG.info(f"Use database {db_name}.")
@@ -33,6 +32,9 @@ class VougeAdapter(MongoAdapter):
             LOG.info(f"Updated sample {lims_id}.")                
         else:
             LOG.info(f"No updates for sample {lims_id}.")
+
+    def sample(self, lims_id):
+        return self.sample_collection.find_one({'_id':lims_id})        
 
 
     def delete_sample(self):
