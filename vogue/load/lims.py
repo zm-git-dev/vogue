@@ -2,8 +2,8 @@ from genologics.lims import Lims
 from genologics.entities import Sample, Artifact
 from genologics.config import BASEURI,USERNAME,PASSWORD
 from datetime import datetime as dt
+import operator
 lims = Lims(BASEURI,USERNAME,PASSWORD)
-
 
 def get_sequenced_date(sample: Sample)-> dt.date:
     """Get the date when a sample passed sequencing."""
@@ -113,7 +113,7 @@ def _get_latest_input_artifact(step: str, lims_id: str) -> Artifact:
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = step) 
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
     if date_art_list:
-        date_art_list.sort()
+        date_art_list.sort(key = operator.itemgetter(0))
         latest_outart = date_art_list[-1]
         for inart in latest_outart[1].input_artifact_list():
             if lims_id in [sample.id for sample in inart.samples]:
@@ -251,7 +251,7 @@ def build_sample(sample: Sample)-> dict:
     """Parse lims sample"""
     application_tag = sample.udf.get('Sequencing Analysis')
 
-    mongo_sample = {'lims_id' : sample.id}
+    mongo_sample = {'_id' : sample.id}
     mongo_sample['family'] = sample.udf.get('Family')
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
