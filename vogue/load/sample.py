@@ -1,6 +1,8 @@
 from genologics.entities import Sample
+from genologics.lims import Lims
+
 import logging
-from vogue.load.lims import build_sample
+from vogue.build.lims import build_sample
 LOG = logging.getLogger(__name__)
    
 
@@ -9,7 +11,7 @@ def load_one_sample(adapter, lims_id=None, lims_sample=None, lims=None, dry_run=
     if not lims_sample:
         LOG.critical("The sample does not exist in the database in the LIMS database.")
         raise SyntaxError()
-    mongo_sample = build_sample(lims_sample)
+    mongo_sample = build_sample(lims_sample, lims)
     
     if dry_run:
         existing_sample = adapter.sample(lims_sample.id)
@@ -28,4 +30,4 @@ def load_all_samples(adapter, lims, dry_run=False):
         return
     for sample in lims.get_samples():
         LOG.info(sample.id)
-        load_one_sample(adapter, lims_sample=sample, dry_run=dry_run)
+        load_one_sample(adapter, lims_sample=sample, dry_run=dry_run, lims=lims)

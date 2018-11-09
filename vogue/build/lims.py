@@ -1,0 +1,47 @@
+from genologics.entities import Sample
+from genologics.lims import Lims
+
+from vogue.build.lims_utils import *
+
+
+def build_sample(sample: Sample, lims: Lims)-> dict:
+    """Parse lims sample"""
+    application_tag = sample.udf.get('Sequencing Analysis')
+
+    mongo_sample = {'_id' : sample.id}
+    mongo_sample['family'] = sample.udf.get('Family')
+    mongo_sample['strain'] = sample.udf.get('Strain')
+    mongo_sample['source'] = sample.udf.get('Source')
+
+    conc_and_amount = get_final_conc_and_amount_dna(application_tag, sample.id, lims)
+    mongo_sample['amount'] = conc_and_amount.get('amount')
+    mongo_sample['amount-concentration'] = conc_and_amount.get('concentration')
+
+    concantration_and_nr_defrosts = get_concantration_and_nr_defrosts(application_tag, sample.id, lims)
+    mongo_sample['nr_defrosts'] = concantration_and_nr_defrosts.get('nr_defrosts', lims)
+    mongo_sample['nr_defrosts-concentration'] = concantration_and_nr_defrosts.get('concentration')
+    mongo_sample['lotnr'] = concantration_and_nr_defrosts.get('lotnr')
+
+    mongo_sample['microbial_library_concentration'] = get_microbial_library_concentration(application_tag, sample.id, lims)
+    mongo_sample['library_size_pre_hyb'] = get_library_size_pre_hyb(application_tag, sample.id, lims)
+    mongo_sample['library_size_post_hyb'] = get_library_size_post_hyb(application_tag, sample.id, lims)
+
+    sequenced_at = get_sequenced_date(sample, lims)
+    received_at = get_received_date(sample, lims)
+    prepared_at = get_prepared_date(sample, lims)
+    delivered_at = get_delivery_date(sample, lims)
+
+    mongo_sample['sequenced_date'] = sequenced_at
+    mongo_sample['received_date'] = received_at
+    mongo_sample['prepared_date'] = prepared_at
+    mongo_sample['delivery_date'] = delivered_at
+    mongo_sample['sequenced_to_delivered'] = get_sequenced_to_delivered(delivered_at, sequenced_at)
+    mongo_sample['prepped_to_sequenced'] = get_prepped_to_sequenced(prepared_at, sequenced_at)
+    mongo_sample['received_to_prepped'] = get_received_to_prepped(prepared_at, received_at)
+    mongo_sample['received_to_delivered'] = get_received_to_delivered(delivered_at, received_at)
+
+    for key in list(mongo_sample.keys()):
+        if mongo_sample[key] is None:
+            mongo_sample.pop(key)
+
+    return mongo_sample
