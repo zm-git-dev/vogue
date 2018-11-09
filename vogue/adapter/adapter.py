@@ -24,11 +24,11 @@ class VougeAdapter(MongoAdapter):
 
         if not update_result.raw_result['updatedExisting']:
             self.db.sample.update_one({'_id' : lims_id}, 
-                {'$set': {'added': dt.today().date().isoformat()}})
+                {'$set': {'added': dt.today()}})
             LOG.info(f"Added sample {lims_id}.")
         elif update_result.modified_count:
             self.db.sample.update_one({'_id' : lims_id}, 
-                {'$set': {'updated': dt.today().date().isoformat()}})
+                {'$set': {'updated': dt.today()}})
             LOG.info(f"Updated sample {lims_id}.")                
         else:
             LOG.info(f"No updates for sample {lims_id}.")
