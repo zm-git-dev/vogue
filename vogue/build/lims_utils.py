@@ -10,14 +10,13 @@ def str_to_datetime(date: str)-> dt:
         return None
     return dt.strptime(date, '%Y-%m-%d')
 
+
 def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
     """Get the date when a sample passed sequencing."""
 
-    #process_type = 'CG002 - Sequence Aggregation' unsure wich we should use acually
     process_types = ['CG002 - Illumina Sequencing (HiSeq X)', 
-                     'CG002 - Illumina Sequencing (Illumina SBS)'] 
+                     'CG002 - Illumina Sequencing (Illumina SBS)']  #process_type = 'CG002 - Sequence Aggregation' unsure wich we should use acually
     udf = 'Passed Sequencing QC'
-
 
     sample_udfs = sample.udf.get(udf)
     if not sample_udfs:
@@ -33,49 +32,61 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
         art_date = str_to_datetime(art.parent_process.date_run)
         if art_date > final_date:
             final_date = art_date
-    
     return final_date
     
 
 def get_received_date(sample: Sample, lims: Lims)-> dt:
     """Get the date when a sample was received."""
+
     process_type = 'CG002 - Reception Control'
     udf = 'date arrived at clinical genomics'
     artifacts = lims.get_artifacts(process_type = process_type,
                                             samplelimsid = sample.id)
+    received_date = None
+
     for artifact in artifacts:   
         if artifact.parent_process and artifact.parent_process.udf.get(udf):
             date_string = artifact.parent_process.udf.get(udf).isoformat()
-            return str_to_datetime(date_string)
-    return None 
+            received_date = str_to_datetime(date_string)
+    return received_date 
 
 def get_prepared_date(sample: Sample, lims: Lims)-> dt:
     """Get the last date when a sample was prepared in the lab."""
+
     process_type = 'CG002 - Aggregate QC (Library Validation)'
     artifacts = lims.get_artifacts(process_type=process_type, 
                                     samplelimsid = sample.id)
-    if artifacts:
-        final_date = str_to_datetime(artifacts[0].parent_process.date_run)
-        for art in artifacts:
-            art_date = str_to_datetime(art.parent_process.date_run)
-            if art_date > final_date:
-                final_date = art_date
-        return final_date
-    return None
+    
+    prepared_dates = [art.parent_process.date_run for art in artifacts]
+    if prepared_dates:
+        prepared_date = str_to_datetime(min(prepared_dates))
+    else:
+        prepared_date = None
+    return prepared_date
+
 
 def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     """Get delivery date for a sample."""
+
     process_type = 'CG002 - Delivery'
     artifacts = lims.get_artifacts(samplelimsid = sample.id, process_type = process_type,
                                    type = 'Analyte')
-    if len(artifacts) == 1:
-        date_string = artifacts[0].parent_process.udf.get('Date delivered').isoformat()
-        return str_to_datetime(date_string)
-    elif len(artifacts) > 1:
-        #log.warning(f"multiple delivery artifacts found for: {lims_id}")
-        date_string = min(artifact.parent_process.udf['Date delivered'] for artifact in artifacts).isoformat()
-        return str_to_datetime(date_string)
-    return None
+    delivery_dates = [] # if for some strange reason there would be more than one
+
+    for art in artifacts:
+        art_date = art.parent_process.udf.get('Date delivered')
+        if art_date:
+            delivery_dates.append(str_to_datetime(art_date.isoformat()))
+    
+    if len(delivery_dates) > 1:
+         pass #log.warning(f"multiple delivery artifacts found for: {lims_id}")
+    if delivery_dates:
+        delivery_date= min(delivery_dates)
+    else:
+        delivery_date = None
+
+    return delivery_date
+
 
 #def get_delivered_to_invoiced(self):
         # """Get time between different time stamps."""
@@ -86,68 +97,80 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
 #            except:
 #                pass
 
+
 def get_sequenced_to_delivered(delivered_at: str, sequenced_at: str) -> int:
+    """Get number of days between different time stamps."""
+
     if delivered_at and sequenced_at:
-        try:
-            delivered = dt.strptime(delivered_at,'%Y-%m-%d')
-            sequenced = dt.strptime(sequenced_at,'%Y-%m-%d')
-            sequenced_to_delivered = delivered - sequenced
-            return sequenced_to_delivered.days
-        except:
-            return None
+        sequenced_to_delivered = delivered_at - sequenced_at
+        sequenced_to_delivered = sequenced_to_delivered.days
+    else:
+        sequenced_to_delivered = None
+    return sequenced_to_delivered
+
 
 def get_prepped_to_sequenced(prepared_at: str, sequenced_at: str) -> int:
+    """Get number of days between different time stamps."""
+
     if prepared_at and sequenced_at:
-        try:
-            prepared = dt.strptime(prepared_at,'%Y-%m-%d')
-            sequenced = dt.strptime(sequenced_at,'%Y-%m-%d')
-            prepped_to_sequenced = sequenced - prepared
-            return prepped_to_sequenced.days
-        except:
-            return None
+        prepped_to_sequenced = sequenced_at - prepared_at
+        prepped_to_sequenced = prepped_to_sequenced.days
+    else:
+        prepped_to_sequenced = None
+    return prepped_to_sequenced
+
 
 def get_received_to_prepped(prepared_at: str, received_at: str) -> int:
+    """Get number of days between different time stamps."""
+
     if prepared_at and received_at:
-        try:
-            prepared = dt.strptime(prepared_at,'%Y-%m-%d')
-            received = dt.strptime(received_at,'%Y-%m-%d')
-            received_to_prepped = prepared - received
-            return received_to_prepped.days
-        except:
-            return None
+        received_to_prepped = prepared_at - received_at
+        received_to_prepped = received_to_prepped.days
+    else:
+        received_to_prepped = None
+    return received_to_prepped
+
 
 def get_received_to_delivered(delivered_at: str, received_at: str) -> int:
+    """Get number of days between different time stamps."""
+
     if delivered_at and received_at:
-        try:
-            delivered = dt.strptime(delivered_at,'%Y-%m-%d')
-            received = dt.strptime(received_at,'%Y-%m-%d')
-            received_to_delivered = delivered - received
-            return received_to_delivered.days
-        except:
-            return None
+        received_to_delivered = delivered_at - received_at
+        received_to_delivered = received_to_delivered.days
+    else:
+        received_to_delivered = None
+    return received_to_delivered
 
 
-def _get_latest_input_artifact(step: str, lims_id: str, lims: Lims) -> Artifact:
-    """Returns the input artifact related to lims_id and the step that was latest run."""
-    artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = step) 
+def _get_latest_output_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
+    """Returns the output artifact related to lims_id and the step that was latest run."""
+
+    artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type, type = 'Analyte')
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
+    latest_output_artifact = None
+
     if date_art_list:
         date_art_list.sort(key = operator.itemgetter(0))
-        latest_outart = date_art_list[-1]
-        for inart in latest_outart[1].input_artifact_list():
-            if lims_id in [sample.id for sample in inart.samples]:
-                return inart                  
-    return None
+        dummy, latest_output_artifact = date_art_list[-1] #get latest
+    return latest_output_artifact
 
-def _get_latest_output_artifact(step: str, lims_id: str, lims: Lims) -> Artifact:
-    """Returns the output artifact related to lims_id and the step that was latest run."""
-    artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = step, type = 'Analyte')
+
+def _get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
+    """Returns the input artifact related to lims_id and the step that was latest run."""
+
+    artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type) 
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
+    latest_input_artifact = None
+
     if date_art_list:
-        date_art_list.sort()
-        latest_outart = date_art_list[-1]
-        return latest_outart[1]               
-    return None
+        date_art_list.sort(key = operator.itemgetter(0))
+        dummy, latest_outart = date_art_list[-1] #get latest
+        for inart in latest_outart.input_artifact_list():
+            if lims_id in [sample.id for sample in inart.samples]:
+                latest_input_artifact = inart 
+                break        
+
+    return latest_input_artifact
 
 
 def get_concantration_and_nr_defrosts(application_tag: str, lims_id: str, lims: Lims) -> dict:
@@ -165,12 +188,13 @@ def get_concantration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
     lot_nr_udf = 'Lot no: TruSeq DNA PCR-Free Sample Prep Kit'
     concentration_udf = 'Concentration (nM)'
 
+    return_dict = {}
     concentration_art = _get_latest_input_artifact(concentration_step, lims_id, lims)
 
     if concentration_art:
         concentration = concentration_art.udf.get(concentration_udf)
-        lotnr = concentration_art.parent_process.udf.get(lot_nr_udf)
-        defrosts = lims.get_processes(type=lot_nr_step, udf={lot_nr_udf : lotnr}) 
+        lotnr = concentration_art.parent_process.udf.get(lot_nr_udf).strip() #handle multiple lot numbers!
+        defrosts = lims.get_processes(type=lot_nr_step, udf={lot_nr_udf : lotnr})
         defrosts_before_latest_process = []
 
         for defrost in defrosts:
@@ -179,9 +203,11 @@ def get_concantration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
                 defrosts_before_latest_process.append(defrost)
 
         nr_defrosts = len(defrosts_before_latest_process)
-            
-        return {'nr_defrosts':nr_defrosts, 'concentration':concentration, 'lotnr':lotnr}
-    return {}
+
+        return_dict = {'nr_defrosts':nr_defrosts, 'concentration':concentration, 'lotnr':lotnr}
+
+    return return_dict
+
 
 def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims) -> dict:
     """Find the latest artifact that passed through a concentration_step and get its concentration_udf.
@@ -195,10 +221,10 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
     concentration_step = 'CG002 - Aggregate QC (Library Validation)'
     amount_step = 'CG002 - Aggregate QC (DNA)'
 
+    return_dict = {}
     concentration_art = _get_latest_input_artifact(concentration_step, lims_id, lims)
 
     if concentration_art:
-
         amount_art = None
         step = concentration_art.parent_process
         while step and not amount_art:
@@ -209,8 +235,9 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
         
         amount = amount_art.udf.get(amount_udf) if amount_art else None
         concentration = concentration_art.udf.get(concentration_udf)
-        return {'amount' : amount, 'concentration':concentration}
-    return {}
+        return_dict = {'amount' : amount, 'concentration':concentration}
+        
+    return return_dict
 
 
 def get_microbial_library_concentration(application_tag: str, lims_id: str, lims: Lims) -> float:
@@ -218,7 +245,7 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
     Get concentration_udf from concentration_step."""
 
     if not application_tag[3:5] == 'NX':
-        return
+        return None
 
     concentration_step = 'CG002 - Aggregate QC (Library Validation)'
     concentration_udf = 'Concentration (nM)'
@@ -236,7 +263,7 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     Get size_udf from size_step."""
 
     if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
-        return
+        return None
 
     size_step = 'CG002 - Amplify Adapter-Ligated Library (SS XT)'
     size_udf = 'Size (bp)'
@@ -254,7 +281,7 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) ->
     Get size_udf from size_step."""
 
     if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
-        return
+        return None
 
     size_step = 'CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'
     size_udf = 'Size (bp)'

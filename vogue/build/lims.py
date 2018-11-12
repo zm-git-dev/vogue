@@ -18,7 +18,7 @@ def build_sample(sample: Sample, lims: Lims)-> dict:
     mongo_sample['amount-concentration'] = conc_and_amount.get('concentration')
 
     concantration_and_nr_defrosts = get_concantration_and_nr_defrosts(application_tag, sample.id, lims)
-    mongo_sample['nr_defrosts'] = concantration_and_nr_defrosts.get('nr_defrosts', lims)
+    mongo_sample['nr_defrosts'] = concantration_and_nr_defrosts.get('nr_defrosts')
     mongo_sample['nr_defrosts-concentration'] = concantration_and_nr_defrosts.get('concentration')
     mongo_sample['lotnr'] = concantration_and_nr_defrosts.get('lotnr')
 
