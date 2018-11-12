@@ -1,15 +1,11 @@
 #!/usr/bin/env python
+import logging
+
 import click
 
 from mongo_adapter import get_client
 from vogue.adapter.adapter import VougeAdapter
 
-from genologics.lims import Lims
-from genologics.entities import Sample
-from genologics.config import BASEURI,USERNAME,PASSWORD
-LIMS = Lims(BASEURI,USERNAME,PASSWORD)
-
-import logging
 LOG = logging.getLogger(__name__)
 
 # commands
@@ -39,7 +35,7 @@ def load(context, database_name, database_uri):
     
     adapter = VougeAdapter(client, db_name=database_name)
     context.obj['adapter'] = adapter
-    context.obj['lims'] = LIMS
+
     
 
 load.add_command(analysis_command)
