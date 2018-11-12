@@ -5,3 +5,5 @@ pymongo
 genologics
 yapf
 flask
+coloredlogs
+mongo_adapter
