@@ -14,7 +14,10 @@ def str_to_datetime(date: str)-> dt:
 
 
 def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
-    """Get the date when a sample passed sequencing."""
+    """Get the date when a sample passed sequencing.
+    
+    This will return the last time that the sample passed sequencing.
+    """
 
     process_types = ['CG002 - Illumina Sequencing (HiSeq X)', 
                      'CG002 - Illumina Sequencing (Illumina SBS)']  
@@ -24,55 +27,56 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
     if not sample_udfs:
         return None
 
-    artifacts = lims.get_artifacts(process_type = process_types, samplelimsid = sample.id)
-    if not artifacts:
-        return None
-
-    final_date = str_to_datetime(artifacts[0].parent_process.date_run)
-    for art in artifacts:
-        art_date = str_to_datetime(art.parent_process.date_run)
-        if art_date > final_date:
-            final_date = art_date
+    final_date = None
+    artifact = get_latest_output_artifact(process_type=process_types, lims_id=sample.id, lims=lims)
+    if artifact:
+        final_date = str_to_datetime(artifact.parent_process.date_run)
 
     return final_date
     
 
 def get_received_date(sample: Sample, lims: Lims)-> dt:
-    """Get the date when a sample was received."""
+    """Get the date when a sample was received.
+    
+    Here we do not consider first or latest parent process.
+    Assumption is that there is only one received date
+    """
 
     process_type = 'CG002 - Reception Control'
     udf = 'date arrived at clinical genomics'
     artifacts = lims.get_artifacts(process_type = process_type, samplelimsid = sample.id)
+    
     received_date = None
-
-    for artifact in artifacts:   
-        if artifact.parent_process and artifact.parent_process.udf.get(udf):
-            date_string = artifact.parent_process.udf.get(udf).isoformat()
-            received_date = str_to_datetime(date_string)
+    for artifact in artifacts:  
+        parent_udf = artifact.parent_process.udf.get(udf)
+        if artifact.parent_process and parent_udf:
+            received_date = str_to_datetime(parent_udf.isoformat())
 
     return received_date 
-
 
 def get_prepared_date(sample: Sample, lims: Lims)-> dt:
     """Get the last date when a sample was prepared in the lab."""
 
     process_type = 'CG002 - Aggregate QC (Library Validation)'
-    artifacts = lims.get_artifacts(process_type=process_type, 
-                                    samplelimsid = sample.id)
     
-    prepared_dates = [art.parent_process.date_run for art in artifacts]
+    artifact = get_latest_output_artifact(process_type=process_type, lims_id=sample.id, lims=lims)
+    
     prepared_date = None
-
-    if prepared_dates:
-        prepared_date = str_to_datetime(min(prepared_dates))
+    if artifact:
+        prepared_date = str_to_datetime(artifact.parent_process.date_run)
 
     return prepared_date
 
 
 def get_delivery_date(sample: Sample, lims: Lims)-> dt:
-    """Get delivery date for a sample."""
+    """Get delivery date for a sample.
+    
+    This will return the first time a sample was delivered
+    """
 
     process_type = 'CG002 - Delivery'
+    # Should we use type = 'Analyte' or 'Analyse'. We do not use type anywhere else
+    # There should be a comment about it
     artifacts = lims.get_artifacts(samplelimsid = sample.id, process_type = process_type,
                                    type = 'Analyte')
     delivery_date = None
@@ -103,7 +107,7 @@ def get_number_of_days(first_date: dt, second_date : dt) -> int:
 
     return days
 
-def _get_latest_output_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
+def get_latest_output_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
     """Returns the output artifact related to lims_id and the step that was latest run."""
 
     latest_output_artifact = None
@@ -120,7 +124,7 @@ def _get_latest_output_artifact(process_type: str, lims_id: str, lims: Lims) -> 
     return latest_output_artifact
 
 
-def _get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
+def get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
     """Returns the input artifact related to lims_id and the step that was latest run."""
 
     latest_input_artifact = None
@@ -161,7 +165,7 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
     concentration_udf = 'Concentration (nM)'
 
     return_dict = {}
-    concentration_art = _get_latest_input_artifact(concentration_step, lims_id, lims)
+    concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
 
     if concentration_art:
         concentration = concentration_art.udf.get(concentration_udf)
@@ -200,7 +204,7 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
     concentration_step = 'CG002 - Aggregate QC (Library Validation)'
     amount_step = 'CG002 - Aggregate QC (DNA)'
 
-    concentration_art = _get_latest_input_artifact(concentration_step, lims_id, lims)
+    concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
 
     if concentration_art:
         amount_art = None
@@ -256,7 +260,7 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     size_step = 'CG002 - Amplify Adapter-Ligated Library (SS XT)'
     size_udf = 'Size (bp)'
 
-    size_art = _get_latest_output_artifact(size_step, lims_id, lims)
+    size_art = get_latest_output_artifact(size_step, lims_id, lims)
 
     if size_art:
         return size_art.udf.get(size_udf)
@@ -274,7 +278,7 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) ->
     size_step = 'CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'
     size_udf = 'Size (bp)'
 
-    size_art = _get_latest_output_artifact(size_step, lims_id, lims)
+    size_art = get_latest_output_artifact(size_step, lims_id, lims)
 
     if size_art:
         return size_art.udf.get(size_udf)
