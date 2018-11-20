@@ -29,9 +29,12 @@ class MockArtifact():
 
     def input_artifact_list(self):
         return self.input_list
+<<<<<<< HEAD
 
     def __repr__(self):
         return f"Artifact:parent_process={self.parent_process},samples={self.samples}"
+=======
+>>>>>>> another test for get_latest_input_artifact
 
 
 class MockLims():
@@ -46,7 +49,11 @@ class MockLims():
         if process_type:
             arts = []
             for art in self.artifacts:
+<<<<<<< HEAD
                 if art.parent_process and art.parent_process.type in process_type:
+=======
+                if art.parent_process and art.parent_process.type == process_type:
+>>>>>>> another test for get_latest_input_artifact
                     arts.append(art)
         return arts
     
@@ -65,6 +72,10 @@ class MockLims():
         self.samples.append(sample)
         return sample
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> another test for get_latest_input_artifact
 
 class MockSample():
     def __init__(self, sample_id='sample', lims=MockLims(), udfs={}):
