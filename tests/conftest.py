@@ -34,7 +34,6 @@ class MockArtifact():
         return f"Artifact:parent_process={self.parent_process},samples={self.samples}"
 
 
-
 class MockLims():
     def __init__(self):
         self.artifacts = []
@@ -67,13 +66,15 @@ class MockLims():
         return sample
 
 
-
-
 class MockSample():
     def __init__(self, sample_id='sample', lims=MockLims(), udfs={}):
         self.id = sample_id
         self.udf = udfs
 
+
+@pytest.fixture
+def artifacts_with_different_dates():
+    return MockArtifact()
 
 @pytest.fixture
 def lims():

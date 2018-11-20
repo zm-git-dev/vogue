@@ -110,7 +110,6 @@ def test_get_latest_output_artifact(lims):
     ##THEN latest_output_artifact should be run on 2018-03-01
     assert latest_output_artifact.parent_process.date_run == date3
 
-
 def test_get_latest_input_artifact(lims):
     ##GIVEN a lims with three artifacts with diferent parent processes with 
     # diferent date_run dates: 2018-01-01, 2018-02-01, 2018-03-01.
@@ -146,6 +145,3 @@ def test_get_latest_input_artifact(lims):
 
     ##THEN latest_input_artifact should be in_art1
     assert latest_input_artifact == in_art1
-
-
-
