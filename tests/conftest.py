@@ -73,10 +73,6 @@ class MockSample():
 
 
 @pytest.fixture
-def artifacts_with_different_dates():
-    return MockArtifact()
-
-@pytest.fixture
 def lims():
     return MockLims()
 
