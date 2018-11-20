@@ -125,7 +125,6 @@ class MockLims():
         return (f"Lims:artifacts={self.artifacts},process={self.processes},"
                 "process_types={self.process_types},samples={self.samples}")
 
-
 class MockSample():
     def __init__(self, sample_id='sample', udfs={}):
         self.id = sample_id
@@ -134,6 +133,11 @@ class MockSample():
     def __repr__(self):
         return f"Sample:id={self.id},udf={self.udf}"
 
+
+
+@pytest.fixture
+def artifacts_with_different_dates():
+    return MockArtifact()
 
 @pytest.fixture
 def lims():
