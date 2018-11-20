@@ -13,26 +13,38 @@ DATABASE = 'vogue'
 
 
 class MockProcess():
-    def __init__(self, date_str = None, process_type = None):
+    def __init__(self, date_str = '2018-01-01', process_type = None):
         self.date_run = date_str
         self.type = process_type
 
 class MockArtifact():
-    def __init__(self, parent_process = None):
+    def __init__(self, parent_process = None, samples = None):
         self.parent_process = parent_process
+        self.samples = samples
+        self.input_list = []
+
+    def input_artifact_list(self):
+        return self.input_list
 
 
 class MockLims():
     def __init__(self):
         self.artifacts = []
         self.processes = []
+        self.samples = []
     
     def get_artifacts(self, process_type, samplelimsid)-> list:
         """"Get a list of artifacts."""
-        return self.artifacts
+        arts = self.artifacts
+        if process_type:
+            arts = []
+            for art in self.artifacts:
+                if art.parent_process and art.parent_process.type == process_type:
+                    arts.append(art)
+        return arts
     
-    def _add_artifact(self, parent_process = None):
-        artifact = MockArtifact(parent_process)
+    def _add_artifact(self, parent_process = None, samples = []):
+        artifact = MockArtifact(parent_process, samples)
         self.artifacts.append(artifact)
         return artifact
 
@@ -40,6 +52,12 @@ class MockLims():
         process = MockProcess(date_str, process_type)
         self.processes.append(process)
         return process
+
+    def _add_sample(self,sample_id):
+        sample = MockSample(sample_id = sample_id)
+        self.samples.append(sample)
+        return sample
+
 
 
 class MockSample():
