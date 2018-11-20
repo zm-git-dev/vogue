@@ -13,23 +13,34 @@ DATABASE = 'vogue'
 
 
 class MockProcess():
-    def __init__(self, date_str = '2014-01-28'):
+    def __init__(self, date_str = None, process_type = None):
         self.date_run = date_str
+        self.type = process_type
 
 class MockArtifact():
-    def __init__(self):
-        self.parent_process = MockProcess()
+    def __init__(self, parent_process = None):
+        self.parent_process = parent_process
+
 
 class MockLims():
     def __init__(self):
         self.artifacts = []
+        self.processes = []
     
     def get_artifacts(self, process_type, samplelimsid)-> list:
         """"Get a list of artifacts."""
         return self.artifacts
     
-    def _add_artifact(self, artifact):
+    def _add_artifact(self, parent_process = None):
+        artifact = MockArtifact(parent_process)
         self.artifacts.append(artifact)
+        return artifact
+
+    def _add_process(self, date_str = None, process_type = None):
+        process = MockProcess(date_str, process_type)
+        self.processes.append(process)
+        return process
+
 
 class MockSample():
     def __init__(self, sample_id='sample', lims=MockLims(), udfs={}):
@@ -38,7 +49,9 @@ class MockSample():
 
 
 
-
+@pytest.fixture
+def artifacts_with_different_dates():
+    return MockArtifact()
 
 @pytest.fixture
 def lims():
