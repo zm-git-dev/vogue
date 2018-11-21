@@ -1,9 +1,11 @@
 from flask import make_response, flash, abort, url_for, redirect, render_template, request, session
 from flask_login import login_user,logout_user, current_user, login_required
-from flask.ext.mail import Message
+#from flask.ext.mail import Message
 from flask_oauthlib.client import OAuthException
+
 from extentions import app
-from vogue import PrepsCommon
+from vogue.server.vogue import find_recived_per_month, find_recived_to_delivered
+
 from  datetime import date
 
 THIS_YEAR = date.today().year
@@ -20,10 +22,12 @@ def index():
 
 @app.route('/prepps/common/<year_of_interest>')
 def common(year_of_interest):
-    PC = PrepsCommon(year_of_interest)
-    turnaround_times = PC.make_data('turnaround_times')
-    received = PC.make_data('received')
-    received_application = PC.make_data('received_application')
+    group_by = ['research', 'diagnostic','standard']
+    group_key = "priority"
+    received = find_recived_per_month(year_of_interest, group_by, group_key)
+    received_application = find_recived_per_month(year_of_interest, group_by, group_key) #wrong groups!!!
+    turnaround_times = find_recived_to_delivered(year_of_interest, group_by, group_key) #wrong groups!!!
+
     return render_template('common.html',
         header = 'Common',
         received = received,
