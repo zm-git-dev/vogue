@@ -4,6 +4,8 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
+
+
 class VougeAdapter(MongoAdapter):
 
     def setup(self, db_name : str):
@@ -39,4 +41,16 @@ class VougeAdapter(MongoAdapter):
 
     def delete_sample(self):
         return None
+
+    def find_samples(self, query:dict)-> list:
+        samples = self.sample_collection.find(query)
+        return list(samples)
+
+        
+
+
+
+
+
+
 
