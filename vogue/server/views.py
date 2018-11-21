@@ -34,7 +34,6 @@ def common(year_of_interest):
                                         'prepped_to_sequenced' ,adapter) #wrong groups!!!
     sequenced_to_delivered = turn_around_times(year_of_interest, group_by, group_key, 
                                         'sequenced_to_delivered' ,adapter) #wrong groups!!!
-    
 
     return render_template('common.html',
         header = 'Common',

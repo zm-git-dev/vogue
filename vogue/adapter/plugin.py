@@ -5,7 +5,13 @@ from datetime import datetime as dt
 LOG = logging.getLogger(__name__)
 
 
+<<<<<<< HEAD:vogue/adapter/plugin.py
 class VogueAdapter(MongoAdapter):
+=======
+
+
+class VougeAdapter(MongoAdapter):
+>>>>>>> under development!:vogue/adapter/adapter.py
 
     def setup(self, db_name : str):
         """Setup connection to a database"""
@@ -42,6 +48,7 @@ class VogueAdapter(MongoAdapter):
     def delete_sample(self):
         return None
 
+<<<<<<< HEAD:vogue/adapter/plugin.py
     def load_analysis(self, analysis_obj):
         """Insert an analysis into the database"""
         res = self.analysis_collection.insert_one(analysis_obj)
@@ -55,3 +62,17 @@ class VogueAdapter(MongoAdapter):
     def find_samples(self, query:dict)-> list:
         samples = self.sample_collection.find(query)
         return list(samples)
+=======
+    def find_samples(self, query:dict)-> list:
+        samples = self.sample_collection.find(query)
+        return list(samples)
+
+        
+
+
+
+
+
+
+
+>>>>>>> under development!:vogue/adapter/adapter.py
