@@ -29,7 +29,7 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
 
     final_date = None
     # Get the last atrtifact
-    artifact = get_output_artifact(process_type=process_types, lims_id=sample.id, lims=lims, last=True)
+    artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=True)
     if artifact:
         final_date = str_to_datetime(artifact.parent_process.date_run)
 
@@ -43,9 +43,9 @@ def get_received_date(sample: Sample, lims: Lims)-> dt:
     Assumption is that there is only one received date.
     """
 
-    process_type = 'CG002 - Reception Control'
+    process_types = ['CG002 - Reception Control']
     udf = 'date arrived at clinical genomics'
-    artifact = get_output_artifact(process_type = process_type, lims_id = sample.id, lims=lims, last=False)
+    artifact = get_output_artifact(process_types = process_types, lims_id = sample.id, lims=lims, last=False)
 
     datetime_arrived = None
     # This is a datetime.date object
@@ -61,9 +61,9 @@ def get_received_date(sample: Sample, lims: Lims)-> dt:
 def get_prepared_date(sample: Sample, lims: Lims)-> dt:
     """Get the first date when a sample was prepared in the lab.
     """
-    process_type = 'CG002 - Aggregate QC (Library Validation)'
+    process_types = ['CG002 - Aggregate QC (Library Validation)']
 
-    artifact = get_output_artifact(process_type=process_type, lims_id=sample.id, lims=lims, last=False)
+    artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
 
     prepared_date = None
     if artifact:
@@ -77,10 +77,10 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     This will return the first time a sample was delivered
     """
 
-    process_type = 'CG002 - Delivery'
+    process_types = ['CG002 - Delivery']
     udf = 'date arrived at clinical genomics'
     
-    artifact = get_output_artifact(process_type=process_type, lims_id=sample.id, lims=lims, last=False)
+    artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
     delivery_date = None
     
     art_date = None
@@ -104,13 +104,12 @@ def get_number_of_days(first_date: dt, second_date : dt) -> int:
 
     return days
 
-def get_output_artifact(process_type: str, lims_id: str, lims: Lims, last: bool = True) -> Artifact:
+def get_output_artifact(process_types: list, lims_id: str, lims: Lims, last: bool = True) -> Artifact:
     """Returns the output artifact related to lims_id and the step that was first/latest run.
     
     If last = False return the first artifact
     """
-    artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type)
-
+    artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_types)
     artifact = None
     date = None
     for art in artifacts:
@@ -269,7 +268,7 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
         return None
 
-    size_step = 'CG002 - Amplify Adapter-Ligated Library (SS XT)'
+    size_step = ['CG002 - Amplify Adapter-Ligated Library (SS XT)']
     size_udf = 'Size (bp)'
 
     size_art = get_output_artifact(size_step, lims_id, lims, latest=True)
@@ -287,7 +286,7 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) ->
     if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
         return None
 
-    size_step = 'CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'
+    size_step = ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)']
     size_udf = 'Size (bp)'
 
     size_art = get_output_artifact(size_step, lims_id, lims, latest=True)
