@@ -3,9 +3,9 @@
 from mongo_adapter import get_client
 from datetime import date
 
-from vogue.adapter.adapter import VougeAdapter
+from vogue.adapter import VogueAdapter
 client = get_client(uri = "mongodb://localhost:27017")
-adapter = VougeAdapter(client, db_name = 'trending')
+adapter = VogueAdapter(client, db_name = 'trending')
 
 
 
