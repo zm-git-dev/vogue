@@ -28,7 +28,8 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
         return None
 
     final_date = None
-    artifact = get_latest_output_artifact(process_type=process_types, lims_id=sample.id, lims=lims)
+    # Get the last atrtifact
+    artifact = get_output_artifact(process_type=process_types, lims_id=sample.id, lims=lims, last=True)
     if artifact:
         final_date = str_to_datetime(artifact.parent_process.date_run)
 
@@ -39,34 +40,36 @@ def get_received_date(sample: Sample, lims: Lims)-> dt:
     """Get the date when a sample was received.
     
     Here we do not consider first or latest parent process.
-    Assumption is that there is only one received date
+    Assumption is that there is only one received date.
     """
 
     process_type = 'CG002 - Reception Control'
     udf = 'date arrived at clinical genomics'
-    artifacts = lims.get_artifacts(process_type = process_type, samplelimsid = sample.id)
-    
-    received_date = None
-    for artifact in artifacts:  
-        parent_udf = artifact.parent_process.udf.get(udf)
-        if artifact.parent_process and parent_udf:
-            received_date = str_to_datetime(parent_udf.isoformat())
+    artifacts = lims.get_output_artifact(process_type = process_type, samplelimsid = sample.id, last=False)
 
-    return received_date 
+    datetime_arrived = None
+    # This is a datetime.date object
+    date_arrived = None
+    if artifact:
+        date_arrived = artifact.parent_process.udf.get(udf)
+    if date_arrived:
+        # We need to convert datetime.date to datetime.datetime
+        datetime_arrived = str_to_datetime(date_arrived.isoformat())
+
+    return datetime_arrived 
 
 def get_prepared_date(sample: Sample, lims: Lims)-> dt:
-    """Get the last date when a sample was prepared in the lab."""
-
+    """Get the first date when a sample was prepared in the lab.
+    """
     process_type = 'CG002 - Aggregate QC (Library Validation)'
-    
-    artifact = get_latest_output_artifact(process_type=process_type, lims_id=sample.id, lims=lims)
-    
+
+    artifact = get_output_artifact(process_type=process_type, lims_id=sample.id, lims=lims, last=False)
+
     prepared_date = None
     if artifact:
         prepared_date = str_to_datetime(artifact.parent_process.date_run)
 
     return prepared_date
-
 
 def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     """Get delivery date for a sample.
@@ -75,24 +78,18 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     """
 
     process_type = 'CG002 - Delivery'
-    # Should we use type = 'Analyte' or 'Analyse'. We do not use type anywhere else
-    # There should be a comment about it
-    artifacts = lims.get_artifacts(samplelimsid = sample.id, process_type = process_type,
-                                   type = 'Analyte')
-    delivery_date = None
-
-    # if for some strange reason there would be more than one:
-    delivery_dates = [] 
-    for art in artifacts:
-        art_date = art.parent_process.udf.get('Date delivered')
-        if art_date:
-            delivery_dates.append(str_to_datetime(art_date.isoformat()))
+    udf = 'date arrived at clinical genomics'
     
-    if len(delivery_dates) > 1:
-        LOG.warning("Multiple delivery days found for: %s.", sample.id)
-
-    if delivery_dates:
-        delivery_date = min(delivery_dates)
+    artifact = lims.get_output_artifact(process_type, sample.id, lims, last=False)
+    delivery_date = None
+    
+    art_date = None
+    if artifact:
+        art_date = art.parent_process.udf.get(udf)
+    
+    if art_date:
+        # We need to convert datetime.date to datetime.datetime
+        delivery_date = str_to_datetime(art_date.isoformat())
 
     return delivery_date
 
@@ -107,21 +104,36 @@ def get_number_of_days(first_date: dt, second_date : dt) -> int:
 
     return days
 
-def get_latest_output_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
-    """Returns the output artifact related to lims_id and the step that was latest run."""
-
-    latest_output_artifact = None
+def get_output_artifact(process_type: str, lims_id: str, lims: Lims, last: bool = True) -> Artifact:
+    """Returns the output artifact related to lims_id and the step that was first/latest run.
+    
+    If last = False return the first artifact
+    """
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type)
-    # Make a list of tuples (<date the artifact was generated>, <artifact>): 
-    date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
 
-    if date_art_list:
-        #Sort on date:
-        date_art_list.sort(key = operator.itemgetter(0)) 
-        #Get latest:
-        dummy, latest_output_artifact = date_art_list[-1] 
+    artifact = None
+    date = None
+    for art in artifacts:
+        # Get the date of the artifact
+        new_date = str_to_datetime(art.parent_process.date_run)
+        # If this is the first artifact we initialise the variables
+        if not date:
+            date = new_date
+        if not artifact:
+            artifact = art
+            continue
+        # If we want the latest artifact check if new date is newer than existing
+        if last:
+            if new_date > date:
+                artifact = art
+                date = new_date
+        # If we want the first artifact check if new date is older than existing
+        else:
+            if new_date < date:
+                artifact = art
+                date = new_date
 
-    return latest_output_artifact
+    return artifact
 
 
 def get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
@@ -260,7 +272,7 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     size_step = 'CG002 - Amplify Adapter-Ligated Library (SS XT)'
     size_udf = 'Size (bp)'
 
-    size_art = get_latest_output_artifact(size_step, lims_id, lims)
+    size_art = get_output_artifact(size_step, lims_id, lims, latest=True)
 
     if size_art:
         return size_art.udf.get(size_udf)
@@ -278,7 +290,7 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) ->
     size_step = 'CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'
     size_udf = 'Size (bp)'
 
-    size_art = get_latest_output_artifact(size_step, lims_id, lims)
+    size_art = get_output_artifact(size_step, lims_id, lims, latest=True)
 
     if size_art:
         return size_art.udf.get(size_udf)
