@@ -4,7 +4,7 @@ from flask_login import login_user,logout_user, current_user, login_required
 from flask_oauthlib.client import OAuthException
 
 from extentions import app
-from vogue.server.vogue import find_recived_per_month, find_recived_to_delivered
+from vogue.server.utils import (find_recived_per_month, find_recived_to_delivered)
 
 from  datetime import date
 
