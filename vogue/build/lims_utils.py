@@ -45,7 +45,7 @@ def get_received_date(sample: Sample, lims: Lims)-> dt:
 
     process_type = 'CG002 - Reception Control'
     udf = 'date arrived at clinical genomics'
-    artifacts = lims.get_output_artifact(process_type = process_type, samplelimsid = sample.id, last=False)
+    artifact = get_output_artifact(process_type = process_type, lims_id = sample.id, lims=lims, last=False)
 
     datetime_arrived = None
     # This is a datetime.date object
@@ -80,7 +80,7 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     process_type = 'CG002 - Delivery'
     udf = 'date arrived at clinical genomics'
     
-    artifact = lims.get_output_artifact(process_type, sample.id, lims, last=False)
+    artifact = get_output_artifact(process_type=process_type, lims_id=sample.id, lims=lims, last=False)
     delivery_date = None
     
     art_date = None
