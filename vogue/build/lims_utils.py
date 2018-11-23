@@ -78,14 +78,14 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     """
 
     process_types = ['CG002 - Delivery']
-    udf = 'date arrived at clinical genomics'
+    udf = 'Date delivered'
     
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
     delivery_date = None
     
     art_date = None
     if artifact:
-        art_date = art.parent_process.udf.get(udf)
+        art_date = artifact.parent_process.udf.get(udf)
     
     if art_date:
         # We need to convert datetime.date to datetime.datetime

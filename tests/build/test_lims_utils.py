@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 from vogue.build.lims_utils import (get_sequenced_date, get_number_of_days, get_output_artifact, 
-                                    get_latest_input_artifact, str_to_datetime)
+                                    get_latest_input_artifact, str_to_datetime, get_received_date,
+                                    get_prepared_date, get_delivery_date)
 
 
 def test_get_sequenced_date_no_udfs(lims_sample, lims):
@@ -17,7 +18,7 @@ def test_get_sequenced_date_no_udfs(lims_sample, lims):
 
     assert sequenced_date is None
 
-
+############################# get_sequenced_date ############################
 def test_get_sequenced_date_no_artifacts(lims_sample, lims):
     ##GIVEN a sample with udf: 'Passed Sequencing QC' and a lims without artifacts
     udf = 'Passed Sequencing QC'
@@ -51,6 +52,83 @@ def test_get_sequenced_date_one_artifact(lims_sample, lims):
 
     assert sequenced_date == str_to_datetime(date)
 
+############################# get_received_date ############################
+def test_get_received_date_no_artifacts(lims_sample, lims):
+    ##GIVEN a sample and a lims without artifacts
+    ##WHEN getting the received date
+
+    received_date = get_received_date(lims_sample, lims)
+
+    ##THEN assert received_date is none
+    assert received_date is None
+
+
+def test_get_received_date_one_artifact(lims_sample, lims):
+    ##GIVEN a lims with
+
+    process_type = 'CG002 - Reception Control'
+    udf = 'date arrived at clinical genomics'
+    process = lims._add_process(date_str = '1818-01-01', process_type = process_type)
+    artifact = lims._add_artifact(parent_process = process)
+    process.udf[udf] = dt.today().date()
+
+    ##WHEN getting the sequence date
+
+    received_date = get_received_date(lims_sample, lims)
+
+    ##THEN assert received_date is none
+    assert received_date == str_to_datetime(dt.today().date().isoformat())
+
+############################# get_prepared_date ############################
+def test_get_prepared_date_no_artifacts(lims_sample, lims):
+    ##GIVEN a sample and lims without artifacts
+
+    ##WHEN getting the prepared date
+    prepared_date = get_prepared_date(lims_sample, lims)
+
+    ##THEN assert prepared_date is none
+    assert prepared_date is None
+
+def test_get_prepared_date_one_artifacts(lims_sample, lims):
+    ##GIVEN a sample and lims one artifacts
+    date = '1818-01-01'
+    process_type = 'CG002 - Aggregate QC (Library Validation)'
+    process = lims._add_process(date_str = date, process_type = process_type)
+    artifact = lims._add_artifact(parent_process = process)
+    
+    ##WHEN getting the prepared date
+    prepared_date = get_prepared_date(lims_sample, lims)
+
+    ##THEN assert prepared_date is date string date
+    assert prepared_date == str_to_datetime(date)
+
+############################# get_delivery_date ############################
+def test_get_delivery_date_no_artifacts(lims_sample, lims):
+    ##GIVEN a sample and lims without artifacts
+
+    ##WHEN getting the delivery date
+    delivery_date = get_delivery_date(lims_sample, lims)
+
+    ##THEN assert delivery_date is none
+    assert delivery_date is None
+
+
+def test_get_delivery_date_one_artifact(lims_sample, lims):
+    ##GIVEN a sample and lims one artifacts
+    process_type = 'CG002 - Delivery'
+    udf = 'Date delivered'
+    process = lims._add_process(date_str = '1818-01-01', process_type = process_type)
+    artifact = lims._add_artifact(parent_process = process)
+    process.udf[udf] = dt.today().date()
+
+
+    ##WHEN getting the delivery date
+    delivery_date = get_delivery_date(lims_sample, lims)
+
+    ##THEN assert delivery_date == str_to_datetime(dt.today().date().isoformat())
+    assert delivery_date == str_to_datetime(dt.today().date().isoformat())
+
+############################# get_number_of_days ############################
 
 def test_get_number_of_days_no_date():
     ##GIVEN a date that is None
@@ -75,6 +153,7 @@ def test_get_number_of_days():
     ##THEN assert nr_days == 2
     assert nr_days == 2
 
+############################# get_output_artifact ############################
 
 def test_get_latest_output_artifact_no_art(lims):
     ##GIVEN a lims with no artifacts
@@ -110,6 +189,7 @@ def test_get_latest_output_artifact(lims):
     ##THEN latest_output_artifact should be run on 2018-03-01
     assert latest_output_artifact.parent_process.date_run == date3
 
+############################# get_latest_input_artifact ############################
 
 def test_get_latest_input_artifact(lims):
     ##GIVEN a lims with three artifacts with diferent parent processes with 
