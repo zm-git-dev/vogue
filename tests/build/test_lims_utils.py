@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 from vogue.build.lims_utils import (get_sequenced_date, get_number_of_days, get_output_artifact, 
                                     get_latest_input_artifact, str_to_datetime, get_received_date,
-                                    get_prepared_date, get_delivery_date)
+                                    get_prepared_date, get_delivery_date, get_concentration_and_nr_defrosts)
 
 
 def test_get_sequenced_date_no_udfs(lims_sample, lims):
@@ -226,6 +226,49 @@ def test_get_latest_input_artifact(lims):
 
     ##THEN latest_input_artifact should be in_art1
     assert latest_input_artifact == in_art1
+
+
+############################# get_concentration_and_nr_defrosts ############################
+def test_get_concentration_and_nr_defrosts(lims):
+    ##GIVEN a lims with no artifacts
+
+    lotnumber = '12345'
+    application_tag = 'WGSPCF'
+    sample_id = 'Dummy_Samp_id'
+    lot_nr_step = 'CG002 - End repair Size selection A-tailing and Adapter ligation (TruSeq PCR-free DNA)'
+    concentration_step = 'CG002 - Aggregate QC (Library Validation)'
+    lot_nr_udf = 'Lot no: TruSeq DNA PCR-Free Sample Prep Kit'
+    concentration_udf = 'Concentration (nM)'
+    sample = lims._add_sample(sample_id = sample_id)
+
+    lot_process_1 = lims._add_process(date_str = '1919-01-01', process_type = lot_nr_step)
+    lot_process_1.udf[lot_nr_udf] = lotnumber
+    lot_process_2 = lims._add_process(date_str = '1819-01-01', process_type = lot_nr_step)
+    lot_process_2.udf[lot_nr_udf] = lotnumber
+    lot_process_3 = lims._add_process(date_str = '1719-01-01', process_type = lot_nr_step)
+    lot_process_3.udf[lot_nr_udf] = lotnumber
+    lot_artifact = lims._add_artifact(parent_process = lot_process_1, samples = [sample])
+
+
+
+    lot_artifact.udf[concentration_udf] = 12
+    concentration_process = lims._add_process(date_str = '1818-01-01', process_type = concentration_step)
+    concentration_out_artifact = lims._add_artifact(parent_process = concentration_process, samples = [sample])
+    concentration_out_artifact.input_list.append(lot_artifact)
+
+
+    ##WHEN running _get_latest_output_artifact
+    result_dict = get_concentration_and_nr_defrosts(application_tag, sample_id,lims)
+
+    ##THEN assert concentration should be 12 and nr_defrosts 3
+    assert result_dict['concentration'] == 12 and result_dict['nr_defrosts'] == 3
+
+
+
+############################# get_final_conc_and_amount_dna ############################
+############################# get_microbial_library_concentration ############################
+############################# get_library_size_pre_hyb ############################
+############################# get_library_size_post_hyb ############################
 
 
 

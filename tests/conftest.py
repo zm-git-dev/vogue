@@ -25,6 +25,7 @@ class MockArtifact():
         self.parent_process = parent_process
         self.samples = samples
         self.input_list = []
+        self.udf = {}
 
     def input_artifact_list(self):
         return self.input_list
@@ -48,6 +49,24 @@ class MockLims():
                 if art.parent_process and art.parent_process.type in process_type:
                     arts.append(art)
         return arts
+
+
+    def get_processes(self, type = None, udf = {}):
+        processes = []
+        
+        for process in self.processes:
+            ok = True
+            if type and process.type != type:
+                ok = False
+            if udf:
+                for key, val in udf.items():
+                    if not process.udf.get(key) or process.udf.get(key)!=val:
+                        ok = False
+            if ok:
+               processes.append(process)
+
+        return  processes
+
     
     def _add_artifact(self, parent_process = None, samples = []):
         artifact = MockArtifact(parent_process, samples)
