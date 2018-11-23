@@ -267,8 +267,6 @@ def test_get_concentration_and_nr_defrosts(lims):
     lot_process_3.udf[lot_nr_udf] = lotnumber
     lot_artifact = lims._add_artifact(parent_process = lot_process_1, samples = [sample])
 
-
-
     lot_artifact.udf[concentration_udf] = 12
     concentration_process = lims._add_process(date_str = '1818-01-01', process_type = concentration_step)
     concentration_out_artifact = lims._add_artifact(parent_process = concentration_process, samples = [sample])
