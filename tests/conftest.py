@@ -16,6 +16,7 @@ class MockProcess():
     def __init__(self, date_str = '2018-01-01', process_type = None):
         self.date_run = date_str
         self.type = process_type
+        self.udf = {}
     
     def __repr__(self):
         return f"Process:date_run={self.date_run},type={self.type}"
