@@ -177,8 +177,9 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
 
     return_dict = {}
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
-
+    print('hej')
     if concentration_art:
+        print('hej')
         concentration = concentration_art.udf.get(concentration_udf)
         lotnr = concentration_art.parent_process.udf.get(lot_nr_udf)
         this_date = str_to_datetime(concentration_art.parent_process.date_run)
@@ -222,7 +223,7 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
         step = concentration_art.parent_process
         # Go back in history untill we get to an output artifact from the amount_step
         while step and not amount_art:
-            art = _get_latest_input_artifact(step.type.name, lims_id, lims)
+            art = get_latest_input_artifact(step.type.name, lims_id, lims)
             if amount_step in [p.type.name for p in lims.get_processes(inputartifactlimsid=art.id)]:
                 amount_art = art
             step = art.parent_process
@@ -244,7 +245,7 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
     concentration_step = 'CG002 - Aggregate QC (Library Validation)'
     concentration_udf = 'Concentration (nM)'
 
-    concentration_art = _get_latest_input_artifact(concentration_step, lims_id, lims)
+    concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
 
     if concentration_art:
         return concentration_art.udf.get(concentration_udf)
@@ -271,7 +272,7 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     size_step = ['CG002 - Amplify Adapter-Ligated Library (SS XT)']
     size_udf = 'Size (bp)'
 
-    size_art = get_output_artifact(size_step, lims_id, lims, latest=True)
+    size_art = get_output_artifact(size_step, lims_id, lims, last=True)
 
     if size_art:
         return size_art.udf.get(size_udf)
@@ -289,7 +290,7 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) ->
     size_step = ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)']
     size_udf = 'Size (bp)'
 
-    size_art = get_output_artifact(size_step, lims_id, lims, latest=True)
+    size_art = get_output_artifact(size_step, lims_id, lims, last=True)
 
     if size_art:
         return size_art.udf.get(size_udf)
