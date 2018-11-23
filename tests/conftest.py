@@ -5,7 +5,6 @@ from mongomock import MongoClient
 from genologics.entities import Sample
 from genologics.config import BASEURI,USERNAME,PASSWORD
 from genologics.lims import Lims
-LIMS = Lims(BASEURI,USERNAME,PASSWORD)
 
 #from vogue.load.lims import build_sample
 
@@ -16,6 +15,9 @@ class MockProcess():
     def __init__(self, date_str = '2018-01-01', process_type = None):
         self.date_run = date_str
         self.type = process_type
+    
+    def __repr__(self):
+        return f"Process:date_run={self.date_run},type={self.type}"
 
 class MockArtifact():
     def __init__(self, parent_process = None, samples = None):
@@ -25,6 +27,9 @@ class MockArtifact():
 
     def input_artifact_list(self):
         return self.input_list
+
+    def __repr__(self):
+        return f"Artifact:parent_process={self.parent_process},samples={self.samples}"
 
 
 class MockLims():
@@ -39,7 +44,7 @@ class MockLims():
         if process_type:
             arts = []
             for art in self.artifacts:
-                if art.parent_process and art.parent_process.type == process_type:
+                if art.parent_process and art.parent_process.type in process_type:
                     arts.append(art)
         return arts
     

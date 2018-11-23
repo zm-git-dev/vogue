@@ -1,5 +1,6 @@
 from datetime import datetime as dt
-from vogue.build.lims_utils import get_sequenced_date, get_number_of_days, _get_latest_output_artifact, _get_latest_input_artifact
+from vogue.build.lims_utils import (get_sequenced_date, get_number_of_days, get_output_artifact, 
+                                    get_latest_input_artifact, str_to_datetime)
 
 
 def test_get_sequenced_date_no_udfs(lims_sample, lims):
@@ -33,23 +34,22 @@ def test_get_sequenced_date_no_artifacts(lims_sample, lims):
 
     assert sequenced_date is None
 
-# def test_get_sequenced_date_one_artifact(lims_sample, lims):
-#     ##GIVEN a sample with udf: 'Passed Sequencing QC' and a lims with an artifact
-#     udf = 'Passed Sequencing QC'
-#     date = '2018-12-31'
+def test_get_sequenced_date_one_artifact(lims_sample, lims):
+    ##GIVEN a sample with udf: 'Passed Sequencing QC' and a lims with an artifact
+    udf = 'Passed Sequencing QC'
+    date = '2018-12-31'
 
 #     lims_sample.udf[udf] = date
 #     assert lims_sample.udf.get(udf) == date
 
-#     process = lims._add_process(date_str = date)
-#     artifact = lims._add_artifact(parent_process = process)
-#     ##WHEN getting the sequence date
+    process = lims._add_process(date_str = date, process_type = 'CG002 - Illumina Sequencing (HiSeq X)')
+    artifact = lims._add_artifact(parent_process = process)
+    ##WHEN getting the sequence date
+    sequenced_date = get_sequenced_date(lims_sample, lims)
 
-#     sequenced_date = get_sequenced_date(lims_sample, lims)
+    ##THEN assert sequenced_date is datetime
 
-#     ##THEN assert sequenced_date is datetime
-
-#     assert isinstance(sequenced_date, dt)
+    assert sequenced_date == str_to_datetime(date)
 
 
 def test_get_number_of_days_no_date():
@@ -83,7 +83,7 @@ def test_get_latest_output_artifact_no_art(lims):
     process_type = 'CG002 - Aggregate QC (Library Validation)'
 
     ##WHEN running _get_latest_output_artifact
-    latest_output_artifact = _get_latest_output_artifact(process_type, lims_id, lims)
+    latest_output_artifact = get_output_artifact(process_type, lims_id, lims, last=True)
 
     ##THEN assert latest_output_artifact is none
     assert latest_output_artifact is None
@@ -105,7 +105,7 @@ def test_get_latest_output_artifact(lims):
     out_art3 = lims._add_artifact(process3)
 
     ##WHEN running _get_latest_output_artifact
-    latest_output_artifact = _get_latest_output_artifact(process_type, lims_id, lims)
+    latest_output_artifact = get_output_artifact(process_type, lims_id, lims, last=True)
 
     ##THEN latest_output_artifact should be run on 2018-03-01
     assert latest_output_artifact.parent_process.date_run == date3
@@ -142,7 +142,7 @@ def test_get_latest_input_artifact(lims):
     out_art3.input_list = [in_art1, in_art2]
 
     ##WHEN running _get_latest_input_artifact
-    latest_input_artifact = _get_latest_input_artifact(process_type, sample_id, lims)
+    latest_input_artifact = get_latest_input_artifact(process_type, sample_id, lims)
 
     ##THEN latest_input_artifact should be in_art1
     assert latest_input_artifact == in_art1

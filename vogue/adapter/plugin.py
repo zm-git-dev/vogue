@@ -1,12 +1,11 @@
+import logging
+
 from mongo_adapter import MongoAdapter
 from datetime import datetime as dt
-import logging
 LOG = logging.getLogger(__name__)
 
 
-
-
-class VougeAdapter(MongoAdapter):
+class VogueAdapter(MongoAdapter):
 
     def setup(self, db_name : str):
         """Setup connection to a database"""
