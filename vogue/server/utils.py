@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 from mongo_adapter import get_client
-from datetime import date
+from datetime import datetime as dt
 
-from vogue.adapter.adapter import VougeAdapter
-client = get_client(uri = "mongodb://localhost:27017")
-adapter = VougeAdapter(client, db_name = 'trending')
+#from vogue.adapter.adapter import VougeAdapter
+#client = get_client(uri = "mongodb://localhost:27017")
+#adapter = VougeAdapter(client, db_name = 'trending')
 
 
 
@@ -28,14 +28,17 @@ def get_dates(month, year):
 
 def get_average(samples, key):
     values = []
+    average = None
     for sample in samples:
         value = sample.get(key)
         if isinstance(value, int) or isinstance(value, float):
             values.append(value)
-    average = sum(values) / float(len(values))
+    if values:
+        average = sum(values) / float(len(values))
     return average
 
-def find_recived_per_month(year : int, group_by : list, group_key : str)-> dict:
+
+def find_recived_per_month(year : int, group_by : list, group_key : str, adapter)-> dict:
     data = {}
     months = list(range(1,13))
     #group_by = ['research', 'diagnostic','standard']
@@ -43,31 +46,31 @@ def find_recived_per_month(year : int, group_by : list, group_key : str)-> dict:
     for i, group in enumerate(group_by):
         data[group] = {'data' : {'labels':[], 'X' : [], 'Y' : []}, 'color' : COLORS[i]}
         for month in months:
-            date1, date2 = get_dates(month, year)
+            date1, date2 = get_dates(month, int(year))
             query = {group_key : group, 
                     "received_date" : {"$gte" : date1, "$lt" : date2}}
             samples = adapter.find_samples(query)
-            data[group]['labels'].append(MONTHS[month])
-            data[group]['X'].append(month)
-            data[group]['Y'].append(len(samples))
+            data[group]['data']['labels'].append(MONTHS[month])
+            data[group]['data']['X'].append(month)
+            data[group]['data']['Y'].append(len(samples))
     return data
 
-def find_recived_to_delivered(year : int, group_by : list, group_key : str)-> dict:
+
+def turn_around_times(year : int, group_by : list, group_key : str, time_range_key : str, adapter)-> dict:
     data = {}
     months = list(range(1,13))
-    #group_by = ['wgs', 'tga']
-    #group_key = "application_chategory"
     for i, group in enumerate(group_by):
         data[group] = {'data' : {'labels':[], 'X' : [], 'Y' : []}, 'color' : COLORS[i]}
         for month in months:
-            date1, date2 = get_dates(month, year)
+            date1, date2 = get_dates(month, int(year))
             query = {group_key : group, 
                     "received_date" : {"$gte" : date1, "$lt" : date2}}
-            samples = adapter.find_samples(query)
-            average = get_average(samples, 'received_to_delivered')
-            data[group]['labels'].append(MONTHS[month])
-            data[group]['X'].append(month)
-            data[group]['Y'].append(average)
+            samples = list(adapter.find_samples(query))
+            average = get_average(samples, time_range_key)
+            if average:
+                data[group]['data']['labels'].append(MONTHS[month])
+                data[group]['data']['X'].append(month)
+                data[group]['data']['Y'].append(average)
     return data
 
 
