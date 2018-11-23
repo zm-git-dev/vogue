@@ -7,3 +7,6 @@ yapf
 flask
 coloredlogs
 mongo_adapter
+flask_login
+flask_oauthlib
+flask_debugtoolbar

@@ -6,11 +6,16 @@
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
           <div class="row">
-          <div class="col-lg-6"><canvas class="my-4 w-100" id="received"></canvas></div>
-          <div class="col-lg-6"><canvas class="my-4 w-100" id="received_application" ></canvas></div>
+          <div class="col-lg-5"><canvas class="my-4 w-100" id="received"></canvas></div>
+          <div class="col-lg-5"><canvas class="my-4 w-100" id="received_application" ></canvas></div>
+          </div>
+          <div class="row">
+          <div class="col-lg-5"><canvas class="my-4 w-100" id="received_to_delivered"></canvas></div>
+          <div class="col-lg-5"><canvas class="my-4 w-100" id="received_to_prepped"></canvas></div>
          </div>
          <div class="row">
-          <div class="col-lg-6"><canvas class="my-4 w-100" id="turnaround_times"></canvas></div>
+          <div class="col-lg-5"><canvas class="my-4 w-100" id="prepped_to_sequenced"></canvas></div>
+          <div class="col-lg-5"><canvas class="my-4 w-100" id="sequenced_to_delivered"></canvas></div>
          </div>
           
         </main>
@@ -36,9 +41,8 @@
         data: { labels: labels,
                 datasets: datasets}
       })
-    </script>
 
-      <script>
+
       var ctx = document.getElementById("received_application")
       var datasets = []
       {% for name in received_application %}
@@ -57,22 +61,78 @@
         data: { labels: labels,
                 datasets: datasets}
       })
-    </script>
 
-    <script>
-      var ctx = document.getElementById("turnaround_times")
+
+      var ctx = document.getElementById("sequenced_to_delivered")
       var datasets = []
-      {% for name in turnaround_times %}
+      {% for name in sequenced_to_delivered %}
         datasets.push({
                         label: "{{name}}", 
-                        data: {{turnaround_times[name]['data']['Y']}},
-                        borderColor: "{{turnaround_times[name]['color'][0]}}",
-                        backgroundColor: "{{turnaround_times[name]['color'][1]}}",
+                        data: {{sequenced_to_delivered[name]['data']['Y']}},
+                        borderColor: "{{sequenced_to_delivered[name]['color'][0]}}",
+                        backgroundColor: "{{sequenced_to_delivered[name]['color'][1]}}",
                         })
-        var labels = {{turnaround_times[name]['data']['labels']|tojson}}
+        var labels = {{sequenced_to_delivered[name]['data']['labels']|tojson}}
       {% endfor %}
 
-      var turnaround_times = new Chart(ctx, {
+      var sequenced_to_delivered = new Chart(ctx, {
+        type: 'line',
+        options : {title: {display: true, text: 'Time from sequenced to delivered (days)'}},
+        data: { labels: labels,
+                datasets: datasets}
+      })
+
+      var ctx = document.getElementById("prepped_to_sequenced")
+      var datasets = []
+      {% for name in prepped_to_sequenced %}
+        datasets.push({
+                        label: "{{name}}", 
+                        data: {{prepped_to_sequenced[name]['data']['Y']}},
+                        borderColor: "{{prepped_to_sequenced[name]['color'][0]}}",
+                        backgroundColor: "{{prepped_to_sequenced[name]['color'][1]}}",
+                        })
+        var labels = {{prepped_to_sequenced[name]['data']['labels']|tojson}}
+      {% endfor %}
+
+      var prepped_to_sequenced = new Chart(ctx, {
+        type: 'line',
+        options : {title: {display: true, text: 'Time from end of prep to sequenced (days)'}},
+        data: { labels: labels,
+                datasets: datasets}
+      })
+
+      var ctx = document.getElementById("received_to_prepped")
+      var datasets = []
+      {% for name in received_to_prepped %}
+        datasets.push({
+                        label: "{{name}}", 
+                        data: {{received_to_prepped[name]['data']['Y']}},
+                        borderColor: "{{received_to_prepped[name]['color'][0]}}",
+                        backgroundColor: "{{received_to_prepped[name]['color'][1]}}",
+                        })
+        var labels = {{received_to_prepped[name]['data']['labels']|tojson}}
+      {% endfor %}
+
+      var received_to_prepped = new Chart(ctx, {
+        type: 'line',
+        options : {title: {display: true, text: 'Time from received to end of prep (days)'}},
+        data: { labels: labels,
+                datasets: datasets}
+      })
+
+      var ctx = document.getElementById("received_to_delivered")
+      var datasets = []
+      {% for name in received_to_delivered %}
+        datasets.push({
+                        label: "{{name}}", 
+                        data: {{received_to_delivered[name]['data']['Y']}},
+                        borderColor: "{{received_to_delivered[name]['color'][0]}}",
+                        backgroundColor: "{{received_to_delivered[name]['color'][1]}}",
+                        })
+        var labels = {{received_to_delivered[name]['data']['labels']|tojson}}
+      {% endfor %}
+
+      var received_to_delivered = new Chart(ctx, {
         type: 'line',
         options : {title: {display: true, text: 'Time from received to delivered (days)'}},
         data: { labels: labels,
