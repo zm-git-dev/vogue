@@ -1,7 +1,8 @@
 from datetime import datetime as dt
 from vogue.build.lims_utils import (get_sequenced_date, get_number_of_days, get_output_artifact, 
                                     get_latest_input_artifact, str_to_datetime, get_received_date,
-                                    get_prepared_date, get_delivery_date, get_concentration_and_nr_defrosts)
+                                    get_prepared_date, get_delivery_date, get_concentration_and_nr_defrosts,
+                                    get_final_conc_and_amount_dna)
 
 
 def test_get_sequenced_date_no_udfs(lims_sample, lims):
@@ -43,8 +44,11 @@ def test_get_sequenced_date_no_artifacts(lims_sample, lims):
 #     lims_sample.udf[udf] = date
 #     assert lims_sample.udf.get(udf) == date
 
-    process = lims._add_process(date_str = date, process_type = 'CG002 - Illumina Sequencing (HiSeq X)')
+    process_type_name = 'CG002 - Illumina Sequencing (HiSeq X)'
+    process_type = lims._add_process_type(name = process_type_name)
+    process = lims._add_process(date_str = date, process_type = process_type)
     artifact = lims._add_artifact(parent_process = process)
+    
     ##WHEN getting the sequence date
     sequenced_date = get_sequenced_date(lims_sample, lims)
 
@@ -66,7 +70,8 @@ def test_get_received_date_no_artifacts(lims_sample, lims):
 def test_get_received_date_one_artifact(lims_sample, lims):
     ##GIVEN a lims with
 
-    process_type = 'CG002 - Reception Control'
+    process_type_name = 'CG002 - Reception Control'
+    process_type = lims._add_process_type(name = process_type_name)
     udf = 'date arrived at clinical genomics'
     process = lims._add_process(date_str = '1818-01-01', process_type = process_type)
     artifact = lims._add_artifact(parent_process = process)
@@ -92,7 +97,8 @@ def test_get_prepared_date_no_artifacts(lims_sample, lims):
 def test_get_prepared_date_one_artifacts(lims_sample, lims):
     ##GIVEN a sample and lims one artifacts
     date = '1818-01-01'
-    process_type = 'CG002 - Aggregate QC (Library Validation)'
+    process_type_name = 'CG002 - Aggregate QC (Library Validation)'
+    process_type = lims._add_process_type(name = process_type_name)
     process = lims._add_process(date_str = date, process_type = process_type)
     artifact = lims._add_artifact(parent_process = process)
     
@@ -115,17 +121,19 @@ def test_get_delivery_date_no_artifacts(lims_sample, lims):
 
 def test_get_delivery_date_one_artifact(lims_sample, lims):
     ##GIVEN a sample and lims one artifacts
-    process_type = 'CG002 - Delivery'
+    process_type_name = 'CG002 - Delivery'
+    process_type = lims._add_process_type(name = process_type_name)
     udf = 'Date delivered'
     process = lims._add_process(date_str = '1818-01-01', process_type = process_type)
-    artifact = lims._add_artifact(parent_process = process)
+    artifact = lims._add_artifact(parent_process = process, samples = [lims_sample])
     process.udf[udf] = dt.today().date()
-
 
     ##WHEN getting the delivery date
     delivery_date = get_delivery_date(lims_sample, lims)
 
     ##THEN assert delivery_date == str_to_datetime(dt.today().date().isoformat())
+    print(delivery_date)
+    print(str_to_datetime(dt.today().date().isoformat()))
     assert delivery_date == str_to_datetime(dt.today().date().isoformat())
 
 ############################# get_number_of_days ############################
@@ -169,22 +177,27 @@ def test_get_latest_output_artifact_no_art(lims):
 
 
 def test_get_latest_output_artifact(lims):
-    ##GIVEN a lims with three artifacts with diferent parent processes with 
-    # diferent date_run dates 2018-01-01, 2018-02-01, 2018-03-01
+    ##GIVEN a lims with artifacts A1,A2,A3 and processes P1, P2,P3 with relationships:
+    # P1 --> A1
+    # P2 --> A2
+    # P3 --> A3
+    # where P1, P2, P3 are of the same type but have different date_run dates: 
+    # 2018-01-01, 2018-02-01, 2018-03-01
+
     lims_id = 'Dummy'
-    process_type = 'CG002 - Aggregate QC (Library Validation)'
-    date1 = '2018-01-01'
-    date2 = '2018-02-01'
-    date3 = '2018-03-01'
-    process1 = lims._add_process(date1, process_type)
-    process2 = lims._add_process(date2, process_type)
-    process3 = lims._add_process(date3, process_type)
-    out_art1 = lims._add_artifact(process1)
-    out_art2 = lims._add_artifact(process2)
-    out_art3 = lims._add_artifact(process3)
+    process_type_name = 'CG002 - Aggregate QC (Library Validation)'
+    process_type = lims._add_process_type(name = process_type_name)
+    date1, date2, date3 = '2018-01-01',  '2018-02-01', '2018-03-01'
+
+    P1 = lims._add_process(date1, process_type)
+    P2 = lims._add_process(date2, process_type)
+    P3 = lims._add_process(date3, process_type)
+    A1 = lims._add_artifact(P1)
+    A2 = lims._add_artifact(P2)
+    A3 = lims._add_artifact(P3)
 
     ##WHEN running _get_latest_output_artifact
-    latest_output_artifact = get_output_artifact(process_type, lims_id, lims, last=True)
+    latest_output_artifact = get_output_artifact(process_type_name, lims_id, lims, last=True)
 
     ##THEN latest_output_artifact should be run on 2018-03-01
     assert latest_output_artifact.parent_process.date_run == date3
@@ -192,40 +205,40 @@ def test_get_latest_output_artifact(lims):
 ############################# get_latest_input_artifact ############################
 
 def test_get_latest_input_artifact(lims):
-    ##GIVEN a lims with three artifacts with diferent parent processes with 
-    # diferent date_run dates: 2018-01-01, 2018-02-01, 2018-03-01.
-    # Where the third artifact (generated on the latest date), has two
-    # input artifats. 
-    # And only one of the input artifcts has a sample list with a sample with
-    # sample_id = TheOne 
+    ##GIVEN a lims with artifacts A1,A2,A3,A4,A5 and processes P1, P2,P3 with relationships:
+    # P1 --> A1
+    # P2 --> A2
+    # [A4, A5] --> P3 --> A3
+    # where P1, P2, P3 are of the same process type but where run on different 
+    # dates: 2018-01-01, 2018-02-01, 2018-03-01. P3 has the latest date
+    # And only A4 has a sample list with a sample with sample_id = TheOne     
 
     sample_id = 'TheOne'
-    process_type = 'CG002 - Aggregate QC (Library Validation)'
-    date1 = '2018-01-01'
-    date2 = '2018-02-01'
-    date3 = '2018-03-01'
+    process_type_name = 'CG002 - Aggregate QC (Library Validation)'
+    process_type = lims._add_process_type(name = process_type_name)
+    date1, date2, date3 = '2018-01-01',  '2018-02-01', '2018-03-01'
 
-    process1 = lims._add_process(date1, process_type)
-    process2 = lims._add_process(date2, process_type)
-    process3 = lims._add_process(date3, process_type)
+    P1 = lims._add_process(date1, process_type)
+    P2 = lims._add_process(date2, process_type)
+    P3 = lims._add_process(date3, process_type)
 
-    out_art1 = lims._add_artifact(parent_process = process1)
-    out_art2 = lims._add_artifact(parent_process = process2)
-    out_art3 = lims._add_artifact(parent_process = process3)
+    A1 = lims._add_artifact(parent_process = P1)
+    A2 = lims._add_artifact(parent_process = P2)
+    A3 = lims._add_artifact(parent_process = P3)
 
-    sample1 = lims._add_sample(sample_id = sample_id)
-    sample2 = lims._add_sample(sample_id = 'Dummy')
+    S1 = lims._add_sample(sample_id = sample_id)
+    S2 = lims._add_sample(sample_id = 'Dummy')
 
-    in_art1 = lims._add_artifact(samples = [sample1])
-    in_art2 = lims._add_artifact(samples = [sample2])
+    A4 = lims._add_artifact(samples = [S1])
+    A5 = lims._add_artifact(samples = [S2])
 
-    out_art3.input_list = [in_art1, in_art2]
+    A3.input_list = [A4, A5]
 
-    ##WHEN running _get_latest_input_artifact
-    latest_input_artifact = get_latest_input_artifact(process_type, sample_id, lims)
+    ##WHEN running get_latest_input_artifact
+    latest_input_artifact = get_latest_input_artifact(process_type_name, sample_id, lims)
 
-    ##THEN latest_input_artifact should be in_art1
-    assert latest_input_artifact == in_art1
+    ##THEN latest_input_artifact should be A4
+    assert latest_input_artifact == A4
 
 def test_get_latest_input_artifact(lims):
     ##GIVEN a lims with three artifacts with diferent parent processes with 
@@ -247,42 +260,76 @@ def test_get_latest_input_artifact(lims):
     process3 = lims._add_process(date3, process_type)
 =======
 ############################# get_concentration_and_nr_defrosts ############################
-def test_get_concentration_and_nr_defrosts(lims):
-    ##GIVEN a lims with no artifacts
+def test_get_concentration_and_nr_defrosts(lims, lims_sample):
+    ##GIVEN a lims with artifacts: A1, A2 and processes: P1, P2, P3, P4
+    # whith relationship: P1 --> A1 --> P4 --> A2
+    # where A1 holds the concentration and P1, P2 and P3 holds the same lotnumber: '12345'
+    # and where P2 and P3 were run before P1 (older date_run values)
 
     lotnumber = '12345'
     application_tag = 'WGSPCF'
-    sample_id = 'Dummy_Samp_id'
-    lot_nr_step = 'CG002 - End repair Size selection A-tailing and Adapter ligation (TruSeq PCR-free DNA)'
-    concentration_step = 'CG002 - Aggregate QC (Library Validation)'
+
+    lot_nr_step_type = lims._add_process_type(name = 'CG002 - End repair Size selection A-tailing and Adapter ligation (TruSeq PCR-free DNA)')
     lot_nr_udf = 'Lot no: TruSeq DNA PCR-Free Sample Prep Kit'
-    concentration_udf = 'Concentration (nM)'
-    sample = lims._add_sample(sample_id = sample_id)
+    P1 = lims._add_process(date_str = '1919-01-01', process_type = lot_nr_step_type)
+    P1.udf[lot_nr_udf] = lotnumber
+    P2 = lims._add_process(date_str = '1819-01-01', process_type = lot_nr_step_type)
+    P2.udf[lot_nr_udf] = lotnumber
+    P3 = lims._add_process(date_str = '1719-01-01', process_type = lot_nr_step_type)
+    P3.udf[lot_nr_udf] = lotnumber
 
-    lot_process_1 = lims._add_process(date_str = '1919-01-01', process_type = lot_nr_step)
-    lot_process_1.udf[lot_nr_udf] = lotnumber
-    lot_process_2 = lims._add_process(date_str = '1819-01-01', process_type = lot_nr_step)
-    lot_process_2.udf[lot_nr_udf] = lotnumber
-    lot_process_3 = lims._add_process(date_str = '1719-01-01', process_type = lot_nr_step)
-    lot_process_3.udf[lot_nr_udf] = lotnumber
-    lot_artifact = lims._add_artifact(parent_process = lot_process_1, samples = [sample])
+    A1 = lims._add_artifact(parent_process = P1, samples = [lims_sample])
+    A1.udf['Concentration (nM)'] = 12
+    
+    concentration_step_type = lims._add_process_type(name = 'CG002 - Aggregate QC (Library Validation)')
+    P4 = lims._add_process(date_str = '1818-01-01', process_type = concentration_step_type)
+    P4.input_artifact_list.append(A1)
 
-    lot_artifact.udf[concentration_udf] = 12
-    concentration_process = lims._add_process(date_str = '1818-01-01', process_type = concentration_step)
-    concentration_out_artifact = lims._add_artifact(parent_process = concentration_process, samples = [sample])
-    concentration_out_artifact.input_list.append(lot_artifact)
+    A2 = lims._add_artifact(parent_process = P4, samples = [lims_sample])
+    A2.input_list.append(A1)
 
+    ##WHEN running get_concentration_and_nr_defrosts
+    result_dict = get_concentration_and_nr_defrosts(application_tag, lims_sample.id,lims)
 
-    ##WHEN running _get_latest_output_artifact
-    result_dict = get_concentration_and_nr_defrosts(application_tag, sample_id,lims)
-
-    ##THEN assert concentration should be 12 and nr_defrosts 3
+    ##THEN concentration should be 12 and nr_defrosts 3
     assert result_dict['concentration'] == 12 and result_dict['nr_defrosts'] == 3
 
 
 
 ############################# get_final_conc_and_amount_dna ############################
-############################# get_microbial_library_concentration ############################
+
+def test_get_final_conc_and_amount_dna(lims, lims_sample):
+    ##GIVEN a lims with artifacts: A1, A2, A3, and processes: P1 and P2
+    # whith relationship: A1 --> P1 --> A2 --> P2 --> A3
+    # where A1 holds the amount udf and A2 holds the concentration
+
+    application_tag = 'WGSLIF'
+
+    A1 = lims._add_artifact(samples = [lims_sample], id='A1')
+    A1.udf['Amount (ng)'] = 11
+
+    amount_step_type = lims._add_process_type(name = 'CG002 - Aggregate QC (DNA)')
+    P1 = lims._add_process(date_str = '1919-01-01', process_type = amount_step_type, pid = 'P1')
+    P1.input_artifact_list.append(A1)
+
+    A2 = lims._add_artifact(parent_process = P1, samples = [lims_sample], id='A2')
+    A2.udf['Concentration (nM)'] = 22
+    A2.input_list.append(A1)
+
+    concentration_step_type = lims._add_process_type(name = 'CG002 - Aggregate QC (Library Validation)')
+    P2 = lims._add_process(date_str = '1919-01-01', process_type = concentration_step_type, pid = 'P2')
+    P2.input_artifact_list.append(A2)
+
+    A3 = lims._add_artifact(samples = [lims_sample], id = 'A3', parent_process = P2)
+    A3.input_list.append(A2)
+
+    ##WHEN running get_final_conc_and_amount_dna 
+    return_dict = get_final_conc_and_amount_dna(application_tag, lims_sample.id, lims)
+
+    ##THEN assert 
+    assert return_dict == {'amount': 11, 'concentration': 22}
+
+############################# get_microbial_liba2rary_concentration ############################
 ############################# get_library_size_pre_hyb ############################
 ############################# get_library_size_post_hyb ############################
 
