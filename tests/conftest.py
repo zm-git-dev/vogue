@@ -53,12 +53,20 @@ class MockLims():
         """"Get a list of artifacts."""
         if not type(process_type)==list:
             process_type=[process_type]
-        arts = self.artifacts
-        if process_type:
-            arts = []
-            for art in self.artifacts:
-                if art.parent_process and art.parent_process.type.name in process_type:
-                    arts.append(art)
+        arts = []
+        for art in self.artifacts:
+            ok = True
+            if process_type:
+                if not art.parent_process:
+                    ok = False
+                elif not art.parent_process.type.name in process_type:
+                    ok = False
+            if samplelimsid:
+                if not samplelimsid in [s.id for s in art.samples]:
+                    ok = False
+            if ok:
+                arts.append(art)
+
         return arts
 
 
