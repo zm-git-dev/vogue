@@ -133,8 +133,6 @@ def test_get_delivery_date_one_artifact(lims_sample, lims):
     delivery_date = get_delivery_date(lims_sample, lims)
 
     ##THEN assert delivery_date == str_to_datetime(dt.today().date().isoformat())
-    print(delivery_date)
-    print(str_to_datetime(dt.today().date().isoformat()))
     assert delivery_date == str_to_datetime(dt.today().date().isoformat())
 
 ############################# get_number_of_days ############################
