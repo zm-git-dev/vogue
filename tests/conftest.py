@@ -71,17 +71,13 @@ def sample_id(test_sample):
 
 @pytest.fixture
 def cancer_analysis():
-    return {'sample_id': '1',
+    return {'case_id': '1',
             'dup_rate': 0.1,
             'somtatic_var_callers': ['VARDICT','MUTECT2','STRELKA','MANTA'],
-            'sample_type': 'tumor',
             'analysis_type': 'paired',
             'somatic_var_count': [9870,765,123,456],
             'var_type': ['SNV_INDEL','SNV_INDEL','SNV_INDEL', 'SV'],
             'TMB': 15,
-            'biopsy_type': 'FFPE',
-            'fixation_time_hour': 24,
-            'total_passed_read': 12345678,
             'workflow_name': 'BALSAMIC',
             'version_version': '2.7.1'}
 
