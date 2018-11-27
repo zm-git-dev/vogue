@@ -15,7 +15,7 @@ class VogueAdapter(MongoAdapter):
         self.db_name = db_name
         self.sample_collection = self.db.sample
         self.analysis_collection = self.db.analysis
-        ## TODO Add a analysis collection here
+        
         LOG.info(f"Use database {db_name}.")
 
     def add_or_update_sample(self, sample_news: dict):
