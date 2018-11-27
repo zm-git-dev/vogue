@@ -10,8 +10,8 @@ def test_load_simple_cancer(adapter, test_sample, cancer_analysis):
     assert adapter.analysis_collection.find_one() is None
     ## WHEN adding a cancer analysis
     
-    sample_id = test_sample['_id']
-    analysis_obj = load_cancer_analysis(adapter, sample_id, cancer_analysis)
+    lims_id = test_sample['_id']
+    analysis_obj = load_cancer_analysis(adapter, lims_id, False, cancer_analysis)
     print(analysis_obj)
     
     ## THEN assert the analysis was added
