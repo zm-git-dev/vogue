@@ -45,7 +45,7 @@ class VogueAdapter(MongoAdapter):
         """Insert an analysis into the database"""
         res = self.analysis_collection.insert_one(analysis_obj)
         
-        # return object_id
+        return res.inserted_id
 
     def analysis(self, analysis_id: str):
         """Functionality to get analyses results"""
