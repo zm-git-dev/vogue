@@ -2,6 +2,9 @@ import pytest
 
 from mongomock import MongoClient
 
+from vogue.build.lims import build_sample
+from vogue.adapter import VogueAdapter
+
 from genologics.entities import Sample
 from genologics.config import BASEURI,USERNAME,PASSWORD
 from genologics.lims import Lims
