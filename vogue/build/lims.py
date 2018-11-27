@@ -17,10 +17,10 @@ def build_sample(sample: Sample, lims: Lims)-> dict:
     mongo_sample['amount'] = conc_and_amount.get('amount')
     mongo_sample['amount-concentration'] = conc_and_amount.get('concentration')
 
-    concantration_and_nr_defrosts = get_concantration_and_nr_defrosts(application_tag, sample.id, lims)
-    mongo_sample['nr_defrosts'] = concantration_and_nr_defrosts.get('nr_defrosts', lims)
-    mongo_sample['nr_defrosts-concentration'] = concantration_and_nr_defrosts.get('concentration')
-    mongo_sample['lotnr'] = concantration_and_nr_defrosts.get('lotnr')
+    concentration_and_nr_defrosts = get_concentration_and_nr_defrosts(application_tag, sample.id, lims)
+    mongo_sample['nr_defrosts'] = concentration_and_nr_defrosts.get('nr_defrosts')
+    mongo_sample['nr_defrosts-concentration'] = concentration_and_nr_defrosts.get('concentration')
+    mongo_sample['lotnr'] = concentration_and_nr_defrosts.get('lotnr')
 
     mongo_sample['microbial_library_concentration'] = get_microbial_library_concentration(application_tag, sample.id, lims)
     mongo_sample['library_size_pre_hyb'] = get_library_size_pre_hyb(application_tag, sample.id, lims)
@@ -35,10 +35,10 @@ def build_sample(sample: Sample, lims: Lims)-> dict:
     mongo_sample['received_date'] = received_at
     mongo_sample['prepared_date'] = prepared_at
     mongo_sample['delivery_date'] = delivered_at
-    mongo_sample['sequenced_to_delivered'] = get_sequenced_to_delivered(delivered_at, sequenced_at)
-    mongo_sample['prepped_to_sequenced'] = get_prepped_to_sequenced(prepared_at, sequenced_at)
-    mongo_sample['received_to_prepped'] = get_received_to_prepped(prepared_at, received_at)
-    mongo_sample['received_to_delivered'] = get_received_to_delivered(delivered_at, received_at)
+    mongo_sample['sequenced_to_delivered'] = get_number_of_days(sequenced_at, delivered_at)
+    mongo_sample['prepped_to_sequenced'] = get_number_of_days(prepared_at, sequenced_at)
+    mongo_sample['received_to_prepped'] = get_number_of_days(received_at, prepared_at)
+    mongo_sample['received_to_delivered'] = get_number_of_days(received_at, delivered_at)
 
     for key in list(mongo_sample.keys()):
         if mongo_sample[key] is None:
