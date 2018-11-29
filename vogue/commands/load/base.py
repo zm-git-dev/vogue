@@ -4,7 +4,7 @@ import logging
 import click
 
 from mongo_adapter import get_client
-from vogue.adapter.adapter import VougeAdapter
+from vogue.adapter.adapter import VogueAdapter
 
 LOG = logging.getLogger(__name__)
 
