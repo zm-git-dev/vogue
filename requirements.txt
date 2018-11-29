@@ -7,3 +7,5 @@ yapf
 flask
 coloredlogs
 mongo_adapter
+multiqc
+lzstring
