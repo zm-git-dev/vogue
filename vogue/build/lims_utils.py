@@ -141,8 +141,12 @@ def get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Ar
 
     latest_input_artifact = None
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type) 
+    print(lims)
+    print(artifacts)
     # Make a list of tuples (<date the artifact was generated>, <artifact>): 
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
+    
+    print(date_art_list)
 
     if date_art_list:
         #Sort on date:

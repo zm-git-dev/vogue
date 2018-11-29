@@ -44,7 +44,7 @@ def test_get_sequenced_date_one_artifact(lims_sample, lims):
     assert lims_sample.udf.get(udf) == date
 
     process = lims._add_process(date_str = date, process_type = 'CG002 - Illumina Sequencing (HiSeq X)')
-    artifact = lims._add_artifact(parent_process = process)
+    artifact = lims._add_artifact(parent_process = process, samples=[lims_sample])
     ##WHEN getting the sequence date
     sequenced_date = get_sequenced_date(lims_sample, lims)
 
@@ -69,7 +69,7 @@ def test_get_received_date_one_artifact(lims_sample, lims):
     process_type = 'CG002 - Reception Control'
     udf = 'date arrived at clinical genomics'
     process = lims._add_process(date_str = '1818-01-01', process_type = process_type)
-    artifact = lims._add_artifact(parent_process = process)
+    artifact = lims._add_artifact(parent_process = process, samples=[lims_sample])
     process.udf[udf] = dt.today().date()
 
     ##WHEN getting the sequence date
@@ -94,7 +94,7 @@ def test_get_prepared_date_one_artifacts(lims_sample, lims):
     date = '1818-01-01'
     process_type = 'CG002 - Aggregate QC (Library Validation)'
     process = lims._add_process(date_str = date, process_type = process_type)
-    artifact = lims._add_artifact(parent_process = process)
+    artifact = lims._add_artifact(parent_process = process, samples=[lims_sample])
     
     ##WHEN getting the prepared date
     prepared_date = get_prepared_date(lims_sample, lims)
@@ -118,7 +118,7 @@ def test_get_delivery_date_one_artifact(lims_sample, lims):
     process_type = 'CG002 - Delivery'
     udf = 'Date delivered'
     process = lims._add_process(date_str = '1818-01-01', process_type = process_type)
-    artifact = lims._add_artifact(parent_process = process)
+    artifact = lims._add_artifact(parent_process = process, samples=[lims_sample])
     process.udf[udf] = dt.today().date()
 
 
@@ -168,10 +168,10 @@ def test_get_latest_output_artifact_no_art(lims):
     assert latest_output_artifact is None
 
 
-def test_get_latest_output_artifact(lims):
+def test_get_latest_output_artifact(lims, lims_sample):
     ##GIVEN a lims with three artifacts with diferent parent processes with 
     # diferent date_run dates 2018-01-01, 2018-02-01, 2018-03-01
-    lims_id = 'Dummy'
+    lims_id = lims_sample.id
     process_type = 'CG002 - Aggregate QC (Library Validation)'
     date1 = '2018-01-01'
     date2 = '2018-02-01'
@@ -179,9 +179,9 @@ def test_get_latest_output_artifact(lims):
     process1 = lims._add_process(date1, process_type)
     process2 = lims._add_process(date2, process_type)
     process3 = lims._add_process(date3, process_type)
-    out_art1 = lims._add_artifact(process1)
-    out_art2 = lims._add_artifact(process2)
-    out_art3 = lims._add_artifact(process3)
+    out_art1 = lims._add_artifact(process1, samples=[lims_sample])
+    out_art2 = lims._add_artifact(process2, samples=[lims_sample])
+    out_art3 = lims._add_artifact(process3, samples=[lims_sample])
 
     ##WHEN running _get_latest_output_artifact
     latest_output_artifact = get_output_artifact(process_type, lims_id, lims, last=True)
@@ -191,7 +191,7 @@ def test_get_latest_output_artifact(lims):
 
 ############################# get_latest_input_artifact ############################
 
-def test_get_latest_input_artifact(lims):
+def test_get_latest_input_artifact(lims, lims_sample, dummy_sample):
     ##GIVEN a lims with three artifacts with diferent parent processes with 
     # diferent date_run dates: 2018-01-01, 2018-02-01, 2018-03-01.
     # Where the third artifact (generated on the latest date), has two
@@ -199,7 +199,7 @@ def test_get_latest_input_artifact(lims):
     # And only one of the input artifcts has a sample list with a sample with
     # sample_id = TheOne 
 
-    sample_id = 'TheOne'
+    sample_id = lims_sample.id
     process_type = 'CG002 - Aggregate QC (Library Validation)'
     date1 = '2018-01-01'
     date2 = '2018-02-01'
@@ -209,51 +209,15 @@ def test_get_latest_input_artifact(lims):
     process2 = lims._add_process(date2, process_type)
     process3 = lims._add_process(date3, process_type)
 
-    out_art1 = lims._add_artifact(parent_process = process1)
-    out_art2 = lims._add_artifact(parent_process = process2)
-    out_art3 = lims._add_artifact(parent_process = process3)
+    out_art1 = lims._add_artifact(parent_process = process1, samples=[lims_sample])
+    out_art2 = lims._add_artifact(parent_process = process2, samples=[lims_sample])
+    out_art3 = lims._add_artifact(parent_process = process3, samples=[lims_sample])
 
     sample1 = lims._add_sample(sample_id = sample_id)
-    sample2 = lims._add_sample(sample_id = 'Dummy')
+    sample2 = lims._add_sample(sample_id = dummy_sample.id)
 
-    in_art1 = lims._add_artifact(samples = [sample1])
-    in_art2 = lims._add_artifact(samples = [sample2])
-
-    out_art3.input_list = [in_art1, in_art2]
-
-    ##WHEN running _get_latest_input_artifact
-    latest_input_artifact = get_latest_input_artifact(process_type, sample_id, lims)
-
-    ##THEN latest_input_artifact should be in_art1
-    assert latest_input_artifact == in_art1
-
-def test_get_latest_input_artifact(lims):
-    ##GIVEN a lims with three artifacts with diferent parent processes with 
-    # diferent date_run dates: 2018-01-01, 2018-02-01, 2018-03-01.
-    # Where the third artifact (generated on the latest date), has two
-    # input artifats. 
-    # And only one of the input artifcts has a sample list with a sample with
-    # sample_id = TheOne 
-
-    sample_id = 'TheOne'
-    process_type = 'CG002 - Aggregate QC (Library Validation)'
-    date1 = '2018-01-01'
-    date2 = '2018-02-01'
-    date3 = '2018-03-01'
-
-    process1 = lims._add_process(date1, process_type)
-    process2 = lims._add_process(date2, process_type)
-    process3 = lims._add_process(date3, process_type)
-
-    out_art1 = lims._add_artifact(parent_process = process1)
-    out_art2 = lims._add_artifact(parent_process = process2)
-    out_art3 = lims._add_artifact(parent_process = process3)
-
-    sample1 = lims._add_sample(sample_id = sample_id)
-    sample2 = lims._add_sample(sample_id = 'Dummy')
-
-    in_art1 = lims._add_artifact(samples = [sample1])
-    in_art2 = lims._add_artifact(samples = [sample2])
+    in_art1 = lims._add_artifact(samples = [lims_sample])
+    in_art2 = lims._add_artifact(samples = [dummy_sample])
 
     out_art3.input_list = [in_art1, in_art2]
 

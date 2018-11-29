@@ -60,14 +60,21 @@ class MockLims():
         for art in self.artifacts:
             ok = True
             if process_type:
+                print('hej')
                 if not art.parent_process:
                     ok = False
+                    print('du')
                 elif not art.parent_process.type.name in process_type:
                     ok = False
+                    print('glade')
+                    
             if samplelimsid:
                 if not samplelimsid in [s.id for s in art.samples]:
                     ok = False
+                    print('köp')
+                    
             if ok:
+                print('dig')
                 arts.append(art)
 
         return arts
@@ -136,6 +143,10 @@ def lims():
 @pytest.fixture
 def lims_sample():
     return MockSample()
+
+@pytest.fixture
+def dummy_sample():
+    return MockSample(sample_id='Dummy')
 
 
 @pytest.fixture
