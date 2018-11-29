@@ -15,7 +15,7 @@ DATABASE = 'vogue'
 class MockProcess():
     def __init__(self, date_str = '2018-01-01', process_type = None, pid = None):
         self.date_run = date_str
-        self.type = process_type
+        self.type = MockProcessType(process_type)
         self.udf = {}
         self.input_artifact_list = []
         self.id = pid
@@ -26,6 +26,9 @@ class MockProcess():
 class MockProcessType():
     def __init__(self, name = ''):
         self.name = name
+
+    def __repr__(self):
+        return f"ProcessType:name={self.name}"
 
 class MockArtifact():
     def __init__(self, parent_process = None, samples = None, id=None):
@@ -51,7 +54,7 @@ class MockLims():
     
     def get_artifacts(self, process_type, samplelimsid)-> list:
         """"Get a list of artifacts."""
-        if not type(process_type)==list:
+        if not isinstance(process_type,list):
             process_type=[process_type]
         arts = []
         for art in self.artifacts:
@@ -110,12 +113,19 @@ class MockLims():
         sample = MockSample(sample_id = sample_id)
         self.samples.append(sample)
         return sample
+    
+    def __repr__(self):
+        return (f"Lims:artifacts={self.artifacts},process={self.processes},"
+                "process_types={self.process_types},samples={self.samples}")
 
 
 class MockSample():
-    def __init__(self, sample_id='sample', lims=MockLims(), udfs={}):
+    def __init__(self, sample_id='sample', udfs={}):
         self.id = sample_id
         self.udf = udfs
+
+    def __repr__(self):
+        return f"Sample:id={self.id},udf={self.udf}"
 
 
 @pytest.fixture
