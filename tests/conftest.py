@@ -11,13 +11,8 @@ from genologics.lims import Lims
 
 DATABASE = 'vogue'
 
-
 class MockProcess():
-<<<<<<< HEAD
     def __init__(self, date_str = '2018-01-01', process_type = None, pid = None):
-=======
-    def __init__(self, date_str = '2018-01-01', process_type = None):
->>>>>>> another test for get_latest_input_artifact
         self.date_run = date_str
         self.type = MockProcessType(process_type)
         self.udf = {}
@@ -35,7 +30,6 @@ class MockProcessType():
         return f"ProcessType:name={self.name}"
 
 class MockArtifact():
-<<<<<<< HEAD
     def __init__(self, parent_process = None, samples = None, id=None):
         self.id = id
         self.parent_process = parent_process
@@ -48,30 +42,17 @@ class MockArtifact():
 
     def __repr__(self):
         return f"Artifact:parent_process={self.parent_process},samples={self.samples}"
-=======
-    def __init__(self, parent_process = None, samples = None):
-        self.parent_process = parent_process
-        self.samples = samples
-        self.input_list = []
-
-    def input_artifact_list(self):
-        return self.input_list
->>>>>>> another test for get_latest_input_artifact
 
 
 class MockLims():
     def __init__(self):
         self.artifacts = []
         self.processes = []
-<<<<<<< HEAD
         self.process_types = []
-=======
->>>>>>> another test for get_latest_input_artifact
         self.samples = []
     
     def get_artifacts(self, process_type, samplelimsid)-> list:
         """"Get a list of artifacts."""
-<<<<<<< HEAD
         if not isinstance(process_type,list):
             process_type=[process_type]
         arts = []
@@ -121,18 +102,6 @@ class MockLims():
     
     def _add_artifact(self, parent_process = None, samples = [], id=None):
         artifact = MockArtifact(parent_process, samples, id)
-=======
-        arts = self.artifacts
-        if process_type:
-            arts = []
-            for art in self.artifacts:
-                if art.parent_process and art.parent_process.type == process_type:
-                    arts.append(art)
-        return arts
-    
-    def _add_artifact(self, parent_process = None, samples = []):
-        artifact = MockArtifact(parent_process, samples)
->>>>>>> another test for get_latest_input_artifact
         self.artifacts.append(artifact)
         return artifact
 
@@ -150,15 +119,10 @@ class MockLims():
         sample = MockSample(sample_id = sample_id)
         self.samples.append(sample)
         return sample
-<<<<<<< HEAD
     
     def __repr__(self):
         return (f"Lims:artifacts={self.artifacts},process={self.processes},"
                 "process_types={self.process_types},samples={self.samples}")
-=======
-
-
->>>>>>> another test for get_latest_input_artifact
 
 class MockSample():
     def __init__(self, sample_id='sample', udfs={}):
