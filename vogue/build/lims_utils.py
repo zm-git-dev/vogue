@@ -29,6 +29,7 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
 
     final_date = None
     # Get the last atrtifact
+    print(lims)
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=True)
     if artifact:
         final_date = str_to_datetime(artifact.parent_process.date_run)
@@ -78,14 +79,14 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     """
 
     process_types = ['CG002 - Delivery']
-    udf = 'date arrived at clinical genomics'
+    udf = 'Date delivered'
     
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
     delivery_date = None
     
     art_date = None
     if artifact:
-        art_date = art.parent_process.udf.get(udf)
+        art_date = artifact.parent_process.udf.get(udf)
     
     if art_date:
         # We need to convert datetime.date to datetime.datetime
@@ -140,8 +141,12 @@ def get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Ar
 
     latest_input_artifact = None
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type) 
+    print(lims)
+    print(artifacts)
     # Make a list of tuples (<date the artifact was generated>, <artifact>): 
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
+    
+    print(date_art_list)
 
     if date_art_list:
         #Sort on date:
@@ -167,6 +172,9 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
     Pick out those steps that were performed before our lot_nr_step --> defrosts_before_this_process
     Count defrosts_before_this_process. --> nr_defrosts"""
 
+    if not application_tag:
+        return {}
+
     if not application_tag[0:6] in ['WGSPCF', 'WGTPCF']:
         return {}
 
@@ -177,7 +185,6 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
 
     return_dict = {}
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
-
     if concentration_art:
         concentration = concentration_art.udf.get(concentration_udf)
         lotnr = concentration_art.parent_process.udf.get(lot_nr_udf)
@@ -206,6 +213,9 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
     """Find the latest artifact that passed through a concentration_step and get its 
     concentration. Then go back in history to the latest amount_step and get the amount."""
 
+    if not application_tag:
+        return {}
+
     if not application_tag[0:6] in ['WGSLIF', 'WGTLIF']:
         return {}
 
@@ -222,7 +232,7 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
         step = concentration_art.parent_process
         # Go back in history untill we get to an output artifact from the amount_step
         while step and not amount_art:
-            art = _get_latest_input_artifact(step.type.name, lims_id, lims)
+            art = get_latest_input_artifact(step.type.name, lims_id, lims)
             if amount_step in [p.type.name for p in lims.get_processes(inputartifactlimsid=art.id)]:
                 amount_art = art
             step = art.parent_process
@@ -238,13 +248,16 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
     """Check only samples with mictobial application tag.
     Get concentration_udf from concentration_step."""
 
+    if not application_tag:
+        return {}
+
     if not application_tag[3:5] == 'NX':
         return None
 
     concentration_step = 'CG002 - Aggregate QC (Library Validation)'
     concentration_udf = 'Concentration (nM)'
 
-    concentration_art = _get_latest_input_artifact(concentration_step, lims_id, lims)
+    concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
 
     if concentration_art:
         return concentration_art.udf.get(concentration_udf)
@@ -265,23 +278,29 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     """Check only 'Targeted enrichment exome/panels'.
     Get size_udf from size_step."""
 
+    if not application_tag:
+        return None
+
     if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
         return None
 
     size_step = ['CG002 - Amplify Adapter-Ligated Library (SS XT)']
     size_udf = 'Size (bp)'
 
-    size_art = get_output_artifact(size_step, lims_id, lims, latest=True)
+    size_art = get_output_artifact(size_step, lims_id, lims, last=True)
 
     if size_art:
         return size_art.udf.get(size_udf)
     else:
-        None
+        return None
 
 
 def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) -> int:
     """Check only 'Targeted enrichment exome/panels'.
     Get size_udf from size_step."""
+
+    if not application_tag:
+        return None
 
     if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
         return None
@@ -289,7 +308,7 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) ->
     size_step = ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)']
     size_udf = 'Size (bp)'
 
-    size_art = get_output_artifact(size_step, lims_id, lims, latest=True)
+    size_art = get_output_artifact(size_step, lims_id, lims, last=True)
 
     if size_art:
         return size_art.udf.get(size_udf)

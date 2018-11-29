@@ -10,12 +10,18 @@
               </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Common trends
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{{ url_for('common', year_of_interest=this_year) }}">Turnaround Times</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   Preps
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{{ url_for('common', year_of_interest=this_year) }}">Common trends</a>
                   <a class="dropdown-item" href="{{ url_for('microbial' , year_of_interest=this_year) }}">Microbial</a>
-                  <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="#">WGS Illumina PCR-free</a>
                   <a class="dropdown-item" href="#">Lucigen PCR-free</a>
                   <a class="dropdown-item" href="#">Targeted enrichment (exome/panels)</a>

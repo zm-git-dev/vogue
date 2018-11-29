@@ -1,9 +1,11 @@
 from flask import make_response, flash, abort, url_for, redirect, render_template, request, session
 from flask_login import login_user,logout_user, current_user, login_required
-from flask.ext.mail import Message
+#from flask.ext.mail import Message
 from flask_oauthlib.client import OAuthException
+
 from extentions import app
-from vogue import PrepsCommon
+from vogue.server.utils import (find_recived_per_month, find_recived_to_delivered)
+
 from  datetime import date
 
 THIS_YEAR = date.today().year
@@ -20,15 +22,29 @@ def index():
 
 @app.route('/prepps/common/<year_of_interest>')
 def common(year_of_interest):
-    PC = PrepsCommon(year_of_interest)
-    turnaround_times = PC.make_data('turnaround_times')
-    received = PC.make_data('received')
-    received_application = PC.make_data('received_application')
+    group_by = ['research','standard','priority']#,'express']
+    group_key = "priority"
+    received = find_recived_per_month(year_of_interest, group_by, group_key, adapter)
+    received_application = find_recived_per_month(year_of_interest, group_by, group_key, adapter) #wrong groups!!!
+    received_to_delivered = turn_around_times(year_of_interest, group_by, group_key, 
+                                        'received_to_delivered' ,adapter) #wrong groups!!!
+    received_to_prepped = turn_around_times(year_of_interest, group_by, group_key, 
+                                        'received_to_prepped' ,adapter) #wrong groups!!!
+    prepped_to_sequenced = turn_around_times(year_of_interest, group_by, group_key, 
+                                        'prepped_to_sequenced' ,adapter) #wrong groups!!!
+    sequenced_to_delivered = turn_around_times(year_of_interest, group_by, group_key, 
+                                        'sequenced_to_delivered' ,adapter) #wrong groups!!!
+    
+
     return render_template('common.html',
         header = 'Common',
         received = received,
         received_application = received_application,
-        turnaround_times = turnaround_times,
+        turnaround_times = received_to_delivered,
+        received_to_delivered = received_to_delivered,
+        received_to_prepped = received_to_prepped,
+        prepped_to_sequenced = prepped_to_sequenced,
+        sequenced_to_delivered = sequenced_to_delivered,
         year_of_interest=year_of_interest,
         this_year = THIS_YEAR,
         years = YEARS)

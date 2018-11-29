@@ -1,6 +1,7 @@
+import logging
+
 from mongo_adapter import MongoAdapter
 from datetime import datetime as dt
-import logging
 LOG = logging.getLogger(__name__)
 
 
@@ -51,3 +52,6 @@ class VogueAdapter(MongoAdapter):
         """Functionality to get analyses results"""
         return self.analysis_collection.find_one({'_id':analysis_id})
         
+    def find_samples(self, query:dict)-> list:
+        samples = self.sample_collection.find(query)
+        return list(samples)
