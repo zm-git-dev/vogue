@@ -3,8 +3,13 @@ from flask_login import login_user,logout_user, current_user, login_required
 #from flask.ext.mail import Message
 from flask_oauthlib.client import OAuthException
 
+<<<<<<< HEAD
 from extentions import app
 from vogue.server.utils import (find_recived_per_month, find_recived_to_delivered)
+=======
+from extentions import app, adapter
+from vogue.server.utils import find_recived_per_month, turn_around_times
+>>>>>>> making it work
 
 from  datetime import date
 
@@ -34,7 +39,10 @@ def common(year_of_interest):
                                         'prepped_to_sequenced' ,adapter) #wrong groups!!!
     sequenced_to_delivered = turn_around_times(year_of_interest, group_by, group_key, 
                                         'sequenced_to_delivered' ,adapter) #wrong groups!!!
+<<<<<<< HEAD
+=======
     
+>>>>>>> making it work
 
     return render_template('common.html',
         header = 'Common',

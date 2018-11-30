@@ -3,15 +3,14 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 
-
 MONTHS = [(1, 'January'), (2, 'February'), (3, 'March'), (4, 'April'), 
         (5, 'May'), (6, 'June'), (7, 'July'), (8, 'August'), (9, 'September'), 
         (10, 'October'), (11, 'November'), (12, 'December')]
 
+
 COLORS = [('RGB(128, 128, 128)','RGB(128, 128, 128, 0.2)'),('RGB(255, 0, 0)','RGB(255, 0, 0, 0.2)'),
         ('RGB(0, 128, 128)','RGB(0, 128, 128, 0.2)'),('RGB(128, 0, 128)','RGB(128, 0, 128, 0.2)'),
         ('RGB(128, 0, 0)','RGB(128, 0, 0,0.2)'), ('RGB(128, 128, 0)','RGB(128, 128, 0,0.2)')]
-
 
 
 def get_dates(month: int, year: int)-> list:

@@ -11,7 +11,6 @@ from genologics.lims import Lims
 
 DATABASE = 'vogue'
 
-
 class MockProcess():
     def __init__(self, date_str = '2018-01-01', process_type = None, pid = None):
         self.date_run = date_str
@@ -125,7 +124,6 @@ class MockLims():
         return (f"Lims:artifacts={self.artifacts},process={self.processes},"
                 "process_types={self.process_types},samples={self.samples}")
 
-
 class MockSample():
     def __init__(self, sample_id='sample', udfs={}):
         self.id = sample_id
@@ -134,6 +132,11 @@ class MockSample():
     def __repr__(self):
         return f"Sample:id={self.id},udf={self.udf}"
 
+
+
+@pytest.fixture
+def artifacts_with_different_dates():
+    return MockArtifact()
 
 @pytest.fixture
 def lims():
