@@ -1,6 +1,8 @@
 import json
 import yaml
 import logging
+import os
+from stat import S_ISREG
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
@@ -26,7 +28,6 @@ def json_read(fname):
             analysis_conf = json.load(f)
             return analysis_conf
     except json.JSONDecodeError as e:
-        #LOG.warning(f"Trying JSON format {e}")
         return e 
 
 def yaml_read(fname):
@@ -39,7 +40,6 @@ def yaml_read(fname):
             analysis_conf = yaml.load(f)
             return analysis_conf
     except (yaml.YAMLError, yaml.scanner.ScannerError) as e:
-        #LOG.warning(f"Trying YAML format {e}")
         return e
 
 def check_file(fname):
@@ -48,10 +48,12 @@ def check_file(fname):
     """
 
     try:
-        with open(fname,'r') as f:
-            garbage = f.readlines()
-    except (IOError, FileNotFoundError) as e:
+        mode = os.stat(fname).st_uid
+    except FileNotFoundError as e:
         LOG.error(e)
         raise e
 
-
+    if not S_ISREG(os.stat(fname).st_mode):
+        e = SyntaxError("Input is not a file.") 
+        LOG.error(e)
+        raise e
