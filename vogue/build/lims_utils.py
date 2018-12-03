@@ -166,6 +166,9 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
     Pick out those steps that were performed before our lot_nr_step --> defrosts_before_this_process
     Count defrosts_before_this_process. --> nr_defrosts"""
 
+    if not application_tag:
+        return {}
+
     if not application_tag[0:6] in ['WGSPCF', 'WGTPCF']:
         return {}
 
@@ -204,6 +207,9 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
     """Find the latest artifact that passed through a concentration_step and get its 
     concentration. Then go back in history to the latest amount_step and get the amount."""
 
+    if not application_tag:
+        return {}
+
     if not application_tag[0:6] in ['WGSLIF', 'WGTLIF']:
         return {}
 
@@ -235,6 +241,9 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
     """Check only samples with mictobial application tag.
     Get concentration_udf from concentration_step."""
 
+    if not application_tag:
+        return {}
+
     if not application_tag[3:5] == 'NX':
         return None
 
@@ -262,6 +271,9 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     """Check only 'Targeted enrichment exome/panels'.
     Get size_udf from size_step."""
 
+    if not application_tag:
+        return None
+
     if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
         return None
 
@@ -273,12 +285,15 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     if size_art:
         return size_art.udf.get(size_udf)
     else:
-        None
+        return None
 
 
 def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) -> int:
     """Check only 'Targeted enrichment exome/panels'.
     Get size_udf from size_step."""
+
+    if not application_tag:
+        return None
 
     if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
         return None
