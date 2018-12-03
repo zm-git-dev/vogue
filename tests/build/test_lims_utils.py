@@ -37,23 +37,25 @@ def test_get_sequenced_date_no_artifacts(lims_sample, lims):
 
     assert sequenced_date is None
 
-# def test_get_sequenced_date_one_artifact(lims_sample, lims):
-#     ##GIVEN a sample with udf: 'Passed Sequencing QC' and a lims with an artifact
-#     udf = 'Passed Sequencing QC'
-#     date = '2018-12-31'
+def test_get_sequenced_date_one_artifact(lims_sample, lims):
+    ##GIVEN a sample with udf: 'Passed Sequencing QC' and a lims with an artifact
+    udf = 'Passed Sequencing QC'
+    date = '2018-12-31'
 
 #     lims_sample.udf[udf] = date
 #     assert lims_sample.udf.get(udf) == date
 
-#     process = lims._add_process(date_str = date)
-#     artifact = lims._add_artifact(parent_process = process)
-#     ##WHEN getting the sequence date
+    process_type_name = 'CG002 - Illumina Sequencing (HiSeq X)'
+    process_type = lims._add_process_type(name = process_type_name)
+    process = lims._add_process(date_str = date, process_type = process_type)
+    artifact = lims._add_artifact(parent_process = process, samples = [lims_sample])
 
-#     sequenced_date = get_sequenced_date(lims_sample, lims)
+    ##WHEN getting the sequence date
+    sequenced_date = get_sequenced_date(lims_sample, lims)
 
-#     ##THEN assert sequenced_date is datetime
+    ##THEN assert sequenced_date is datetime
 
-#     assert isinstance(sequenced_date, dt)
+    assert sequenced_date == str_to_datetime(date)
 
 ############################# get_received_date ############################
 def test_get_received_date_no_artifacts(lims_sample, lims):
@@ -167,7 +169,7 @@ def test_get_latest_output_artifact_no_art(lims):
     process_type = 'CG002 - Aggregate QC (Library Validation)'
 
     ##WHEN running _get_latest_output_artifact
-    latest_output_artifact = _get_latest_output_artifact(process_type, lims_id, lims)
+    latest_output_artifact = get_output_artifact(process_type, lims_id, lims, last=True)
 
     ##THEN assert latest_output_artifact is none
     assert latest_output_artifact is None
@@ -194,7 +196,7 @@ def test_get_latest_output_artifact(lims, lims_sample):
     A3 = lims._add_artifact(P3, samples = [lims_sample])
 
     ##WHEN running _get_latest_output_artifact
-    latest_output_artifact = _get_latest_output_artifact(process_type, lims_id, lims)
+    latest_output_artifact = get_output_artifact(process_type_name, lims_sample.id, lims, last=True)
 
     ##THEN latest_output_artifact should be run on 2018-03-01
     assert latest_output_artifact.parent_process.date_run == date3
@@ -399,13 +401,10 @@ def test_get_library_size_post_hyb(lims, lims_sample):
     A2.udf['Size (bp)'] = 500
     A3.udf['Size (bp)'] = 300
 
-    ##WHEN running _get_latest_input_artifact
-    latest_input_artifact = _get_latest_input_artifact(process_type, sample_id, lims)
 
     ##WHEN running get_library_size_post_hyb
     size = get_library_size_post_hyb(application_tag, lims_sample.id, lims) 
 
     ##THEN size should be fetched from A2   
     assert size == 500
-
 
