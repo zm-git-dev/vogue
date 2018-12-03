@@ -31,9 +31,6 @@ class PrepsCommon():
                     chategory_dict['labels'].append(month)
             data[chategory['name']] = {'data':chategory_dict, 'color':COLORS[i]}
             i+=1
-        print('lhjglgkjhgkj')
-        print(data)
-        print('lhjglgkjhgkj1111')
         return data
 
     
