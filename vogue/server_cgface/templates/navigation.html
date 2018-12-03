@@ -1,0 +1,37 @@
+{% block content %}
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('index') }}">
+                  <span data-feather="home"></span>
+                  Home <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Preps
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{{ url_for('common', year_of_interest=this_year) }}">Common trends</a>
+                  <a class="dropdown-item" href="{{ url_for('microbial' , year_of_interest=this_year) }}">Microbial</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#">WGS Illumina PCR-free</a>
+                  <a class="dropdown-item" href="#">Lucigen PCR-free</a>
+                  <a class="dropdown-item" href="#">Targeted enrichment (exome/panels)</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Sequencing
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{{ url_for('novaseq' , year_of_interest=this_year) }}">NovaSeq</a>
+                  <a class="dropdown-item" href="{{ url_for('hiseqx' , year_of_interest=this_year) }}">Hiseq X</a>
+                  <a class="dropdown-item" href="#">Hiseq 2500</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nav>
+    {% endblock %}

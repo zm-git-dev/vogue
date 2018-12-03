@@ -81,6 +81,7 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     udf = 'Date delivered'
     
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
+    print(artifact)
     delivery_date = None
     
     art_date = None
@@ -141,8 +142,9 @@ def get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Ar
     latest_input_artifact = None
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type) 
     # Make a list of tuples (<date the artifact was generated>, <artifact>): 
+    print(artifacts)
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
-
+    print(date_art_list)
     if date_art_list:
         #Sort on date:
         date_art_list.sort(key = operator.itemgetter(0))
@@ -177,9 +179,7 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
 
     return_dict = {}
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
-    print('hej')
     if concentration_art:
-        print('hej')
         concentration = concentration_art.udf.get(concentration_udf)
         lotnr = concentration_art.parent_process.udf.get(lot_nr_udf)
         this_date = str_to_datetime(concentration_art.parent_process.date_run)
@@ -198,7 +198,7 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
             nr_defrosts = len(defrosts_before_this_process)
 
             return_dict = {'nr_defrosts' : nr_defrosts, 'concentration' : concentration, 
-                            'lotnr' : lotnr}
+                            'lotnr' : lotnr, 'concentration_date' : this_date}
 
     return return_dict
 
@@ -217,13 +217,15 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
     amount_step = 'CG002 - Aggregate QC (DNA)'
 
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
-
+    print(concentration_art.id)
     if concentration_art:
         amount_art = None
         step = concentration_art.parent_process
+        print(step.id)
         # Go back in history untill we get to an output artifact from the amount_step
         while step and not amount_art:
             art = get_latest_input_artifact(step.type.name, lims_id, lims)
+            print(art.id)
             if amount_step in [p.type.name for p in lims.get_processes(inputartifactlimsid=art.id)]:
                 amount_art = art
             step = art.parent_process
