@@ -170,7 +170,6 @@ def find_concentration_time(year : int, adapter)-> dict:
                 data.append({'x' : month_number})
         if data:
             concentration_time['data'][group] = {'data' : data, 'color' : COLORS[i]}
-    print(concentration_time['labels'])
     return concentration_time
 
 

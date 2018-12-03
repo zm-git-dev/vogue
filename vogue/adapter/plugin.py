@@ -5,7 +5,7 @@ from datetime import datetime as dt
 LOG = logging.getLogger(__name__)
 
 
-class VogueAdapter(MongoAdapter):
+class VougeAdapter(MongoAdapter):
 
     def setup(self, db_name : str):
         """Setup connection to a database"""

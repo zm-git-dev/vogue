@@ -60,7 +60,6 @@ def microbial(year_of_interest):
     concentration_defrosts = find_concentration_defrosts(year_of_interest, adapter)
     concentration_time = find_concentration_time(year_of_interest, adapter)
     concentration_amount = find_concentration_amount(year_of_interest, adapter)
-    print(concentration_amount)
     return render_template('microbial.html',
         header = 'Microbial Samples',
         page_id = 'microbial',
