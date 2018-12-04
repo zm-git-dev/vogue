@@ -1,4 +1,4 @@
-from vogue.adapter import VogueAdapter
+from vogue.adapter import VougeAdapter
 from vogue.build.analysis import build_analysis
 
 def load_cancer_analysis(adapter: VogueAdapter, lims_id=None, dry_run=False, analysis : dict={}):
