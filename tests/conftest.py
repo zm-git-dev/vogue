@@ -2,6 +2,8 @@ import pytest
 
 from mongomock import MongoClient
 
+from vogue.adapter import VogueAdapter
+
 from genologics.entities import Sample
 from genologics.config import BASEURI,USERNAME,PASSWORD
 from genologics.lims import Lims
@@ -25,6 +27,9 @@ class MockProcess():
 class MockProcessType():
     def __init__(self, name = ''):
         self.name = name
+
+    def __repr__(self):	
+        return f"ProcessType:name={self.name}"
 
 class MockArtifact():
     def __init__(self, parent_process = None, samples = None, id=None):
@@ -50,7 +55,7 @@ class MockLims():
     
     def get_artifacts(self, process_type, samplelimsid)-> list:
         """"Get a list of artifacts."""
-        if not type(process_type)==list:
+        if not isinstance(process_type,list):
             process_type=[process_type]
         arts = []
         for art in self.artifacts:
@@ -110,12 +115,19 @@ class MockLims():
         self.samples.append(sample)
         return sample
 
+    def __repr__(self):	
+        return (f"Lims:artifacts={self.artifacts},process={self.processes},"	
+                "process_types={self.process_types},samples={self.samples}")
+
 
 
 class MockSample():
     def __init__(self, sample_id='sample', lims=MockLims(), udfs={}):
         self.id = sample_id
         self.udf = udfs
+
+    def __repr__(self):	
+        return f"Sample:id={self.id},udf={self.udf}"
 
 
 
@@ -139,17 +151,38 @@ def simple_artifact():
 #def mongo_sample(lims_sample):
 #    return build_sample(lims_sample)
 
-#@pytest.fixture(scope='function')
-#def pymongo_client(request):
-#    """Get a client to the mongo database"""
-#
-#    logger.info("Get a mongomock client")
-#    start_time = datetime.datetime.now()
-#    mock_client = MongoClient()
-#
-#    def teardown():
-#        mock_client.drop_database(DATABASE)
-#
-#    request.addfinalizer(teardown)
-#
-#    return mock_client
+@pytest.fixture
+def test_sample():	
+    return {'_id': '1'}	
+
+@pytest.fixture	
+def sample_id(test_sample):	
+    return test_sample['_id']
+
+@pytest.fixture
+def cancer_analysis():	
+    return {'case_id': '1',	
+            'samples': ['1', '2'],	
+            'picard_markdup': ['path_file_sample_1', 'path_file_sample_2'],	 
+            'TMB': 15,	
+            'workflow_name': 'BALSAMIC',	
+            'version_version': '2.7.1'}
+
+
+@pytest.fixture(scope='function')	
+def pymongo_client(request):	
+    """Get a client to the mongo database"""
+
+    mock_client = MongoClient()
+
+    def teardown():	
+        mock_client.drop_database(DATABASE)	
+
+    request.addfinalizer(teardown)	
+
+    return mock_client	
+
+@pytest.fixture(scope='function')	
+def adapter(request, pymongo_client):	
+    """Get a client to the mongo database"""	
+    return VogueAdapter(pymongo_client, DATABASE)
