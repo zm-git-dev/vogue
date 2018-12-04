@@ -10,10 +10,16 @@ MONTHS = [(1, 'January'), (2, 'February'), (3, 'March'), (4, 'April'),
 
 COLORS = [('RGB(128, 128, 128)','RGB(128, 128, 128, 0.2)'),('RGB(255, 0, 0)','RGB(255, 0, 0, 0.2)'),
         ('RGB(0, 128, 128)','RGB(0, 128, 128, 0.2)'),('RGB(128, 0, 128)','RGB(128, 0, 128, 0.2)'),
-        ('RGB(128, 0, 0)','RGB(128, 0, 0,0.2)'), ('RGB(128, 128, 0)','RGB(128, 128, 0,0.2)')]
+        ('RGB(128, 0, 0)','RGB(128, 0, 0,0.2)'), ('RGB(128, 128, 0)','RGB(128, 128, 0,0.2)'),
+        ('RGB(52, 152, 219)', 'RGB(52, 152, 219, 0.2)'),('RGB(33, 97, 140)','RGB(33, 97, 140, 0.2)'),  
+         ('RGB(46, 204, 113)','RGB(46, 204, 113, 0.2)'),('RGB(241, 196, 15)','RGB(241, 196, 15, 0.2)'),
+         ('RGB(23, 32, 42)','RGB(23, 32, 42, 0.2)'),('RGB(183, 149, 11)','RGB(183, 149, 11, 0.2)'),  
+        ('RGB(0, 255, 0)','RGB(0, 255, 0, 0.2)'),('RGB(0, 255, 255)','RGB(0, 255, 255, 0.2)'),
+        ('RGB(255, 0, 255)','RGB(255, 0, 255, 0.2)'),('RGB(0, 0, 255)','RGB(0, 0, 255, 0.2)')]
 
 
-def get_dates(month: int, year: int)-> list:
+
+def get_dates_of_month(month: int, year: int)-> list:
     """Returns:
         date1 = first date of month (datetime) 
         date2 = first date of next month (datetime) """
@@ -23,6 +29,16 @@ def get_dates(month: int, year: int)-> list:
         date2 = dt(year + 1, 1, 1, 0, 0)
     else:
         date2 = dt(year, month +1 , 1, 0, 0)
+
+    return date1, date2
+
+def get_dates_of_year(year: int)-> list:
+    """Returns:
+        date1 = first jan 'this' year
+        date2 = first jan 'next' year """
+
+    date1 = dt(year, 1, 1, 0, 0)
+    date2 = dt(year + 1, 1, 1, 0, 0)
 
     return date1, date2
 
@@ -51,9 +67,9 @@ def find_recived_per_month(year : int, group_by : list, group_key : str, adapter
     for i, group in enumerate(group_by):
         data[group] = {'data' : {'labels':[], 'X' : [], 'Y' : []}, 'color' : COLORS[i]}
         for month_number, month_name in MONTHS:
-            date1, date2 = get_dates(month_number, int(year))
+            date1, date2 = get_dates_of_month(month_number, int(year))
             query = {group_key : group, 
-                    "received_date" : {"$gte" : date1, "$lt" : date2}}
+                    'received_date' : {'$gte' : date1, '$lt' : date2}}
             samples = adapter.find_samples(query)
             data[group]['data']['labels'].append(month_name)
             data[group]['data']['X'].append(month_number)
@@ -74,9 +90,9 @@ def turn_around_times(year : int, group_by : list, group_key : str, time_range_k
     for i, group in enumerate(group_by):
         data[group] = {'data' : {'labels':[], 'X' : [], 'Y' : []}, 'color' : COLORS[i]}
         for month_number, month_name in MONTHS:
-            date1, date2 = get_dates(month_number, int(year))
+            date1, date2 = get_dates_of_month(month_number, int(year))
             query = {group_key : group, 
-                    "received_date" : {"$gte" : date1, "$lt" : date2}}
+                    'received_date' : {'$gte' : date1, '$lt' : date2}}
             samples = list(adapter.find_samples(query))
             average = get_average(samples, time_range_key)
             if average:
@@ -85,3 +101,74 @@ def turn_around_times(year : int, group_by : list, group_key : str, time_range_k
                 data[group]['data']['Y'].append(average)
 
     return data
+
+
+def find_concentration_defrosts(year : int, adapter)-> dict:
+    """Prepares data for ... plots."""
+
+    group_by_key = 'lotnr'
+    date1, date2 = get_dates_of_year(int(year))
+    group_by = list(adapter.sample_collection.distinct(group_by_key))
+    defrosts = {'axis' : {'x' : 'Number of Defrosts', 'y' : 'Concentration (nM)'}, 
+                'data': {}, 'title' : 'Some title!'}
+    for i, group in enumerate(group_by):
+        data = []
+        query = {'lotnr' : group, 
+                'received_date' : {'$gte' : date1, '$lt' : date2},
+                'nr_defrosts-concentration' : { '$exists' : True},
+                'nr_defrosts': { '$exists' : True}}
+        samples = adapter.find_samples(query)
+        for sample in samples:
+            data.append({'x' : sample['nr_defrosts'], 'y': round(sample['nr_defrosts-concentration'], 2) })
+        if data:
+            defrosts['data'][group] = {'data' : data, 'color' : COLORS[i]}
+ 
+    return defrosts
+
+
+def find_concentration_amount(year : int, adapter)-> dict:
+    """Prepares data for ... plots."""
+
+    date1, date2 = get_dates_of_year(int(year))
+    amount = {'axis' : {'x' : 'Amount (ng)', 'y' : 'Concentration (nM)'}, 
+                'data': [], 'title' : 'Some title!'}
+    query = {'received_date' : {'$gte' : date1, '$lt' : date2},
+                'amount' : { '$exists' : True},
+                'amount-concentration': { '$exists' : True}}
+
+    samples = adapter.find_samples(query)
+    for sample in samples:
+        amount['data'].append({'x' : sample['amount'], 'y': round(sample['amount-concentration'], 2), 'label': sample['_id'] })
+
+    return amount
+
+
+def find_concentration_time(year : int, adapter)-> dict:
+    """Prepares""" ##OBS THIS ONE IS A BIG QUESTON MARK. WHEN WE SAY OVER TIME HERE, HOW DO WE MESRE TIME? 
+    # received_date IS OBVOIUSLY NOT THE CORRECT DATE TO LOOK AT....
+
+    group_by_key = 'lotnr'
+    y_axis_key = 'nr_defrosts-concentration'
+    group_by = list(adapter.sample_collection.distinct(group_by_key))
+    concentration_time = {'axis' : {'x' : 'Time', 'y' : 'Concentration (nM)'}, 
+                'data': {}, 'title' : 'Some title!', 'labels' : [m[1] for m in MONTHS]}
+
+    for i, group in enumerate(group_by):
+        data = []
+        for month_number, month_name in MONTHS:
+            date1, date2 = get_dates_of_month(month_number, int(year))
+            query = {group_by_key : group, 
+                    'prepared_date' : {'$gte' : date1, '$lt' : date2},
+                    y_axis_key : { '$exists' : True}}
+
+            samples = list(adapter.find_samples(query))
+            average = get_average(samples, y_axis_key)
+            if average:
+                data.append({'x' : month_number, 'y': round(average, 2) })
+            else:
+                data.append({'x' : month_number})
+        if data:
+            concentration_time['data'][group] = {'data' : data, 'color' : COLORS[i]}
+    return concentration_time
+
+

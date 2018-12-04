@@ -4,7 +4,7 @@ import logging
 import click
 
 from mongo_adapter import get_client
-from vogue.adapter import VogueAdapter
+from vogue.adapter import VougeAdapter
 
 LOG = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def load(context, database_name, database_uri):
         LOG.error(f'Invalid database uri: {err}')
         context.abort()
     
-    adapter = VogueAdapter(client, db_name=database_name)
+    adapter = VougeAdapter(client, db_name=database_name)
     context.obj['adapter'] = adapter
 
     

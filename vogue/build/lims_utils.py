@@ -29,7 +29,6 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
 
     final_date = None
     # Get the last atrtifact
-    print(lims)
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=True)
     if artifact:
         final_date = str_to_datetime(artifact.parent_process.date_run)
@@ -141,13 +140,8 @@ def get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Ar
 
     latest_input_artifact = None
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type) 
-    print(lims)
-    print(artifacts)
     # Make a list of tuples (<date the artifact was generated>, <artifact>): 
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
-    
-    print(date_art_list)
-
     if date_art_list:
         #Sort on date:
         date_art_list.sort(key = operator.itemgetter(0))
@@ -204,7 +198,7 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
             nr_defrosts = len(defrosts_before_this_process)
 
             return_dict = {'nr_defrosts' : nr_defrosts, 'concentration' : concentration, 
-                            'lotnr' : lotnr}
+                            'lotnr' : lotnr, 'concentration_date' : this_date}
 
     return return_dict
 
@@ -226,7 +220,6 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
     amount_step = 'CG002 - Aggregate QC (DNA)'
 
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
-
     if concentration_art:
         amount_art = None
         step = concentration_art.parent_process

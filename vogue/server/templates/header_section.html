@@ -6,11 +6,11 @@
             <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
           </div>
           <form  action="{{ url_for('index')}}" method="POST" >
-          <input type="hidden" name="common" value="common">
-           <select name="year" class="form-control" required onchange="this.form.submit()">
-              {% for year in years %}
-              <option value={{year}} {{ 'selected' if year == year_of_interest }}>Year {{year}} </option>
-              {% endfor %}
+            <input type="hidden" name="page" value="{{page_id}}">
+            <select name="year" class="form-control" required onchange="this.form.submit()">
+                {% for year in years %}
+                <option value={{year}} {{ 'selected' if year == year_of_interest }}>Year {{year}} </option>
+                {% endfor %}
             </select>
           </form>
         </div>

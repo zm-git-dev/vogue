@@ -14,9 +14,6 @@ def build_sample(sample: Sample, lims: Lims)-> dict:
     mongo_sample['source'] = sample.udf.get('Source')
     mongo_sample['priority'] = sample.udf.get('priority')
 
-    print(application_tag)
-    print(sample)
-    print(lims)
     conc_and_amount = get_final_conc_and_amount_dna(application_tag, sample.id, lims)
     mongo_sample['amount'] = conc_and_amount.get('amount')
     mongo_sample['amount-concentration'] = conc_and_amount.get('concentration')
