@@ -2,7 +2,7 @@ import pytest
 
 from mongomock import MongoClient
 
-from vogue.adapter import VogueAdapter
+from vogue.adapter import VougeAdapter
 
 from genologics.entities import Sample
 from genologics.config import BASEURI,USERNAME,PASSWORD
@@ -185,4 +185,4 @@ def pymongo_client(request):
 @pytest.fixture(scope='function')	
 def adapter(request, pymongo_client):	
     """Get a client to the mongo database"""	
-    return VogueAdapter(pymongo_client, DATABASE)
+    return VougeAdapter(pymongo_client, DATABASE)
