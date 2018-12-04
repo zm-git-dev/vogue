@@ -1,7 +1,7 @@
 from vogue.adapter import VougeAdapter
 from vogue.build.analysis import build_analysis
 
-def load_cancer_analysis(adapter: VogueAdapter, lims_id=None, dry_run=False, analysis : dict={}):
+def load_cancer_analysis(adapter: VougeAdapter, lims_id=None, dry_run=False, analysis : dict={}):
     """Load information from a cancer analysis"""
     
     sample_obj = adapter.sample(lims_id)
