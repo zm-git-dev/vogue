@@ -7,6 +7,10 @@ from stat import S_ISREG
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
 
+class NotAFileError(Exception):
+    """Error, path is not a file"""
+    pass
+
 def add_doc(docstring):
     """
     A decorator for adding docstring. Taken shamelessly from stackexchange.
@@ -27,8 +31,9 @@ def json_read(fname):
         with open(fname, 'r') as f:
             analysis_conf = json.load(f)
             return analysis_conf
-    except json.JSONDecodeError as e:
-        return e 
+    except:
+        LOG.warning('Input config is not JSON')
+        return False 
 
 def yaml_read(fname):
     """
@@ -39,8 +44,9 @@ def yaml_read(fname):
         with open(fname, 'r') as f:
             analysis_conf = yaml.load(f)
             return analysis_conf
-    except (yaml.YAMLError, yaml.scanner.ScannerError) as e:
-        return e
+    except:
+        LOG.warning('Input config is not YAML')
+        return False
 
 def check_file(fname):
     """
@@ -49,11 +55,10 @@ def check_file(fname):
 
     try:
         mode = os.stat(fname).st_uid
+        if not S_ISREG(os.stat(fname).st_mode):
+            e = NotAFileError("Input is not a file.") 
+            LOG.error(e)
+            raise e
     except FileNotFoundError as e:
-        LOG.error(e)
-        raise e
-
-    if not S_ISREG(os.stat(fname).st_mode):
-        e = SyntaxError("Input is not a file.") 
         LOG.error(e)
         raise e
