@@ -12,7 +12,7 @@ NO_FILE = 'tests/fixtures/no_exist_file.data'
 NOT_FILE = 'tests/fixtures'
 
 
-class TestCase_check_file(unittest.TestCase):
+class Testcase_cli_utils(unittest.TestCase):
 
     def test_add_doc(self):
         @add_doc("doc decorator")
