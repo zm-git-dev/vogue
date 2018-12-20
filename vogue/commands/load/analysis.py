@@ -36,7 +36,11 @@ def analysis(context, sample_id, analysis_config):
     Read and load analysis results. These are either QC or analysis output files.
     """
     LOG.info("Reading and validating config file.")
-    check_file(analysis_config)
+    try:
+        check_file(analysis_config)
+    except FileNotFoundError as e:
+        context.abort()
+
     LOG.info("Trying JSON format")
     analysis_dict = json_read(analysis_config)
     if not isinstance(analysis_dict,dict):
@@ -44,9 +48,9 @@ def analysis(context, sample_id, analysis_config):
         analysis_dict = yaml_read(analysis_config)
         if not isinstance(analysis_dict,dict):
             LOG.error("Cannot read input analysis config file. Type unknown.")
-            raise TypeError
+            context.abort()
 
     LOG.info("Validating config file")
     if not validate_conf(analysis_dict):
         LOG.error("Input config file is not valid format")
-        raise TypeError
+        context.abort()
