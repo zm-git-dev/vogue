@@ -1,0 +1,17 @@
+{
+    "report_data_sources": {
+        "GATK": {
+            "base_recalibrator": {
+                "ACC5152A16_R": "/mnt/hds/proj/bioinfo/BALSAMIC_analysis/analyses/GMS_181203/ACC5152A16/analysis/bam/ACC5152A16_R.sorted.mrkdup.ralgn.bsrcl.bam.bsrcl_list"
+            }
+        },
+        "Picard": {
+            "AlignmentSummaryMetrics": {
+                "ACC5152A16_R": "/mnt/hds/proj/bioinfo/BALSAMIC_analysis/analyses/GMS_181203/ACC5152A16/analysis/bam/ACC5152A16_R.sorted.alignmetric"
+            },
+            "HsMetrics": {
+                "ACC5152A16_R": "/mnt/hds/proj/bioinfo/BALSAMIC_analysis/analyses/GMS_181203/ACC5152A16/analysis/bam/ACC5152A16_R.sorted.mrkdup.hsmetric"
+            },
+            "InsertSizeMetrics": {
+                "ACC5152A16_R": "/mnt/hds/proj/bioinfo/BALSAMIC_analysis/analyses/GMS_181203/ACC5152A16/analysis/bam/ACC5152A16_R.sorted.insertsizemetric"
+            },
