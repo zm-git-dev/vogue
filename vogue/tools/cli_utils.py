@@ -2,14 +2,10 @@ import json
 import yaml
 import logging
 import os
-from stat import S_ISREG
+import pathlib
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
-
-class NotAFileError(Exception):
-    """Error, path is not a file"""
-    pass
 
 def add_doc(docstring):
     """
@@ -53,12 +49,8 @@ def check_file(fname):
     Check file exists and readable.
     """
 
-    try:
-        mode = os.stat(fname).st_uid
-        if not S_ISREG(os.stat(fname).st_mode):
-            e = NotAFileError("Input is not a file.") 
-            LOG.error(e)
-            raise e
-    except FileNotFoundError as e:
-        LOG.error(e)
-        raise e
+    path = pathlib.Path(fname)
+
+    if not path.exists() or not path.is_file():
+        LOG.error("File not found or input is not a file.")
+        raise FileNotFoundError
