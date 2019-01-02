@@ -1,6 +1,7 @@
 import logging
 LOG = logging.getLogger(__name__)
 
+
 def validate_conf(analysis_conf):
     """
     Takes input analysis_conf dictionary and validates entries.
@@ -13,13 +14,18 @@ def validate_conf(analysis_conf):
             LOG.info('Input multiqc file is probably properly formatted.')
             valid_dict = True
         else:
-            LOG.warning('Input multiqc file has too few keys in it OR it is truncated.')
+            LOG.warning(
+                'Input multiqc file has too few keys in it OR it is truncated.'
+            )
             valid_dict = False
     except (KeyError, AttributeError) as e:
-        LOG.warning('Input multiqc file is either not a multiqc report or it it is truncated.')
+        LOG.warning(
+            'Input multiqc file is either not a multiqc report or it it is truncated.'
+        )
         valid_dict = False
 
     return valid_dict
+
 
 def build_analysis(analysis: dict, analysis_type: str):
     """build a analysis object"""

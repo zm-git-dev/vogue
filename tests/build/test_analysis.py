@@ -16,7 +16,6 @@ NOT_FILE = 'tests/fixtures'
 
 
 class Testcase_analysis(unittest.TestCase):
-    
     def test_validate_conf(self):
 
         invalid_analysis_dict = json_read(INVALID_JSON)
@@ -30,6 +29,7 @@ class Testcase_analysis(unittest.TestCase):
         valid_analysis_dict = json_read(VALID_JSON)
         analysis_type = 'cancer'
 
-        ready_analysis_dict = build_analysis(valid_analysis_dict, analysis_type) 
+        ready_analysis_dict = build_analysis(valid_analysis_dict,
+                                             analysis_type)
 
-        self.assertIsInstance(valid_analysis_dict, dict) 
+        self.assertIsInstance(valid_analysis_dict, dict)
