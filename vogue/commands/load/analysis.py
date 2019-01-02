@@ -5,16 +5,13 @@ import click
 import yaml
 import json
 
-from vogue.tools.cli_utils import json_read, yaml_read, check_file
+from vogue.tools.cli_utils import json_read
+from vogue.tools.cli_utils import yaml_read
+from vogue.tools.cli_utils import check_file
+from vogue.build.analysis import validate_conf
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
-
-def validate_conf(analysis_conf):
-    """
-    Takes input analysis_conf dictionary and validates entries.
-    """
-    return True
 
 @click.command("analysis", short_help = "Read files from analysis workflows")
 @click.option(
