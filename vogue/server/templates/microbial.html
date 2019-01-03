@@ -6,105 +6,40 @@
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
             <div class="row">
-                <div class="col-lg-12"><canvas class="my-4 w-100" id="defrosts"></canvas></div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12"><canvas class="my-4 w-100" id="concentration_time"></canvas></div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12"><canvas class="my-4 w-100" id="amount"></canvas></div>
+                <div class="col-lg-12"><canvas class="my-4 w-100" id="microbial_concentration_time"></canvas></div>
             </div>
         </main>
     </div>
 </div>
-
 <script>
-    var ctx = document.getElementById("defrosts")
+
+    var ctx = document.getElementById("microbial_concentration_time")
     var datasets = []
-    {% for group in defrosts['data'] %}
-      datasets.push({
-                      label: "{{group}}", 
-                      data: {{defrosts['data'][group]['data']|tojson}},
-                      borderColor: "{{defrosts['data'][group]['color'][0]}}",
-                      backgroundColor: "{{defrosts['data'][group]['color'][1]}}",
-                      })    
-    {% endfor %}
-
-    var received = new Chart(ctx, {
-      type: 'scatter',
-      options : {title: {display: true, text: "{{defrosts['title']}}" },
-                legend: {position:'right'},
-                scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{defrosts['axis']['x']|tojson}}},
-                        ticks: {stepSize: 1}
-                        }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{defrosts['axis']['y']|tojson}}}
-                        }]
-                    }
-                },
-      data: { type: "scatter",
-                datasets: datasets}
-    })
-
-
-    var ctx = document.getElementById("amount")
-    var datasets = [{data: {{amount['data']|tojson}} }]
-
-    var received = new Chart(ctx, {
-        type: 'scatter',
-        toolTipContent: '{label}',
-        options : {title: {display: true, text: "{{amount['title']}}" },
-                legend: {display: false},
-                scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{amount['axis']['x']|tojson}}},
-                        ticks: {stepSize: 1}
-                        }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{amount['axis']['y']|tojson}}}
-                        }]
-                    }
-                },
-        data : {type: "scatter",
-                datasets: datasets}
-    })
-
-
-
-
-    var ctx = document.getElementById("concentration_time")
-    var datasets = []
-    {% for group in concentration_time['data'] %}
+    {% for group in microbial_concentration_time['data'] %}
         datasets.push({
                     label: "{{group}}", 
-                      data: {{concentration_time['data'][group]['data']|tojson}},
-                      borderColor: "{{concentration_time['data'][group]['color'][0]}}",
-                      backgroundColor: "{{concentration_time['data'][group]['color'][1]}}",
+                      data: {{microbial_concentration_time['data'][group]['data']|tojson}},
+                      borderColor: "{{microbial_concentration_time['data'][group]['color'][0]}}",
+                      backgroundColor: "{{microbial_concentration_time['data'][group]['color'][1]}}",
                       fill: false
                       })    
     {% endfor %}
-    var labels = {{concentration_time['labels']|tojson}}
+    var labels = {{microbial_concentration_time['labels']|tojson}}
 
     var received_to_delivered = new Chart(ctx, {
         type: 'line',
-        options : { title : {display: true, text: 'blsbls'},
+        options : { title : {display: true, text: "{{microbial_concentration_time['title']}}"},
                     legend : {position:'right'},
                     spanGaps: true,
                     scales: {
                     xAxes: [{
                         display: true,
-                        scaleLabel: {display: true, labelString: {{concentration_time['axis']['x']|tojson}}},
+                        scaleLabel: {display: true, labelString: {{microbial_concentration_time['axis']['x']|tojson}}},
                         ticks: {stepSize: 1}
                         }],
                     yAxes: [{
                         display: true,
-                        scaleLabel: {display: true, labelString: {{concentration_time['axis']['y']|tojson}}}
+                        scaleLabel: {display: true, labelString: {{microbial_concentration_time['axis']['y']|tojson}}}
                         }]
                     }
                         },

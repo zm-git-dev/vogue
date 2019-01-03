@@ -6,8 +6,8 @@ from flask_oauthlib.client import OAuthException
 
 from extentions import app, adapter
 from vogue.server.utils import (find_recived_per_month, turn_around_times, 
-                                find_concentration_defrosts, find_concentration_time,
-                                find_concentration_amount)
+                                find_concentration_defrosts, find_concentration_amount,   
+                                find_key_over_time)
 
 from  datetime import date
 
@@ -22,6 +22,15 @@ def index():
     if request.form.get('page') == 'microbial':
         year = request.form.get('year')
         return redirect(url_for('microbial', year_of_interest=year))
+    if request.form.get('page') == 'wgs':
+        year = request.form.get('year')
+        return redirect(url_for('wgs', year_of_interest=year))
+    if request.form.get('page') == 'lucigen':
+        year = request.form.get('year')
+        return redirect(url_for('lucigen', year_of_interest=year))
+    if request.form.get('page') == 'target_enrichment':
+        year = request.form.get('year')
+        return redirect(url_for('target_enrichment', year_of_interest=year))
     return render_template(
         'index.html',
         this_year = THIS_YEAR)
@@ -58,19 +67,66 @@ def common(year_of_interest):
 
 @app.route('/prepps/microbial/<year_of_interest>')
 def microbial(year_of_interest):
-    concentration_defrosts = find_concentration_defrosts(year_of_interest, adapter)
-    concentration_time = find_concentration_time(year_of_interest, adapter)
-    concentration_amount = find_concentration_amount(year_of_interest, adapter)
+    microbial_concentration_time = find_key_over_time(year_of_interest, 'strain', 
+                                        'microbial_library_concentration', 'Microbial',
+                                        'Concentration (nM)' , adapter)
+
     return render_template('microbial.html',
         header = 'Microbial Samples',
         page_id = 'microbial',
-        defrosts = concentration_defrosts,
-        concentration_time = concentration_time,
-        amount = concentration_amount,
+        microbial_concentration_time = microbial_concentration_time,
         year_of_interest=year_of_interest,
         this_year = THIS_YEAR,
         years = YEARS)
 
+@app.route('/prepps/target_enrichment/<year_of_interest>')
+def target_enrichment(year_of_interest):
+    library_size_pre_hyb = find_key_over_time(year_of_interest, 'source', 'library_size_pre_hyb', 
+                                        'Targeted enrichment exome/panels', 'library size pre-hybridization QC', adapter)
+    library_size_post_hyb = find_key_over_time(year_of_interest, 'source', 'library_size_post_hyb', 
+                                        'Targeted enrichment exome/panels', 'library size post-hybridization QC', adapter)
+    
+    return render_template('target_enrichment.html',
+        header = 'Target enrichment (exom/panels)',
+        page_id = 'target_enrichment',
+        library_size_pre_hyb = library_size_pre_hyb,
+        library_size_post_hyb = library_size_post_hyb,
+        year_of_interest=year_of_interest,
+        this_year = THIS_YEAR,
+        years = YEARS)
+
+@app.route('/prepps/wgs/<year_of_interest>')
+def wgs(year_of_interest):
+    concentration_defrosts = find_concentration_defrosts(year_of_interest, adapter)
+    concentration_time = find_key_over_time(year_of_interest, 'lotnr', 'nr_defrosts-concentration', 
+                                        'wgs illumina PCR-free', 'Concentration (nM)', adapter) #, by_month=False)
+    
+    return render_template('wgs.html',
+        header = 'WGS illumina PCR-free',
+        page_id = 'wgs',
+        defrosts = concentration_defrosts,
+        concentration_time = concentration_time,
+        year_of_interest=year_of_interest,
+        this_year = THIS_YEAR,
+        years = YEARS)
+
+
+@app.route('/prepps/lucigen/<year_of_interest>')
+def lucigen(year_of_interest):
+    amount_concentration_time = find_key_over_time(year_of_interest, 'lotnr', 
+                                        'amount-concentration', 'lucigen PCR-free',
+                                        'Concentration (nM)' , adapter)
+    concentration_amount = find_concentration_amount(year_of_interest, adapter)
+
+
+    return render_template('lucigen.html',
+        header = 'Lucigen PCR-free',
+        page_id = 'lucigen',
+        amount_concentration = amount_concentration_time,
+        amount = concentration_amount,
+        year_of_interest=year_of_interest,
+        this_year = THIS_YEAR,
+        years = YEARS)
 
 @app.route('/sequencing/novaseq/<year_of_interest>')
 def novaseq(year_of_interest):
