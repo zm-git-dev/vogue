@@ -1,0 +1,91 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'navigation.html' %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            {% include 'header_section.html' %}
+            <div class="row">
+                <div class="col-lg-12"><canvas class="my-4 w-100" id="library_size_post_hyb"></canvas></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12"><canvas class="my-4 w-100" id="library_size_pre_hyb"></canvas></div>
+            </div>ß
+        </main>
+    </div>
+</div>
+
+
+<script>
+
+    var ctx = document.getElementById("library_size_post_hyb")
+    var datasets = []
+    {% for group in library_size_post_hyb['data'] %}
+        datasets.push({
+                    label: "{{group}}", 
+                      data: {{library_size_post_hyb['data'][group]['data']|tojson}},
+                      borderColor: "{{library_size_post_hyb['data'][group]['color'][0]}}",
+                      backgroundColor: "{{library_size_post_hyb['data'][group]['color'][1]}}",
+                      fill: false
+                      })    
+    {% endfor %}
+    var labels = {{library_size_post_hyb['labels']|tojson}}
+
+    var received_to_delivered = new Chart(ctx, {
+        type: 'line',
+        options : { title : {display: true, text: "{{library_size_post_hyb['title']}}"},
+                    legend : {position:'right'},
+                    spanGaps: true,
+                    scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {display: true, labelString: {{library_size_post_hyb['axis']['x']|tojson}}},
+                        ticks: {stepSize: 1}
+                        }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {display: true, labelString: {{library_size_post_hyb['axis']['y']|tojson}}}
+                        }]
+                    }
+                        },
+        data: { labels: labels, datasets: datasets}
+      })
+
+</script>
+<script>
+
+    var ctx = document.getElementById("library_size_pre_hyb")
+    var datasets = []
+    {% for group in library_size_pre_hyb['data'] %}
+        datasets.push({
+                    label: "{{group}}", 
+                      data: {{library_size_pre_hyb['data'][group]['data']|tojson}},
+                      borderColor: "{{library_size_pre_hyb['data'][group]['color'][0]}}",
+                      backgroundColor: "{{library_size_pre_hyb['data'][group]['color'][1]}}",
+                      fill: false,
+                      })    
+    {% endfor %}
+    var labels = {{library_size_pre_hyb['labels']|tojson}}
+
+    var received_to_delivered = new Chart(ctx, {
+        type: 'line',
+        options : { title : {display: true, text: "{{library_size_pre_hyb['title']}}"},
+                    legend : {position:'right'},
+                    spanGaps: true,
+                    scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {display: true, labelString: {{library_size_pre_hyb['axis']['x']|tojson}}},
+                        ticks: {stepSize: 1}
+                        }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {display: true, labelString: {{library_size_pre_hyb['axis']['y']|tojson}}}
+                        }]
+                    }
+                        },
+        data: { labels: labels, datasets: datasets}
+      })
+
+</script>
+{% endblock %}

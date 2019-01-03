@@ -13,6 +13,7 @@ def build_sample(sample: Sample, lims: Lims)-> dict:
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
     mongo_sample['priority'] = sample.udf.get('priority')
+    mongo_sample['application_tag'] = application_tag
 
     conc_and_amount = get_final_conc_and_amount_dna(application_tag, sample.id, lims)
     mongo_sample['amount'] = conc_and_amount.get('amount')

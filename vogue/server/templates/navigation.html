@@ -22,9 +22,9 @@
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   <a class="dropdown-item" href="{{ url_for('microbial' , year_of_interest=this_year) }}">Microbial</a>
-                  <a class="dropdown-item" href="#">WGS Illumina PCR-free</a>
-                  <a class="dropdown-item" href="#">Lucigen PCR-free</a>
-                  <a class="dropdown-item" href="#">Targeted enrichment (exome/panels)</a>
+                  <a class="dropdown-item" href="{{ url_for('wgs' , year_of_interest=this_year) }}">WGS Illumina PCR-free</a>
+                  <a class="dropdown-item" href="{{ url_for('lucigen' , year_of_interest=this_year) }}">Lucigen PCR-free</a>
+                  <a class="dropdown-item" href="{{ url_for('target_enrichment' , year_of_interest=this_year) }}">Targeted enrichment (exome/panels)</a>
                 </div>
               </li>
               <li class="nav-item dropdown">

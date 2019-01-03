@@ -110,7 +110,7 @@ def find_concentration_defrosts(year : int, adapter)-> dict:
     date1, date2 = get_dates_of_year(int(year))
     group_by = list(adapter.sample_collection.distinct(group_by_key))
     defrosts = {'axis' : {'x' : 'Number of Defrosts', 'y' : 'Concentration (nM)'}, 
-                'data': {}, 'title' : 'Some title!'}
+                'data': {}, 'title' : 'wgs illumina PCR-free'}
     for i, group in enumerate(group_by):
         data = []
         query = {'lotnr' : group, 
@@ -131,7 +131,7 @@ def find_concentration_amount(year : int, adapter)-> dict:
 
     date1, date2 = get_dates_of_year(int(year))
     amount = {'axis' : {'x' : 'Amount (ng)', 'y' : 'Concentration (nM)'}, 
-                'data': [], 'title' : 'Some title!'}
+                'data': [], 'title' : 'lucigen PCR-free'}
     query = {'received_date' : {'$gte' : date1, '$lt' : date2},
                 'amount' : { '$exists' : True},
                 'amount-concentration': { '$exists' : True}}
@@ -143,15 +143,13 @@ def find_concentration_amount(year : int, adapter)-> dict:
     return amount
 
 
-def find_concentration_time(year : int, adapter)-> dict:
-    """Prepares""" ##OBS THIS ONE IS A BIG QUESTON MARK. WHEN WE SAY OVER TIME HERE, HOW DO WE MESRE TIME? 
-    # received_date IS OBVOIUSLY NOT THE CORRECT DATE TO LOOK AT....
 
-    group_by_key = 'lotnr'
-    y_axis_key = 'nr_defrosts-concentration'
+def find_key_over_time(year : int, group_by_key: str, y_axis_key: str, title: str, y_axis_label: str,adapter)-> dict:
+    """Prepares"""
+
     group_by = list(adapter.sample_collection.distinct(group_by_key))
-    concentration_time = {'axis' : {'x' : 'Time', 'y' : 'Concentration (nM)'}, 
-                'data': {}, 'title' : 'Some title!', 'labels' : [m[1] for m in MONTHS]}
+    concentration_time = {'axis' : {'x' : 'Time', 'y' : y_axis_label}, 
+                'data': {}, 'title' : title, 'labels' : [m[1] for m in MONTHS]}
 
     for i, group in enumerate(group_by):
         data = []
@@ -164,11 +162,44 @@ def find_concentration_time(year : int, adapter)-> dict:
             samples = list(adapter.find_samples(query))
             average = get_average(samples, y_axis_key)
             if average:
-                data.append({'x' : month_number, 'y': round(average, 2) })
-            else:
-                data.append({'x' : month_number})
+                data.append({'x' : month_name, 'y': round(average, 2) })
+
         if data:
             concentration_time['data'][group] = {'data' : data, 'color' : COLORS[i]}
     return concentration_time
 
 
+# ###################
+# def find_key_over_time_other(year : int, group_by_key: str, y_axis_key: str, title: str, y_axis_label: str, 
+#                     adapter, by_month: bool = True)-> dict:
+#     """Prepares""" ##OBS THIS ONE IS A BIG QUESTON MARK. WHEN WE SAY OVER TIME HERE, HOW DO WE MESRE TIME? 
+#     # received_date IS OBVOIUSLY NOT THE CORRECT DATE TO LOOK AT....
+
+#     group_by = list(adapter.sample_collection.distinct(group_by_key))
+#     labels = [m[1] for m in MONTHS] if by_month else [m[0] for m in MONTHS]
+#     concentration_time = {'axis' : {'x' : '# Months', 'y' : y_axis_label}, 
+#                 'data': {}, 'title' : title, 'labels' : labels}
+#     for i, group in enumerate(group_by):
+#         data = []
+#         first_time = None
+#         for month_number, month_name in MONTHS:
+#             date1, date2 = get_dates_of_month(month_number, int(year))
+#             query = {group_by_key : group, 
+#                     'prepared_date' : {'$gte' : date1, '$lt' : date2},
+#                     y_axis_key : { '$exists' : True}}
+
+#             samples = list(adapter.find_samples(query))
+#             average = get_average(samples, y_axis_key)
+            
+#             if average:
+#                 if not first_time:
+#                     first_time = month_number
+#                 if by_month:
+#                     data.append({'x' : month_number , 'y': round(average, 2) })
+#                 else:
+#                     data.append({'x' : month_number - first_time + 1, 'y': round(average, 2) })
+
+#         if data:
+#             print(data)
+#             concentration_time['data'][group] = {'data' : data, 'color' : COLORS[i]}
+#     return concentration_time

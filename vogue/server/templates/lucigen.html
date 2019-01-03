@@ -1,0 +1,80 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'navigation.html' %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            {% include 'header_section.html' %}
+            <div class="row">
+                <div class="col-lg-12"><canvas class="my-4 w-100" id="amount"></canvas></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12"><canvas class="my-4 w-100" id="amount_concentration"></canvas></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    var ctx = document.getElementById("amount")
+    var datasets = [{data: {{amount['data']|tojson}} }]
+
+    var received = new Chart(ctx, {
+        type: 'scatter',
+        toolTipContent: '{label}',
+        options : {title: {display: true, text: "{{amount['title']}}" },
+                legend: {display: false},
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {display: true, labelString: {{amount['axis']['x']|tojson}}},
+                        ticks: {stepSize: 1}
+                        }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {display: true, labelString: {{amount['axis']['y']|tojson}}}
+                        }]
+                    }
+                },
+        data : {type: "scatter",
+                datasets: datasets}
+    })
+
+</script>
+<script>
+
+    var ctx = document.getElementById("amount_concentration")
+    var datasets = []
+    {% for group in amount_concentration['data'] %}
+        datasets.push({
+                    label: "{{group}}", 
+                      data: {{amount_concentration['data'][group]['data']|tojson}},
+                      borderColor: "{{amount_concentration['data'][group]['color'][0]}}",
+                      backgroundColor: "{{amount_concentration['data'][group]['color'][1]}}",
+                      fill: false
+                      })    
+    {% endfor %}
+    var labels = {{amount_concentration['labels']|tojson}}
+
+    var received_to_delivered = new Chart(ctx, {
+        type: 'line',
+        options : { title : {display: true, text: "{{amount_concentration['title']}}"},
+                    legend : {position:'right'},
+                    spanGaps: true,
+                    scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {display: true, labelString: {{amount_concentration['axis']['x']|tojson}}},
+                        ticks: {stepSize: 1}
+                        }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {display: true, labelString: {{amount_concentration['axis']['y']|tojson}}}
+                        }]
+                    }
+                        },
+        data: { labels: labels, datasets: datasets}
+      })
+
+</script>
+{% endblock %}
