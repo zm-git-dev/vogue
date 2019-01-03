@@ -27,9 +27,14 @@ class Testcase_analysis(unittest.TestCase):
     def test_build_analysis(self):
 
         valid_analysis_dict = json_read(VALID_JSON)
-        analysis_type = 'cancer'
 
+        analysis_type = 'QC'
         ready_analysis_dict = build_analysis(valid_analysis_dict,
                                              analysis_type)
 
-        self.assertIsInstance(valid_analysis_dict, dict)
+        self.assertIsInstance(ready_analysis_dict, dict)
+        
+        analysis_type = 'something_else'
+        ready_analysis_dict = build_analysis(valid_analysis_dict,
+                                             analysis_type)
+        self.assertIsNone(ready_analysis_dict, None)
