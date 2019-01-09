@@ -12,39 +12,29 @@ def validate_conf(analysis_conf: dict):
     exist, disqualifies the file and returns False
     """
 
-    try:
-        if 'report_saved_raw_data' in analysis_conf.keys():
-            LOG.info('Input seems to be a valid multiqc report')
-            return True
-        else:
-            LOG.warning('Input does not seem to be a multiqc report')
-            return False
-
-    except (KeyError, AttributeError) as e:
-        LOG.warning(
-            'Input multiqc file is either not a multiqc report or it it is truncated.'
-        )
+    if not 'report_saved_raw_data' in analysis_conf.keys():
+        LOG.warning('Input does not seem to be a multiqc report')
         return False
 
+    LOG.info('Input seems to be a valid multiqc report')
+    return True
 
 def build_analysis(multiqc_dict: dict, analysis_type: str):
     """build a analysis object"""
 
-    if analysis_type in analysis_model.ANALYSIS_SETS.keys():
-
-        analysis = dict()
-
-        # Find common analysis between predefined set and config file loaded.
-        analysis_sets = set(
-            analysis_model.ANALYSIS_SETS[analysis_type].keys()) & set(
-                multiqc_dict['report_saved_raw_data'].keys())
-
-        for a in analysis_sets:
-            analysis[a] = multiqc_dict['report_saved_raw_data'][a]
-
-        return analysis
-
-    else:
+    if not analysis_type in analysis_model.ANALYSIS_SETS.keys():
         LOG.warning(
             f'Analysis did not match the analysis type: {analysis_type}')
         return None
+
+    analysis = dict()
+
+    # Find common analysis between predefined set and config file loaded.
+    analysis_common_keys = set(
+        analysis_model.ANALYSIS_SETS[analysis_type].keys()) & set(
+            multiqc_dict['report_saved_raw_data'].keys())
+
+    for common_key in analysis_common_keys:
+        analysis[common_key] = multiqc_dict['report_saved_raw_data'][common_key]
+
+    return analysis
