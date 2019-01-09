@@ -407,4 +407,3 @@ def test_get_library_size_post_hyb(lims, lims_sample):
 
     ##THEN size should be fetched from A2   
     assert size == 500
-
