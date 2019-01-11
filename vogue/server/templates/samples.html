@@ -15,20 +15,20 @@
 
 <script>
     var series = []
-    {% for name in received['group'] %}
+    {% for name in received.group %}
     series.push({
         name: "{{name}}",
-        data: {{ received['group'][name]['data'] | tojson }},
-        color: "{{received['group'][name]['color'][0]}}",
+        data: {{ received.group[name].data | tojson }},
+        color: "{{received.group[name].color[0]}}",
         marker: { symbol: 'circle' },
-        fillColor: "{{received['group'][name]['color'][1]}}"})
+        fillColor: "{{received.group[name].color[1]}}"})
     {% endfor %}
 
     Highcharts.chart('received', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_application['title'] | tojson }} },
-        xAxis: { categories: {{ received['labels']| tojson }}},
-        yAxis: { title: { text: {{ received['axis']['y'] | tojson }} } },
+        title: { text: {{ received_application.title | tojson }} },
+        xAxis: { categories: {{ received.labels| tojson }}},
+        yAxis: { title: { text: {{ received.axis.y | tojson }} } },
         tooltip: {
             shared: true,
             valueSuffix: ' days'
@@ -36,20 +36,20 @@
         series: series});
 
     var series = []
-    {% for name in received_application['group'] %}
+    {% for name in received_application.group %}
     series.push({
         name: "{{name}}",
-        data: {{ received_application['group'][name]['data'] | tojson }},
-        color: "{{received_application['group'][name]['color'][0]}}",
+        data: {{ received_application.group[name].data | tojson }},
+        color: "{{received_application.group[name].color[0]}}",
         marker: { symbol: 'circle' },
-        fillColor: "{{received_application['group'][name]['color'][1]}}"})
+        fillColor: "{{received_application.group[name].color[1]}}"})
     {% endfor %}
 
     Highcharts.chart('received_application', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_application['title'] | tojson }} },
-        xAxis: { categories: {{ received_application['labels']| tojson }}},
-        yAxis: { title: { text: {{ received_application['axis']['y'] | tojson }}}},
+        title: { text: {{ received_application.title | tojson }} },
+        xAxis: { categories: {{ received_application.labels| tojson }}},
+        yAxis: { title: { text: {{ received_application.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'

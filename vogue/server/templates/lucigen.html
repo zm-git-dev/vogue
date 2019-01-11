@@ -11,9 +11,10 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-12"><canvas class="my-4 w-100" id="amount_concentration_time"></canvas></div>
+                <div class="col-lg-12">
+                    <div id="amount_concentration_time"></div>
+                </div>
             </div>
-
         </main>
     </div>
 </div>
@@ -22,12 +23,12 @@
 <script>
     Highcharts.chart('amount', {
         title: {
-            text: "{{amount['title']}}"
+            text: "{{amount.title}}"
         },
         xAxis: {
-            title: { text: {{ amount['axis']['x'] | tojson }}}},
+            title: { text: {{ amount.axis.x | tojson }}}},
         yAxis: {
-            title: { text: {{ amount['axis']['y'] | tojson }}}},
+            title: { text: {{ amount.axis.y | tojson }}}},
         legend: {
             enabled: false
         },
@@ -49,7 +50,7 @@
             },
             color: 'rgba(223, 83, 83, .5)',
             type: 'scatter',
-            data: {{ amount['data']| tojson }},
+            data: {{ amount.data| tojson }},
             marker: {
             radius: 3
         }
@@ -57,36 +58,22 @@
 });
 </script>
 
-<script>
 
-    var series = []
-    {% for group in amount_concentration_time['data'] %}
-    series.push({
-        name: "{{group}}",
-        data: {{ amount_concentration_time['data'][group]['data'] | tojson }},
-        marker: { symbol: 'circle' },
-                
-                      })
-    {% endfor %}
+
+<script>
+    var data = []
+    {% if amount_concentration_time.group.no_group is defined %}
+    var data = {{ amount_concentration_time.group.no_group.data | tojson }}
+    {% endif %}
+
     Highcharts.chart('amount_concentration_time', {
-        chart: {
-            type: 'spline'
-        },
-        title: {
-            text: '{{amount_concentration_time['title']}}'},
-        xAxis: {
-            categories: {{ amount_concentration_time['labels']| tojson }}},
-        yAxis: {
-            title: { text: {{ amount_concentration_time['axis']['y'] | tojson }}}},
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle'
-        },
-        tooltip: {
-            crosshairs: true,
-            shared: true
-        },
+        chart: { type: 'spline' },
+        title: { text: '{{amount_concentration_time.title}}'},
+        subtitle: { text: '' },
+        xAxis: { categories: {{ amount_concentration_time.labels| tojson }}},
+        yAxis: { title: { text: {{ amount_concentration_time.axis.y | tojson }}}},
+        legend: { enabled: false },
+        tooltip: { crosshairs: true, shared: true },
         plotOptions: {
             series: { connectNulls: true },
             spline: {
@@ -97,7 +84,10 @@
                 }
             }
         },
-        series: series 
+        series: [{
+            name: 'Average Concnetration',
+            data: data,
+            marker: { symbol: 'circle' }}] 
 });
 
 </script>

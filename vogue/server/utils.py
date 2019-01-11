@@ -115,7 +115,7 @@ def find_key_over_time( title: str = None, year : int = None, group_key: str = N
                 query[group_key] = group
             if y_axis_key:
                 query[y_axis_key] = {'$exists' : True}
-                
+            print(query)
             samples = list(adapter.find_samples(query))
 
             if y_unit == 'number samples':
@@ -130,7 +130,7 @@ def find_key_over_time( title: str = None, year : int = None, group_key: str = N
                 data.append(None)
 
         if list(set(data)) != [None]:
-            plot_content['group'][group] = {'data' : data, 'color' : COLORS[i]}
+            plot_content['group'][group] = {'data' : data, 'color' : COLORS[i]}      
 
     return plot_content
 

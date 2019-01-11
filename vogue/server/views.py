@@ -6,7 +6,7 @@ from flask_oauthlib.client import OAuthException
 
 from extentions import app
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount,   
-                                find_key_over_time, scatter_to_remoove_find)
+                                find_key_over_time)
 
 from  datetime import date
 
@@ -154,7 +154,6 @@ def target_enrichment(year_of_interest):
 
 @app.route('/prepps/wgs/<year_of_interest>')
 def wgs(year_of_interest):
-    scatter_to_remoove = scatter_to_remoove_find(year = year_of_interest)
     concentration_defrosts = find_concentration_defrosts(year = year_of_interest)
     concentration_time = find_key_over_time(
                             year = year_of_interest, 
@@ -162,11 +161,9 @@ def wgs(year_of_interest):
                             title = 'wgs illumina PCR-free', 
                             y_axis_label = 'Concentration (nM)',
                             y_unit = 'average') #, by_month=False)
-    
     return render_template('wgs.html',
         header = 'WGS illumina PCR-free',
         page_id = 'wgs',
-        defrosts = scatter_to_remoove,
         concentration_defrosts = concentration_defrosts,
         concentration_time = concentration_time,
         year_of_interest=year_of_interest,
@@ -176,13 +173,12 @@ def wgs(year_of_interest):
 @app.route('/prepps/lucigen/<year_of_interest>')
 def lucigen(year_of_interest):
     amount_concentration_time = find_key_over_time(year = year_of_interest, 
-                                        group_key = 'lotnr', 
                                         y_axis_key ='amount-concentration', 
                                         title = 'lucigen PCR-free',
                                         y_axis_label = 'Concentration (nM)' ,
                                         y_unit = 'average')
     concentration_amount = find_concentration_amount(year = year_of_interest)
-
+    print(amount_concentration_time)
     return render_template('lucigen.html',
         header = 'Lucigen PCR-free',
         page_id = 'lucigen',

@@ -7,11 +7,6 @@
             {% include 'header_section.html' %}
             <div class="row">
                 <div class="col-lg-12">
-                    <div id="defrosts_new"></div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
                     <div id="concentration_defrosts"></div>
                 </div>
             </div>
@@ -26,51 +21,24 @@
 
 <script>
     var series = []
-    {% for group in defrosts['data'] %}
-    series.push({
-        type: 'scatter',
-        name: "{{group}}",
-        data: {{ defrosts['data'][group]['data'] | tojson }},
-        marker: {
-            radius: 3,
-            symbol: 'circle',
-            lineColor: '#666666',
-            lineWidth: 1
-        }})
-    {% endfor %}
-
-    Highcharts.chart('defrosts_new', {
-        title: { text: "{{defrosts['title']}}" },
-        xAxis: { title: { text: {{ defrosts['axis']['x'] | tojson }}}},
-        yAxis: { title: { text: {{ defrosts['axis']['y'] | tojson }}}},
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle'
-        },
-        series: series});
-</script>
-
-<script>
-    var series = []
-    {% for group in concentration_defrosts['data'] %}
+    {% for group in concentration_defrosts.data %}
     series.push({
         name: "{{group}}",
-        data: {{ concentration_defrosts['data'][group]['median'] | tojson }},
+        data: {{ concentration_defrosts.data[group].median | tojson }},
         marker: {
             radius: 3,
             symbol: 'circle',
             lineColor: '#666666',
             lineWidth: 1
         },
-        color: {{ concentration_defrosts['data'][group]['color'][0] | tojson }}},
+        color: {{ concentration_defrosts.data[group].color[0] | tojson }}},
         {
             name: 'Interquartile Range',
-            data: {{ concentration_defrosts['data'][group]['quartile'] | tojson }},
+            data: {{ concentration_defrosts.data[group].quartile | tojson }},
         type: 'arearange',
         lineWidth: 0,
         linkedTo: ':previous',
-        color: {{ concentration_defrosts['data'][group]['color'][1] | tojson }},
+        color: {{ concentration_defrosts.data[group].color[1] | tojson }},
         fillOpacity: 0.3,
         zIndex: 0,
         marker: {
@@ -80,15 +48,15 @@
 
     Highcharts.chart('concentration_defrosts', {
         title: {
-            text: '{{concentration_defrosts['title']}}'},
+            text: '{{concentration_defrosts.title}}'},
         subtitle: {
             text: 'bla bla bla'
         },
         xAxis: {
-            categories: {{ concentration_defrosts['labels']| tojson }},
-        title: { text: {{ defrosts['axis']['x'] | tojson }}}},
+            categories: {{ concentration_defrosts.labels| tojson }},
+        title: { text: {{ concentration_defrosts.axis.x | tojson }}}},
         yAxis: {
-            title: { text: {{ concentration_defrosts['axis']['y'] | tojson }}}},
+            title: { text: {{ concentration_defrosts.axis.y | tojson }}}},
         legend: {
             layout: 'vertical',
             align: 'right',
@@ -111,14 +79,20 @@
         series: series});
 
 </script>
+concentration_time.group.items()
 
 <script>
+    var data = []
+    {% if concentration_time.group.no_group is defined %}
+    var data = {{ concentration_time.group.no_group.data | tojson }}
+    {% endif %}
+
     Highcharts.chart('concentration_time', {
         chart: { type: 'spline' },
-        title: { text: '{{concentration_time['title']}}'},
+        title: { text: '{{concentration_time.title}}'},
         subtitle: { text: 'bla bla bla' },
-        xAxis: { categories: {{ concentration_time['labels']| tojson }}},
-        yAxis: { title: { text: {{ concentration_time['axis']['y'] | tojson }}}},
+        xAxis: { categories: {{ concentration_time.labels| tojson }}},
+        yAxis: { title: { text: {{ concentration_time.axis.y | tojson }}}},
         legend: { enabled: false },
         tooltip: { crosshairs: true, shared: true },
         plotOptions: {
@@ -133,7 +107,7 @@
         },
         series: [{
             name: 'Average Concnetration',
-            data: {{ concentration_time['group']['no_group']['data'] | tojson }},
+            data: data,
             marker: { symbol: 'circle' }}] 
 });
 
