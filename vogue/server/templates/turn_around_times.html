@@ -1,0 +1,108 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'navigation.html' %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            {% include 'header_section.html' %}
+            <div class="row">
+                <div class="col-lg-6" , id='received_to_delivered'></div>
+                <div class="col-lg-6" id="received_to_prepped"></div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6" id="prepped_to_sequenced"></div>
+                <div class="col-lg-6" id="sequenced_to_delivered"></div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    var series = []
+    {% for name in sequenced_to_delivered['group'] %}
+    series.push({
+        name: "{{name}}",
+        data: {{ sequenced_to_delivered['group'][name]['data'] | tojson }},
+        color: "{{sequenced_to_delivered['group'][name]['color'][0]}}",
+        marker: { symbol: 'circle' },
+        fillColor: "{{sequenced_to_delivered['group'][name]['color'][1]}}"})
+    {% endfor %}
+
+    Highcharts.chart('sequenced_to_delivered', {
+        chart: { type: 'areaspline' },
+        title: { text: {{ sequenced_to_delivered['title']| tojson }}},
+        xAxis: { categories: {{ sequenced_to_delivered['labels']| tojson }}},
+        yAxis: { title: { text: {{ sequenced_to_delivered['axis']['y'] | tojson }}}},
+        tooltip: {
+            shared: true,
+            valueSuffix: ' days'
+        },
+        series: series});
+
+
+    var series = []
+    {% for name in prepped_to_sequenced['group'] %}
+    series.push({
+        name: "{{name}}",
+        data: {{ prepped_to_sequenced['group'][name]['data'] | tojson }},
+        color: "{{prepped_to_sequenced['group'][name]['color'][0]}}",
+        marker: { symbol: 'circle' },
+        fillColor: "{{prepped_to_sequenced['group'][name]['color'][1]}}"})
+    {% endfor %}
+
+    Highcharts.chart('prepped_to_sequenced', {
+        chart: { type: 'areaspline' },
+        title: { text: {{ prepped_to_sequenced['title']| tojson }}},
+        xAxis: { categories: {{ prepped_to_sequenced['labels']| tojson }}},
+        yAxis: { title: { text: {{ prepped_to_sequenced['axis']['y'] | tojson }}}},
+        tooltip: {
+            shared: true,
+            valueSuffix: ' days'
+        },
+        series: series});
+
+    var series = []
+    {% for name in received_to_prepped['group'] %}
+    series.push({
+        name: "{{name}}",
+        data: {{ received_to_prepped['group'][name]['data'] | tojson }},
+        color: "{{received_to_prepped['group'][name]['color'][0]}}",
+        marker: { symbol: 'circle' },
+        fillColor: "{{received_to_prepped['group'][name]['color'][1]}}"})
+    {% endfor %}
+
+    Highcharts.chart('received_to_prepped', {
+        chart: { type: 'areaspline' },
+        title: { text: {{ received_to_prepped['title']| tojson }}},
+        xAxis: { categories: {{ received_to_prepped['labels']| tojson }}},
+        yAxis: { title: { text: {{ received_to_prepped['axis']['y'] | tojson }}}},
+        tooltip: {
+            shared: true,
+            valueSuffix: ' days'
+        },
+        series: series});
+
+    var series = []
+    {% for name in received_to_delivered['group'] %}
+    series.push({
+        name: "{{name}}",
+        data: {{ received_to_delivered['group'][name]['data'] | tojson }},
+        color: "{{received_to_delivered['group'][name]['color'][0]}}",
+        marker: { symbol: 'circle' },
+        fillColor: "{{received_to_delivered['group'][name]['color'][1]}}"})
+    {% endfor %}
+
+    Highcharts.chart('received_to_delivered', {
+        chart: { type: 'areaspline' },
+        title: { text: {{ received_to_delivered['title']| tojson }}},
+        xAxis: { categories: {{ received_to_delivered['labels']| tojson }}},
+        yAxis: { title: { text: {{ received_to_delivered['axis']['y'] | tojson }}}},
+        tooltip: {
+            shared: true,
+            valueSuffix: ' days'
+        },
+        series: series});
+
+</script>
+{% endblock %}
