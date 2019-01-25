@@ -32,9 +32,8 @@
             lineWidth: 1
         },
         color: {{ concentration_defrosts.data[group].color[0] | tojson }}},
-        {
-            name: 'Interquartile Range',
-            data: {{ concentration_defrosts.data[group].quartile | tojson }},
+        {name: 'Interquartile Range',
+        data: {{ concentration_defrosts.data[group].quartile | tojson }},
         type: 'arearange',
         lineWidth: 0,
         linkedTo: ':previous',

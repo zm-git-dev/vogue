@@ -4,21 +4,7 @@ from mongo_adapter import get_client
 from extentions import adapter
 from datetime import datetime as dt
 import numpy as np
-
-MONTHS = [(1, 'Jan'), (2, 'Feb'), (3, 'Mar'), (4, 'Apr'), 
-        (5, 'May'), (6, 'Jun'), (7, 'Jul'), (8, 'Aug'), (9, 'Sep'), 
-        (10, 'Oct'), (11, 'Nov'), (12, 'Dec')]
-
-
-COLORS = [('RGB(128, 128, 128)','RGB(128, 128, 128, 0.2)'),('RGB(255, 0, 0)','RGB(255, 0, 0, 0.2)'),
-          ('RGB(0, 128, 128)','RGB(0, 128, 128, 0.2)'),('RGB(128, 0, 128)','RGB(128, 0, 128, 0.2)'),
-          ('RGB(128, 0, 0)','RGB(128, 0, 0,0.2)'), ('RGB(128, 128, 0)','RGB(128, 128, 0,0.2)'),
-          ('RGB(52, 152, 219)', 'RGB(52, 152, 219, 0.2)'),('RGB(33, 97, 140)','RGB(33, 97, 140, 0.2)'),  
-          ('RGB(46, 204, 113)','RGB(46, 204, 113, 0.2)'),('RGB(241, 196, 15)','RGB(241, 196, 15, 0.2)'),
-          ('RGB(23, 32, 42)','RGB(23, 32, 42, 0.2)'),('RGB(183, 149, 11)','RGB(183, 149, 11, 0.2)'),  
-          ('RGB(0, 255, 0)','RGB(0, 255, 0, 0.2)'),('RGB(0, 255, 255)','RGB(0, 255, 255, 0.2)'),
-          ('RGB(255, 0, 255)','RGB(255, 0, 255, 0.2)'),('RGB(0, 0, 255)','RGB(0, 0, 255, 0.9)')]
-
+from vogue.constants.constants import MONTHS, COLORS
 
 
 def get_dates_of_month(month: int, year: int)-> list:
@@ -68,8 +54,8 @@ def get_percentiles(samples: list, key: str)-> float:
         if isinstance(value, int) or isinstance(value, float):
             values.append(value)
     if values:
-        a = np.array(values)
-        percentiles = [np.percentile(a,25), np.percentile(a,50), np.percentile(a,72)]
+        values = np.array(values)
+        percentiles = [np.percentile(values,25), np.percentile(values,50), np.percentile(values,75)]
 
     return percentiles
 
@@ -115,7 +101,6 @@ def find_key_over_time( title: str = None, year : int = None, group_key: str = N
                 query[group_key] = group
             if y_axis_key:
                 query[y_axis_key] = {'$exists' : True}
-            print(query)
             samples = list(adapter.find_samples(query))
 
             if y_unit == 'number samples':
@@ -147,6 +132,8 @@ def find_concentration_amount(year : int = None, adapter = adapter)-> dict:
 
     samples = adapter.find_samples(query)
     for sample in samples:
+        if sample['amount']>200:
+            sample['amount'] = 200
         amount['data'].append({'x' : sample['amount'], 'y': round(sample['amount-concentration'], 2), 
                                 'name': sample['_id'] })
 
@@ -168,6 +155,7 @@ def find_concentration_defrosts(year : int = None, adapter = adapter)-> dict:
         group_has_any_valid_data = False
         median = []
         quartile = []
+        nr_samples = []
         for nr in nr_defrosts:
             query = {'lotnr' : group, 
                 'received_date' : {'$gte' : date1, '$lt' : date2},
@@ -178,9 +166,11 @@ def find_concentration_defrosts(year : int = None, adapter = adapter)-> dict:
             if percentiles:
                 median.append([nr ,round(percentiles[1], 2)])
                 quartile.append([nr, round(percentiles[0], 2), round(percentiles[2], 2)])
+                nr_samples.append(len(samples))
                 group_has_any_valid_data = True
         if group_has_any_valid_data:
-            defrosts['data'][group] = {'median' : median,'quartile': quartile, 'color' : COLORS[i]}
+            defrosts['data'][group] = {'median' : median,'quartile': quartile, 'color' : COLORS[i], 
+                                        'nr_samples' : nr_samples}
             
     return defrosts
 

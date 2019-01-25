@@ -2,17 +2,11 @@ from flask import make_response, flash, abort, url_for, redirect, render_templat
 from flask_login import login_user,logout_user, current_user, login_required
 #from flask.ext.mail import Message
 from flask_oauthlib.client import OAuthException
-
+from vogue.constants.constants import YEARS, THIS_YEAR
 
 from extentions import app
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount,   
                                 find_key_over_time)
-
-from  datetime import date
-
-THIS_YEAR = date.today().year
-YEARS = [str(y) for y in range(2017, THIS_YEAR + 1)]
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -21,7 +15,7 @@ def index():
         return redirect(url_for('turn_around_times', year_of_interest=year))
     if request.form.get('page') == 'samples':
         year = request.form.get('year')
-        return redirect(url_for('comon_samples', year_of_interest=year))
+        return redirect(url_for('common_samples', year_of_interest=year))
     if request.form.get('page') == 'microbial':
         year = request.form.get('year')
         return redirect(url_for('microbial', year_of_interest=year))
@@ -83,14 +77,14 @@ def turn_around_times(year_of_interest):
 
 
 @app.route('/common/samples/<year_of_interest>')
-def comon_samples(year_of_interest):
+def common_samples(year_of_interest):
     group_by = ['research','standard','priority']#,'express']
     group_key = "priority"
     received = find_key_over_time(
                     year = year_of_interest, 
                     group_key = group_key, 
                     title = 'Received_application samples per month (grouped by priority)', 
-                    y_axis_label = 'Days', 
+                    y_axis_label = 'Nr of samples', 
                     y_unit = 'number samples')
     received_application = find_key_over_time(
                     year = year_of_interest, 
@@ -178,7 +172,6 @@ def lucigen(year_of_interest):
                                         y_axis_label = 'Concentration (nM)' ,
                                         y_unit = 'average')
     concentration_amount = find_concentration_amount(year = year_of_interest)
-    print(amount_concentration_time)
     return render_template('lucigen.html',
         header = 'Lucigen PCR-free',
         page_id = 'lucigen',
