@@ -6,45 +6,56 @@
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
             <div class="row">
-                <div class="col-lg-12"><canvas class="my-4 w-100" id="microbial_concentration_time"></canvas></div>
+                <div class="col-lg-12">
+                    <div id="microbial_concentration_time"></div>
+                </div>
             </div>
         </main>
     </div>
 </div>
+
 <script>
-
-    var ctx = document.getElementById("microbial_concentration_time")
-    var datasets = []
-    {% for group in microbial_concentration_time['data'] %}
-        datasets.push({
-                    label: "{{group}}", 
-                      data: {{microbial_concentration_time['data'][group]['data']|tojson}},
-                      borderColor: "{{microbial_concentration_time['data'][group]['color'][0]}}",
-                      backgroundColor: "{{microbial_concentration_time['data'][group]['color'][1]}}",
-                      fill: false
-                      })    
+    var series = []
+    {% for group in microbial_concentration_time.group %}
+    series.push({
+        name: "{{group}}",
+        data: {{ microbial_concentration_time.group[group].data | tojson }},
+        marker: { symbol: 'circle' },
+                
+                      })
     {% endfor %}
-    var labels = {{microbial_concentration_time['labels']|tojson}}
 
-    var received_to_delivered = new Chart(ctx, {
-        type: 'line',
-        options : { title : {display: true, text: "{{microbial_concentration_time['title']}}"},
-                    legend : {position:'right'},
-                    spanGaps: true,
-                    scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{microbial_concentration_time['axis']['x']|tojson}}},
-                        ticks: {stepSize: 1}
-                        }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{microbial_concentration_time['axis']['y']|tojson}}}
-                        }]
-                    }
-                        },
-        data: { labels: labels, datasets: datasets}
-      })
+    Highcharts.chart('microbial_concentration_time', {
+        chart: {
+            type: 'spline'
+        },
+        title: {
+            text: '{{microbial_concentration_time.title}}'},
+        xAxis: {
+            categories: {{ microbial_concentration_time.labels| tojson }}},
+        yAxis: {
+            title: { text: {{ microbial_concentration_time.axis.y | tojson }}}},
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true
+        },
+        plotOptions: {
+            series: { connectNulls: true },
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            }
+        },
+        series: series 
+});
 
 </script>
 {% endblock %}
