@@ -9,7 +9,7 @@ def load_cancer_analysis(adapter: VougeAdapter, lims_id=None, dry_run=False, ana
         raise SyntaxError("Sample {} does not exist".format(lims_id))
     
     ## TODO build the analysis object
-    analysis_obj = build_analysis(analysis, 'cancer' )
+    analysis_obj = build_analysis(analysis, 'QC' )
     ## TODO load the object with adapter
     adapter.load_analysis(analysis_obj)
     
