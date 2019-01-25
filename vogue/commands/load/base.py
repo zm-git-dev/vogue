@@ -10,6 +10,8 @@ LOG = logging.getLogger(__name__)
 
 # commands
 from vogue.commands.load.analysis import analysis as analysis_command
+from vogue.commands.load.status_db import status_db as status_db_command
+
 from vogue.commands.load.lims import lims as lims_command
 
 # Get version and doc decorator
@@ -39,4 +41,5 @@ def load(context, database_name, database_uri):
     
 
 load.add_command(analysis_command)
+load.add_command(status_db_command)
 load.add_command(lims_command)
