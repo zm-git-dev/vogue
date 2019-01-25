@@ -6,75 +6,89 @@
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
             <div class="row">
-                <div class="col-lg-12"><canvas class="my-4 w-100" id="amount"></canvas></div>
+                <div class="col-lg-12">
+                    <div id="amount"></div>
+                </div>
             </div>
             <div class="row">
-                <div class="col-lg-12"><canvas class="my-4 w-100" id="amount_concentration"></canvas></div>
+                <div class="col-lg-12">
+                    <div id="amount_concentration_time"></div>
+                </div>
             </div>
         </main>
     </div>
 </div>
 
-<script>
-    var ctx = document.getElementById("amount")
-    var datasets = [{data: {{amount['data']|tojson}} }]
 
-    var received = new Chart(ctx, {
-        type: 'scatter',
-        toolTipContent: '{label}',
-        options : {title: {display: true, text: "{{amount['title']}}" },
-                legend: {display: false},
-                scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{amount['axis']['x']|tojson}}},
-                        ticks: {stepSize: 1}
-                        }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{amount['axis']['y']|tojson}}}
-                        }]
-                    }
+<script>
+    Highcharts.chart('amount', {
+        title: {
+            text: "{{amount.title}}"
+        },
+        xAxis: {
+            title: { text: {{ amount.axis.x | tojson }}}},
+        yAxis: {
+            title: { text: {{ amount.axis.y | tojson }}}},
+        legend: {
+            enabled: false
+        },
+        plotOptions: {
+            scatter: {
+                dataLabels: {
+                    format: "{point.name}",
+                    enabled: true
                 },
-        data : {type: "scatter",
-                datasets: datasets}
-    })
-
+                enableMouseTracking: true
+            }
+        },
+        series: [{
+            regression: true,
+            regressionSettings: {
+                type: 'polynomial',
+                color: 'rgba(223, 183, 83, .9)',
+                dashStyle: 'dash'
+            },
+            color: 'rgba(223, 83, 83, .5)',
+            type: 'scatter',
+            data: {{ amount.data| tojson }},
+            marker: {
+            radius: 3
+        }
+    }]
+});
 </script>
+
+
+
 <script>
+    var data = []
+    {% if amount_concentration_time.group.no_group is defined %}
+    var data = {{ amount_concentration_time.group.no_group.data | tojson }}
+    {% endif %}
 
-    var ctx = document.getElementById("amount_concentration")
-    var datasets = []
-    {% for group in amount_concentration['data'] %}
-        datasets.push({
-                    label: "{{group}}", 
-                      data: {{amount_concentration['data'][group]['data']|tojson}},
-                      borderColor: "{{amount_concentration['data'][group]['color'][0]}}",
-                      backgroundColor: "{{amount_concentration['data'][group]['color'][1]}}",
-                      fill: false
-                      })    
-    {% endfor %}
-    var labels = {{amount_concentration['labels']|tojson}}
-
-    var received_to_delivered = new Chart(ctx, {
-        type: 'line',
-        options : { title : {display: true, text: "{{amount_concentration['title']}}"},
-                    legend : {position:'right'},
-                    spanGaps: true,
-                    scales: {
-                    xAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{amount_concentration['axis']['x']|tojson}}},
-                        ticks: {stepSize: 1}
-                        }],
-                    yAxes: [{
-                        display: true,
-                        scaleLabel: {display: true, labelString: {{amount_concentration['axis']['y']|tojson}}}
-                        }]
-                    }
-                        },
-        data: { labels: labels, datasets: datasets}
-      })
+    Highcharts.chart('amount_concentration_time', {
+        chart: { type: 'spline' },
+        title: { text: '{{amount_concentration_time.title}}'},
+        subtitle: { text: '' },
+        xAxis: { categories: {{ amount_concentration_time.labels| tojson }}},
+        yAxis: { title: { text: {{ amount_concentration_time.axis.y | tojson }}}},
+        legend: { enabled: false },
+        tooltip: { crosshairs: true, shared: true },
+        plotOptions: {
+            series: { connectNulls: true },
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            }
+        },
+        series: [{
+            name: 'Average Concnetration',
+            data: data,
+            marker: { symbol: 'circle' }}] 
+});
 
 </script>
 {% endblock %}

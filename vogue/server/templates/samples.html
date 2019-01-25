@@ -1,0 +1,61 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'navigation.html' %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            {% include 'header_section.html' %}
+            <div class="col-lg-12" id="received"></div>
+            <div class="col-lg-12" id="received_application"></div>
+        </main>
+    </div>
+</div>
+
+
+
+<script>
+    var series = []
+    {% for name in received.group %}
+    series.push({
+        name: "{{name}}",
+        data: {{ received.group[name].data | tojson }},
+        color: "{{received.group[name].color[0]}}",
+        marker: { symbol: 'circle' },
+        fillColor: "{{received.group[name].color[1]}}"})
+    {% endfor %}
+
+    Highcharts.chart('received', {
+        chart: { type: 'areaspline' },
+        title: { text: {{ received_application.title | tojson }} },
+        xAxis: { categories: {{ received.labels| tojson }}},
+        yAxis: { title: { text: {{ received.axis.y | tojson }} } },
+        tooltip: {
+            shared: true,
+            valueSuffix: ' days'
+        },
+        series: series});
+
+    var series = []
+    {% for name in received_application.group %}
+    series.push({
+        name: "{{name}}",
+        data: {{ received_application.group[name].data | tojson }},
+        color: "{{received_application.group[name].color[0]}}",
+        marker: { symbol: 'circle' },
+        fillColor: "{{received_application.group[name].color[1]}}"})
+    {% endfor %}
+
+    Highcharts.chart('received_application', {
+        chart: { type: 'areaspline' },
+        title: { text: {{ received_application.title | tojson }} },
+        xAxis: { categories: {{ received_application.labels| tojson }}},
+        yAxis: { title: { text: {{ received_application.axis.y | tojson }}}},
+        tooltip: {
+            shared: true,
+            valueSuffix: ' days'
+        },
+        series: series});
+
+</script>
+
+{% endblock %}

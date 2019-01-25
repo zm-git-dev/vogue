@@ -1,22 +1,10 @@
 #!/usr/bin/env python
 
 from mongo_adapter import get_client
+from extentions import adapter
 from datetime import datetime as dt
-
-MONTHS = [(1, 'January'), (2, 'February'), (3, 'March'), (4, 'April'), 
-        (5, 'May'), (6, 'June'), (7, 'July'), (8, 'August'), (9, 'September'), 
-        (10, 'October'), (11, 'November'), (12, 'December')]
-
-
-COLORS = [('RGB(128, 128, 128)','RGB(128, 128, 128, 0.2)'),('RGB(255, 0, 0)','RGB(255, 0, 0, 0.2)'),
-        ('RGB(0, 128, 128)','RGB(0, 128, 128, 0.2)'),('RGB(128, 0, 128)','RGB(128, 0, 128, 0.2)'),
-        ('RGB(128, 0, 0)','RGB(128, 0, 0,0.2)'), ('RGB(128, 128, 0)','RGB(128, 128, 0,0.2)'),
-        ('RGB(52, 152, 219)', 'RGB(52, 152, 219, 0.2)'),('RGB(33, 97, 140)','RGB(33, 97, 140, 0.2)'),  
-         ('RGB(46, 204, 113)','RGB(46, 204, 113, 0.2)'),('RGB(241, 196, 15)','RGB(241, 196, 15, 0.2)'),
-         ('RGB(23, 32, 42)','RGB(23, 32, 42, 0.2)'),('RGB(183, 149, 11)','RGB(183, 149, 11, 0.2)'),  
-        ('RGB(0, 255, 0)','RGB(0, 255, 0, 0.2)'),('RGB(0, 255, 255)','RGB(0, 255, 255, 0.2)'),
-        ('RGB(255, 0, 255)','RGB(255, 0, 255, 0.2)'),('RGB(0, 0, 255)','RGB(0, 0, 255, 0.2)')]
-
+import numpy as np
+from vogue.constants.constants import MONTHS, COLORS
 
 
 def get_dates_of_month(month: int, year: int)-> list:
@@ -56,54 +44,138 @@ def get_average(samples: list, key: str)-> float:
 
     return average
 
+def get_percentiles(samples: list, key: str)-> float:
+    """Calculates percentiles of the key value for all samples."""
 
-def find_recived_per_month(year : int, group_by : list, group_key : str, adapter)-> dict:
-    """Prepares data for recived_per_month plots.
+    values = []
+    percentiles = []
+    for sample in samples:
+        value = sample.get(key)
+        if isinstance(value, int) or isinstance(value, float):
+            values.append(value)
+    if values:
+        values = np.array(values)
+        percentiles = [np.percentile(values,25), np.percentile(values,50), np.percentile(values,75)]
+
+    return percentiles
+
+
+def find_key_over_time( title: str = None, year : int = None, group_key: str = None, 
+                        y_axis_key: str = None, y_axis_label: str = None, y_unit : str = None, 
+                        adapter = adapter)-> dict:
+
+    """Prepares data for plots showing progress of "something" over "time".
+
+    The "time" is allways in months and the "something" can be either number of samples of a 
+    certain group, or the average of some value from all samples within a certain group.
+    If no group_key is provided, all samples will be concidered as one group.
+
     Input:
-        group_by: the data in the plot will be grouped by the the values in this list.
-        group_key: is the key in the database holding the group value."""
+        title :         Plot title.
+        year :          Data from this year will be shown in the plot. 
+        group_key :     Is the key in the database holding the group value.
+        y_axis_key :    Key in database wich value will be plotted on the Y-axes (if given).
+        y_unit :        Determines what to plot on the y axis (average/nr samples) (if "nr samples", 
+                        no y_axis_key is needed).
+        y_axis_label :  What it seems to be :)
+        """
 
-    data = {}
+    if group_key:
+        group_by = list(adapter.sample_collection.distinct(group_key))
+    else: 
+        group_by = ['no_group']
+
+    plot_content = {'axis' : {'y' : y_axis_label}, 
+                    'group' : {}, 
+                    'title' : title, 
+                    'labels' : [m[1] for m in MONTHS]}
+
     for i, group in enumerate(group_by):
-        data[group] = {'data' : {'labels':[], 'X' : [], 'Y' : []}, 'color' : COLORS[i]}
+        data = []
         for month_number, month_name in MONTHS:
+
             date1, date2 = get_dates_of_month(month_number, int(year))
-            query = {group_key : group, 
-                    'received_date' : {'$gte' : date1, '$lt' : date2}}
-            samples = adapter.find_samples(query)
-            data[group]['data']['labels'].append(month_name)
-            data[group]['data']['X'].append(month_number)
-            data[group]['data']['Y'].append(len(samples))
+            query = {'received_date' : {'$gte' : date1, '$lt' : date2}}
 
-    return data
-
-
-def turn_around_times(year : int, group_by : list, group_key : str, time_range_key : str, 
-                        adapter)-> dict:
-    """Prepares data for turn_around_time plots.
-    Input:
-        group_by: the data in the plot will be grouped by the the values in this list.
-        group_key: is the key in the database holding the group value.
-        time_range_key: The key in the database holding the timerange value (in #days) to plot"""
-
-    data = {}
-    for i, group in enumerate(group_by):
-        data[group] = {'data' : {'labels':[], 'X' : [], 'Y' : []}, 'color' : COLORS[i]}
-        for month_number, month_name in MONTHS:
-            date1, date2 = get_dates_of_month(month_number, int(year))
-            query = {group_key : group, 
-                    'received_date' : {'$gte' : date1, '$lt' : date2}}
+            if group_key:
+                query[group_key] = group
+            if y_axis_key:
+                query[y_axis_key] = {'$exists' : True}
             samples = list(adapter.find_samples(query))
-            average = get_average(samples, time_range_key)
-            if average:
-                data[group]['data']['labels'].append(month_name)
-                data[group]['data']['X'].append(month_number)
-                data[group]['data']['Y'].append(average)
 
-    return data
+            if y_unit == 'number samples':
+                y = len(samples)
+            elif y_unit == 'average':
+                average = get_average(samples, y_axis_key)
+                y = round(average,1) if average else None
+
+            if y:
+                data.append(y)
+            else:
+                data.append(None)
+
+        if list(set(data)) != [None]:
+            plot_content['group'][group] = {'data' : data, 'color' : COLORS[i]}      
+
+    return plot_content
 
 
-def find_concentration_defrosts(year : int, adapter)-> dict:
+def find_concentration_amount(year : int = None, adapter = adapter)-> dict:
+    """Prepares data for a scatter plot showning Concentration agains Amount."""
+
+    date1, date2 = get_dates_of_year(int(year))
+    amount = {'axis' : {'x' : 'Amount (ng)', 'y' : 'Concentration (nM)'}, 
+                'data': [], 'title' : 'lucigen PCR-free'}
+    query = {'received_date' : {'$gte' : date1, '$lt' : date2},
+                'amount' : { '$exists' : True},
+                'amount-concentration': { '$exists' : True}}
+
+    samples = adapter.find_samples(query)
+    for sample in samples:
+        if sample['amount']>200:
+            sample['amount'] = 200
+        amount['data'].append({'x' : sample['amount'], 'y': round(sample['amount-concentration'], 2), 
+                                'name': sample['_id'] })
+
+    return amount
+
+def find_concentration_defrosts(year : int = None, adapter = adapter)-> dict:
+    """Prepares data for a plot showning Number of defrosts agains Concentration"""
+
+    group_by_key = 'lotnr'
+    date1, date2 = get_dates_of_year(int(year))
+    group_by = list(adapter.sample_collection.distinct(group_by_key))
+    nr_defrosts = list(adapter.sample_collection.distinct('nr_defrosts'))
+    nr_defrosts.sort()
+
+    defrosts = {'axis' : {'x' : 'Number of Defrosts', 'y' : 'Concentration (nM)'}, 
+                'data': {}, 'title' : 'wgs illumina PCR-free', 'labels':nr_defrosts}
+
+    for i, group in enumerate(group_by):
+        group_has_any_valid_data = False
+        median = []
+        quartile = []
+        nr_samples = []
+        for nr in nr_defrosts:
+            query = {'lotnr' : group, 
+                'received_date' : {'$gte' : date1, '$lt' : date2},
+                'nr_defrosts-concentration' : { '$exists' : True},
+                'nr_defrosts': { '$eq' : nr}}
+            samples = list(adapter.find_samples(query))
+            percentiles = get_percentiles(samples, 'nr_defrosts-concentration')
+            if percentiles:
+                median.append([nr ,round(percentiles[1], 2)])
+                quartile.append([nr, round(percentiles[0], 2), round(percentiles[2], 2)])
+                nr_samples.append(len(samples))
+                group_has_any_valid_data = True
+        if group_has_any_valid_data:
+            defrosts['data'][group] = {'median' : median,'quartile': quartile, 'color' : COLORS[i], 
+                                        'nr_samples' : nr_samples}
+            
+    return defrosts
+
+
+def scatter_to_remoove_find(year : int= None, adapter = adapter)-> dict:
     """Prepares data for ... plots."""
 
     group_by_key = 'lotnr'
@@ -119,87 +191,9 @@ def find_concentration_defrosts(year : int, adapter)-> dict:
                 'nr_defrosts': { '$exists' : True}}
         samples = adapter.find_samples(query)
         for sample in samples:
-            data.append({'x' : sample['nr_defrosts'], 'y': round(sample['nr_defrosts-concentration'], 2) })
+            data.append({'x' : sample['nr_defrosts'], 'y': round(sample['nr_defrosts-concentration'], 2), 
+                        'name': sample['_id']})
         if data:
             defrosts['data'][group] = {'data' : data, 'color' : COLORS[i]}
  
     return defrosts
-
-
-def find_concentration_amount(year : int, adapter)-> dict:
-    """Prepares data for ... plots."""
-
-    date1, date2 = get_dates_of_year(int(year))
-    amount = {'axis' : {'x' : 'Amount (ng)', 'y' : 'Concentration (nM)'}, 
-                'data': [], 'title' : 'lucigen PCR-free'}
-    query = {'received_date' : {'$gte' : date1, '$lt' : date2},
-                'amount' : { '$exists' : True},
-                'amount-concentration': { '$exists' : True}}
-
-    samples = adapter.find_samples(query)
-    for sample in samples:
-        amount['data'].append({'x' : sample['amount'], 'y': round(sample['amount-concentration'], 2), 'label': sample['_id'] })
-
-    return amount
-
-
-
-def find_key_over_time(year : int, group_by_key: str, y_axis_key: str, title: str, y_axis_label: str,adapter)-> dict:
-    """Prepares"""
-
-    group_by = list(adapter.sample_collection.distinct(group_by_key))
-    concentration_time = {'axis' : {'x' : 'Time', 'y' : y_axis_label}, 
-                'data': {}, 'title' : title, 'labels' : [m[1] for m in MONTHS]}
-
-    for i, group in enumerate(group_by):
-        data = []
-        for month_number, month_name in MONTHS:
-            date1, date2 = get_dates_of_month(month_number, int(year))
-            query = {group_by_key : group, 
-                    'prepared_date' : {'$gte' : date1, '$lt' : date2},
-                    y_axis_key : { '$exists' : True}}
-
-            samples = list(adapter.find_samples(query))
-            average = get_average(samples, y_axis_key)
-            if average:
-                data.append({'x' : month_name, 'y': round(average, 2) })
-
-        if data:
-            concentration_time['data'][group] = {'data' : data, 'color' : COLORS[i]}
-    return concentration_time
-
-
-# ###################
-# def find_key_over_time_other(year : int, group_by_key: str, y_axis_key: str, title: str, y_axis_label: str, 
-#                     adapter, by_month: bool = True)-> dict:
-#     """Prepares""" ##OBS THIS ONE IS A BIG QUESTON MARK. WHEN WE SAY OVER TIME HERE, HOW DO WE MESRE TIME? 
-#     # received_date IS OBVOIUSLY NOT THE CORRECT DATE TO LOOK AT....
-
-#     group_by = list(adapter.sample_collection.distinct(group_by_key))
-#     labels = [m[1] for m in MONTHS] if by_month else [m[0] for m in MONTHS]
-#     concentration_time = {'axis' : {'x' : '# Months', 'y' : y_axis_label}, 
-#                 'data': {}, 'title' : title, 'labels' : labels}
-#     for i, group in enumerate(group_by):
-#         data = []
-#         first_time = None
-#         for month_number, month_name in MONTHS:
-#             date1, date2 = get_dates_of_month(month_number, int(year))
-#             query = {group_by_key : group, 
-#                     'prepared_date' : {'$gte' : date1, '$lt' : date2},
-#                     y_axis_key : { '$exists' : True}}
-
-#             samples = list(adapter.find_samples(query))
-#             average = get_average(samples, y_axis_key)
-            
-#             if average:
-#                 if not first_time:
-#                     first_time = month_number
-#                 if by_month:
-#                     data.append({'x' : month_number , 'y': round(average, 2) })
-#                 else:
-#                     data.append({'x' : month_number - first_time + 1, 'y': round(average, 2) })
-
-#         if data:
-#             print(data)
-#             concentration_time['data'][group] = {'data' : data, 'color' : COLORS[i]}
-#     return concentration_time
