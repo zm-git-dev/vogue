@@ -36,6 +36,23 @@ class VougeAdapter(MongoAdapter):
         else:
             LOG.info(f"No updates for sample {lims_id}.")
 
+    def add_or_update_application_tag(self, application_tag_news: dict):
+        """Adds/updates a application_tag in the database"""
+
+        tag = application_tag_news['_id']
+        update_result = self.db.application_tag.update_one({'_id' : tag}, {'$set': application_tag_news}, upsert=True)
+
+        if not update_result.raw_result['updatedExisting']:
+            self.db.application_tag.update_one({'_id' : tag}, 
+                {'$set': {'added': dt.today()}})
+            LOG.info(f"Added application_tag {tag}.")
+        elif update_result.modified_count:
+            self.db.application_tag.update_one({'_id' : tag}, 
+                {'$set': {'updated': dt.today()}})
+            LOG.info(f"Updated application_tag {tag}.")
+        else:
+            LOG.info(f"No updates for application_tag {tag}.")
+
     def sample(self, lims_id):
         return self.sample_collection.find_one({'_id':lims_id})
 

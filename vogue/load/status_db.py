@@ -1,22 +1,16 @@
+import sys
 import logging
 from vogue.build.status_db import build_application_tag
 LOG = logging.getLogger(__name__)
    
 
-def load_one_sample(adapter, lims_id=None, lims_sample=None, lims=None, dry_run=False):
-    lims_sample = lims_sample or Sample(lims, id = lims_id)
-    if not lims_sample:
-        LOG.critical("The sample does not exist in the database in the LIMS database.")
-        raise SyntaxError()
-    mongo_application_tag = build_application_tag(lims_sample, lims)
+def load_aplication_tags(adapter, db_json_list, dry_run=False):
+    
     
     if dry_run:
-        existing_sample = adapter.sample(lims_sample.id)
-        if existing_sample:
-            LOG.info("The sample exist in the database.")
-        else:
-            LOG.info("The sample does not exist in the database.")
-        LOG.info("Sample informamtion from lims to add/update: \n %s", mongo_application_tag)
+        LOG.info("Will go through all application tags in status-db and add/update them in status-db.")
         return
-    
-    adapter.add_or_update_application_tag(mongo_application_tag)
+
+    for application_tag in db_json_list:
+        mongo_application_tag = build_application_tag(application_tag)
+        adapter.add_or_update_application_tag(mongo_application_tag)
