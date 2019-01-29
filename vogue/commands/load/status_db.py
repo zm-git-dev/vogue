@@ -1,8 +1,6 @@
 import logging
 import click
 import json
-from vogue.tools.cli_utils import json_read
-from vogue.tools.cli_utils import check_file
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
@@ -31,10 +29,10 @@ def status_db(context, db_dump, db_name):
     LOG.info("Reading db json dump.")
     try:
         db_dict = json.loads(db_dump)
-    except FileNotFoundError as e:
+    except:
+        LOG.error("status-db dump, not in json format.")
         context.abort()
 
-    db_dict = json.loads(db_dump)
     if not isinstance(db_dict, dict):
         LOG.error("Cannot read input db-dump. Type unknown.")
         context.abort()
