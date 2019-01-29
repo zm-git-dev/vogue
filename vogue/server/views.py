@@ -1,7 +1,4 @@
-from flask import make_response, flash, abort, url_for, redirect, render_template, request, session
-from flask_login import login_user,logout_user, current_user, login_required
-#from flask.ext.mail import Message
-from flask_oauthlib.client import OAuthException
+from flask import  url_for, redirect, render_template, request
 from vogue.constants.constants import YEARS, THIS_YEAR
 
 from extentions import app
