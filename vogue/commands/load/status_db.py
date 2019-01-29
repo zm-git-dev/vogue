@@ -23,6 +23,7 @@ def status_db(context, db_dump, app_tag):
     try:
         db_json_list = json.loads(db_dump)
     except:
+        LOG.error("status-db dump, not in json format.")
         context.abort()
 
     if not isinstance(db_json_list, list):
