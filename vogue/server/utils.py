@@ -60,6 +60,32 @@ def get_percentiles(samples: list, key: str)-> float:
     return percentiles
 
 
+def build_apptag_group_queries()-> list:
+    categories = adapter.app_tag_collection.distinct('category')
+    apptag_group_queries = {}
+    for category in categories:
+        app_tags = list(adapter.find_app_tags({'category' : category}))
+        group = [tag.get('_id') for tag in app_tags] 
+        apptag_group_queries[category] = {'application_tag': {'$in' : [group] }}
+    return apptag_group_queries
+
+
+
+def build_sample_groups()-> dict:
+    categories = adapter.app_tag_collection.distinct('category')
+    sample_groups = {}
+    for category in categories:
+        app_tags = list(adapter.find_app_tags({'category' : category}))
+        app_tags = [tag.get('_id') for tag in app_tags] 
+        query = {'application_tag': {'$in' : app_tags }}
+        sample_groups[category] = list(adapter.find_samples(query))
+    return sample_groups
+
+
+def build_group_queries_from_key(group_key)-> list:
+    group_by = list(adapter.sample_collection.distinct(group_key))
+
+
 def find_key_over_time( title: str = None, year : int = None, group_key: str = None, 
                         y_axis_key: str = None, y_axis_label: str = None, y_unit : str = None, 
                         adapter = adapter)-> dict:
@@ -79,6 +105,8 @@ def find_key_over_time( title: str = None, year : int = None, group_key: str = N
                         no y_axis_key is needed).
         y_axis_label :  What it seems to be :)
         """
+    groups = build_sample_groups()
+    print(groups)
 
     if group_key:
         group_by = list(adapter.sample_collection.distinct(group_key))
@@ -98,7 +126,7 @@ def find_key_over_time( title: str = None, year : int = None, group_key: str = N
             query = {'received_date' : {'$gte' : date1, '$lt' : date2}}
 
             if group_key:
-                query[group_key] = group
+                query[group_key] = { '$in' : [group] } 
             if y_axis_key:
                 query[y_axis_key] = {'$exists' : True}
             samples = list(adapter.find_samples(query))
@@ -157,7 +185,7 @@ def find_concentration_defrosts(year : int = None, adapter = adapter)-> dict:
         quartile = []
         nr_samples = []
         for nr in nr_defrosts:
-            query = {'lotnr' : group, 
+            query = {'lotnr' :  group, 
                 'received_date' : {'$gte' : date1, '$lt' : date2},
                 'nr_defrosts-concentration' : { '$exists' : True},
                 'nr_defrosts': { '$eq' : nr}}
@@ -172,28 +200,4 @@ def find_concentration_defrosts(year : int = None, adapter = adapter)-> dict:
             defrosts['data'][group] = {'median' : median,'quartile': quartile, 'color' : COLORS[i], 
                                         'nr_samples' : nr_samples}
             
-    return defrosts
-
-
-def scatter_to_remoove_find(year : int= None, adapter = adapter)-> dict:
-    """Prepares data for ... plots."""
-
-    group_by_key = 'lotnr'
-    date1, date2 = get_dates_of_year(int(year))
-    group_by = list(adapter.sample_collection.distinct(group_by_key))
-    defrosts = {'axis' : {'x' : 'Number of Defrosts', 'y' : 'Concentration (nM)'}, 
-                'data': {}, 'title' : 'wgs illumina PCR-free'}
-    for i, group in enumerate(group_by):
-        data = []
-        query = {'lotnr' : group, 
-                'received_date' : {'$gte' : date1, '$lt' : date2},
-                'nr_defrosts-concentration' : { '$exists' : True},
-                'nr_defrosts': { '$exists' : True}}
-        samples = adapter.find_samples(query)
-        for sample in samples:
-            data.append({'x' : sample['nr_defrosts'], 'y': round(sample['nr_defrosts-concentration'], 2), 
-                        'name': sample['_id']})
-        if data:
-            defrosts['data'][group] = {'data' : data, 'color' : COLORS[i]}
- 
     return defrosts
