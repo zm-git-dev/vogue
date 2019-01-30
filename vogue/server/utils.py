@@ -59,34 +59,22 @@ def get_percentiles(samples: list, key: str)-> float:
 
     return percentiles
 
-
-def build_apptag_group_queries()-> list:
-    categories = adapter.app_tag_collection.distinct('category')
-    apptag_group_queries = {}
-    for category in categories:
-        app_tags = list(adapter.find_app_tags({'category' : category}))
-        group = [tag.get('_id') for tag in app_tags] 
-        apptag_group_queries[category] = {'application_tag': {'$in' : [group] }}
-    return apptag_group_queries
-
-
-
-def build_sample_groups()-> dict:
-    categories = adapter.app_tag_collection.distinct('category')
-    sample_groups = {}
-    for category in categories:
-        app_tags = list(adapter.find_app_tags({'category' : category}))
-        app_tags = [tag.get('_id') for tag in app_tags] 
-        query = {'application_tag': {'$in' : app_tags }}
-        sample_groups[category] = list(adapter.find_samples(query))
-    return sample_groups
+def build_app_tag_group_queries()-> dict:
+    groups = adapter.app_tag_collection.aggregate([{ "$group" : { "_id" : "$category", "app_tags": { "$push": "$_id" } } }])
+    queries = []
+    for group in groups:
+        queries.append((group['_id'], {'application_tag': {'$in' : group['app_tags'] }}))
+    return queries
 
 
 def build_group_queries_from_key(group_key)-> list:
+
     group_by = list(adapter.sample_collection.distinct(group_key))
+    queries = [(group,{group_key : { '$eq' : group }}) for group in group_by]
+    return queries
 
 
-def find_key_over_time( title: str = None, year : int = None, group_key: str = None, 
+def find_key_over_time( title: str = None, year : int = None, group_queries: list = [('no_group',{})], 
                         y_axis_key: str = None, y_axis_label: str = None, y_unit : str = None, 
                         adapter = adapter)-> dict:
 
@@ -99,36 +87,29 @@ def find_key_over_time( title: str = None, year : int = None, group_key: str = N
     Input:
         title :         Plot title.
         year :          Data from this year will be shown in the plot. 
-        group_key :     Is the key in the database holding the group value.
+        group_queries : List of tuples (<group name>, <group query>)
         y_axis_key :    Key in database wich value will be plotted on the Y-axes (if given).
         y_unit :        Determines what to plot on the y axis (average/nr samples) (if "nr samples", 
                         no y_axis_key is needed).
         y_axis_label :  What it seems to be :)
         """
-    groups = build_sample_groups()
-    print(groups)
-
-    if group_key:
-        group_by = list(adapter.sample_collection.distinct(group_key))
-    else: 
-        group_by = ['no_group']
 
     plot_content = {'axis' : {'y' : y_axis_label}, 
                     'group' : {}, 
                     'title' : title, 
                     'labels' : [m[1] for m in MONTHS]}
 
-    for i, group in enumerate(group_by):
+
+    color_nr = 0
+    for group, group_query in group_queries:
         data = []
+        query = group_query.copy()
         for month_number, month_name in MONTHS:
-
             date1, date2 = get_dates_of_month(month_number, int(year))
-            query = {'received_date' : {'$gte' : date1, '$lt' : date2}}
-
-            if group_key:
-                query[group_key] = { '$in' : [group] } 
+            query['received_date'] = {'$gte' : date1, '$lt' : date2}
             if y_axis_key:
                 query[y_axis_key] = {'$exists' : True}
+
             samples = list(adapter.find_samples(query))
 
             if y_unit == 'number samples':
@@ -143,7 +124,8 @@ def find_key_over_time( title: str = None, year : int = None, group_key: str = N
                 data.append(None)
 
         if list(set(data)) != [None]:
-            plot_content['group'][group] = {'data' : data, 'color' : COLORS[i]}      
+            plot_content['group'][group] = {'data' : data, 'color' : COLORS[color_nr]}
+            color_nr += 1  
 
     return plot_content
 

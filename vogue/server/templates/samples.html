@@ -26,7 +26,7 @@
 
     Highcharts.chart('received', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_application.title | tojson }} },
+        title: { text: {{ received.title | tojson }} },
         xAxis: { categories: {{ received.labels| tojson }}},
         yAxis: { title: { text: {{ received.axis.y | tojson }} } },
         tooltip: {

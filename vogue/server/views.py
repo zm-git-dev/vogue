@@ -3,7 +3,8 @@ from vogue.constants.constants import YEARS, THIS_YEAR
 
 from extentions import app
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount,   
-                                find_key_over_time)
+                                find_key_over_time, build_group_queries_from_key, 
+                                build_app_tag_group_queries)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -32,35 +33,65 @@ def index():
 
 @app.route('/common/turn_around_times/<year_of_interest>')
 def turn_around_times(year_of_interest):
-    group_key = "priority"
-    received_to_delivered = find_key_over_time(
+    app_tag_group_queries = build_app_tag_group_queries()
+    prio_group_queries = build_group_queries_from_key("priority")
+
+    received_to_delivered = {'tag' : find_key_over_time(
                                 year = year_of_interest, 
-                                group_key = group_key, 
+                                group_queries = app_tag_group_queries, 
                                 y_axis_key ='received_to_delivered', 
-                                title = 'Time from recieved to delivered', 
+                                title = 'Time from recieved to delivered (grouped by application tag)', 
                                 y_axis_label = 'Days', 
-                                y_unit = 'average')
-    received_to_prepped = find_key_over_time(
+                                y_unit = 'average'),
+                            'prio' : find_key_over_time(
                                 year = year_of_interest, 
-                                group_key = group_key, 
+                                group_queries = prio_group_queries, 
+                                y_axis_key ='received_to_delivered', 
+                                title = 'Time from recieved to delivered (grouped by priority)', 
+                                y_axis_label = 'Days', 
+                                y_unit = 'average')}
+    received_to_prepped = {'tag' : find_key_over_time(
+                                year = year_of_interest, 
+                                group_queries = app_tag_group_queries, 
                                 y_axis_key ='received_to_prepped' , 
-                                title = 'Time from recieved to prepped', 
+                                title = 'Time from recieved to prepped (grouped by application tag)', 
                                 y_axis_label = 'Days', 
-                                y_unit = 'average')
-    prepped_to_sequenced = find_key_over_time(
+                                y_unit = 'average'),
+                            'prio' : find_key_over_time(
                                 year = year_of_interest, 
-                                group_key = group_key, 
+                                group_queries = prio_group_queries, 
+                                y_axis_key ='received_to_prepped' , 
+                                title = 'Time from recieved to prepped (grouped by priority)', 
+                                y_axis_label = 'Days', 
+                                y_unit = 'average')}
+    prepped_to_sequenced = {'tag' : find_key_over_time(
+                                year = year_of_interest, 
+                                group_queries = app_tag_group_queries, 
                                 y_axis_key ='prepped_to_sequenced' , 
-                                title = 'Time from prepped to sequenced', 
+                                title = 'Time from prepped to sequenced (grouped by application tag)', 
                                 y_axis_label = 'Days', 
-                                y_unit = 'average')
-    sequenced_to_delivered = find_key_over_time(
+                                y_unit = 'average'),
+                            'prio' : find_key_over_time(
                                 year = year_of_interest, 
-                                group_key = group_key, 
-                                y_axis_key ='sequenced_to_delivered', 
-                                title = 'Time from sequenced to delivered', 
+                                group_queries = prio_group_queries, 
+                                y_axis_key ='prepped_to_sequenced' , 
+                                title = 'Time from prepped to sequenced (grouped by priority)', 
                                 y_axis_label = 'Days', 
-                                y_unit = 'average')
+                                y_unit = 'average')}
+    sequenced_to_delivered = {'tag' : find_key_over_time(
+                                year = year_of_interest, 
+                                group_queries = app_tag_group_queries, 
+                                y_axis_key ='sequenced_to_delivered', 
+                                title = 'Time from sequenced to delivered (grouped by application tag)', 
+                                y_axis_label = 'Days', 
+                                y_unit = 'average'),
+                            'prio' : find_key_over_time(
+                                year = year_of_interest, 
+                                group_queries = prio_group_queries, 
+                                y_axis_key ='sequenced_to_delivered', 
+                                title = 'Time from sequenced to delivered (grouped by priority)', 
+                                y_axis_label = 'Days', 
+                                y_unit = 'average')}
     
     return render_template('turn_around_times.html',
         header = 'Turn Around Times',
@@ -76,17 +107,18 @@ def turn_around_times(year_of_interest):
 @app.route('/common/samples/<year_of_interest>')
 def common_samples(year_of_interest):
     group_by = ['research','standard','priority']#,'express']
-    group_key = "priority"
+    group_queries = build_group_queries_from_key("priority")
+    app_tag_group_queries = build_app_tag_group_queries()
     received = find_key_over_time(
                     year = year_of_interest, 
-                    group_key = group_key, 
+                    group_queries = group_queries, 
                     title = 'Received_application samples per month (grouped by priority)', 
                     y_axis_label = 'Nr of samples', 
                     y_unit = 'number samples')
     received_application = find_key_over_time(
                     year = year_of_interest, 
-                    group_key = group_key, 
-                    title = 'Received_application samples per month (grouped by priority)', 
+                    group_queries = app_tag_group_queries, 
+                    title = 'Received_application samples per month (grouped by aplication tag)', 
                     y_axis_label = 'Days', 
                     y_unit = 'number samples')#wrong groups!!!
 
@@ -101,9 +133,10 @@ def common_samples(year_of_interest):
 
 @app.route('/prepps/microbial/<year_of_interest>')
 def microbial(year_of_interest):
+    group_queries = build_group_queries_from_key("strain")
     microbial_concentration_time = find_key_over_time(
                                         year = year_of_interest, 
-                                        group_key = 'strain', 
+                                        group_queries = group_queries, 
                                         y_axis_key ='microbial_library_concentration', 
                                         title = 'Microbial',
                                         y_axis_label = 'Concentration (nM)',
@@ -119,16 +152,17 @@ def microbial(year_of_interest):
 
 @app.route('/prepps/target_enrichment/<year_of_interest>')
 def target_enrichment(year_of_interest):
+    group_queries = build_group_queries_from_key("source")
     library_size_post_hyb = find_key_over_time(
                                 year = year_of_interest, 
-                                group_key = 'source', 
+                                group_queries = group_queries, 
                                 y_axis_key ='library_size_post_hyb', 
                                 title = 'Post-hybridization QC', 
                                 y_axis_label = 'library size',
                                 y_unit = 'average')
     library_size_pre_hyb = find_key_over_time(
                                 year = year_of_interest, 
-                                group_key = 'source', 
+                                group_queries = group_queries, 
                                 y_axis_key ='library_size_pre_hyb', 
                                 title = 'Pre-hybridization QC', 
                                 y_axis_label = 'library size',
