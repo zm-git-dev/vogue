@@ -24,10 +24,16 @@ def load_one_sample(adapter, lims_id=None, lims_sample=None, lims=None, dry_run=
     
     adapter.add_or_update_sample(mongo_sample)
 
-def load_all_samples(adapter, lims, dry_run=False):
+def load_all_samples(adapter, lims, dry_run=False, start_sample = None):
     if dry_run:
         LOG.info('Will load all lims samples.')
         return
     for sample in lims.get_samples():
-        LOG.info(sample.id)
-        load_one_sample(adapter, lims_sample=sample, dry_run=dry_run, lims=lims)
+        if not start_sample:
+            LOG.info(sample.id)
+            load_one_sample(adapter, lims_sample=sample, dry_run=dry_run, lims=lims)
+        elif start_sample and start_sample == sample.id:
+            start_sample = None
+
+
+        
