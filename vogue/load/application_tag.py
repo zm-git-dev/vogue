@@ -13,4 +13,5 @@ def load_aplication_tags(adapter, db_json_list, dry_run=False):
 
     for application_tag in db_json_list:
         mongo_application_tag = build_application_tag(application_tag)
-        adapter.add_or_update_application_tag(mongo_application_tag)
+        if isinstance(mongo_application_tag, dict):
+            adapter.add_or_update_application_tag(mongo_application_tag)
