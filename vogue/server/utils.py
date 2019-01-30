@@ -60,7 +60,12 @@ def get_percentiles(samples: list, key: str)-> float:
     return percentiles
 
 def build_app_tag_group_queries()-> dict:
-    groups = adapter.app_tag_collection.aggregate([{ "$group" : { "_id" : "$category", "app_tags": { "$push": "$_id" } } }])
+    """Returns List of tuples (<group name>, <group query>), 
+        <group name>        the app tag category (wgs, rml, etc) 
+        <group query>       the query for all app tags in the category"""
+
+    groups = adapter.app_tag_collection.aggregate([{ "$group" : { "_id" : "$category", 
+                                                     "app_tags" : { "$push": "$_id" } } }])
     queries = []
     for group in groups:
         queries.append((group['_id'], {'application_tag': {'$in' : group['app_tags'] }}))
@@ -68,9 +73,12 @@ def build_app_tag_group_queries()-> dict:
 
 
 def build_group_queries_from_key(group_key)-> list:
+    """Returns List of tuples (<group name>, <group query>), 
+        <group name>        any value hold by group_key
+        <group query>       the query for that group"""
 
     group_by = list(adapter.sample_collection.distinct(group_key))
-    queries = [(group,{group_key : { '$eq' : group }}) for group in group_by]
+    queries = [(group, {group_key : { '$eq' : group }}) for group in group_by]
     return queries
 
 
@@ -82,7 +90,7 @@ def find_key_over_time( title: str = None, year : int = None, group_queries: lis
 
     The "time" is allways in months and the "something" can be either number of samples of a 
     certain group, or the average of some value from all samples within a certain group.
-    If no group_key is provided, all samples will be concidered as one group.
+    If no group_queries is provided, all samples will be concidered as one group.
 
     Input:
         title :         Plot title.
@@ -99,16 +107,17 @@ def find_key_over_time( title: str = None, year : int = None, group_queries: lis
                     'title' : title, 
                     'labels' : [m[1] for m in MONTHS]}
 
+    y_axis_query = {y_axis_key : {'$exists' : True}} if y_axis_key else {}
 
-    color_nr = 0
-    for group, group_query in group_queries:
+    for i, group_query in enumerate(group_queries):
+        group, query = group_query
+        if not group:
+            continue
         data = []
-        query = group_query.copy()
+        query.update(y_axis_query)
         for month_number, month_name in MONTHS:
             date1, date2 = get_dates_of_month(month_number, int(year))
             query['received_date'] = {'$gte' : date1, '$lt' : date2}
-            if y_axis_key:
-                query[y_axis_key] = {'$exists' : True}
 
             samples = list(adapter.find_samples(query))
 
@@ -118,14 +127,10 @@ def find_key_over_time( title: str = None, year : int = None, group_queries: lis
                 average = get_average(samples, y_axis_key)
                 y = round(average,1) if average else None
 
-            if y:
-                data.append(y)
-            else:
-                data.append(None)
+            data.append(y) if y else data.append(None)
 
         if list(set(data)) != [None]:
-            plot_content['group'][group] = {'data' : data, 'color' : COLORS[color_nr]}
-            color_nr += 1  
+            plot_content['group'][group] = {'data' : data, 'color' : COLORS[i]}
 
     return plot_content
 
@@ -167,7 +172,7 @@ def find_concentration_defrosts(year : int = None, adapter = adapter)-> dict:
         quartile = []
         nr_samples = []
         for nr in nr_defrosts:
-            query = {'lotnr' :  group, 
+            query = {'lotnr' : group, 
                 'received_date' : {'$gte' : date1, '$lt' : date2},
                 'nr_defrosts-concentration' : { '$exists' : True},
                 'nr_defrosts': { '$eq' : nr}}
