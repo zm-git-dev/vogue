@@ -3,8 +3,6 @@ import click
 import json
 from vogue.load.application_tag import load_aplication_tags
 
-
-LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
 
 
