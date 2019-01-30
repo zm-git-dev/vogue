@@ -7,7 +7,7 @@ def build_application_tag(app_tag: dict)-> dict:
     category = app_tag.get('category')
 
     if not tag:
-        return None
+        return False
 
     mongo_application_tag = {'_id' : tag}
     if category:

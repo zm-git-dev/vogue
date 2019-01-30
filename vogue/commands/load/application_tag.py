@@ -7,8 +7,7 @@ LOG = logging.getLogger(__name__)
 
 
 @click.command("apptag", short_help="Reads json with application tag info.")
-@click.option('-a', '--application-tags', type=str, required=True, help='Database dump in json')
-#@click.argument('application-tags', type=str, help='json formatted application tags')
+@click.option('-a', '--application-tags', required=True, help='json formatted application tags')
 @click.pass_context
 
 
@@ -23,12 +22,13 @@ def application_tags(context, application_tags):
     LOG.info("Reading json.")
     try:
         json_list = json.loads(application_tags)
-    except:
-        LOG.error("This is not json.")
+    except json.JSONDecodeError as e: 
+        LOG.error("Imput string is not proper json.")
+        LOG.error(e)
         context.abort()
 
     if not isinstance(json_list, list):
-        LOG.error("Cannot read input. Its not json.")
+        LOG.error("Cannot read input. Its not list of jsons.")
         context.abort()
 
     LOG.info("json is read.")
