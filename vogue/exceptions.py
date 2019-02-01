@@ -1,0 +1,4 @@
+
+
+class MissingApplicationTag(Exception):
+    pass

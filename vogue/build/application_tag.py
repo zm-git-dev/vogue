@@ -1,4 +1,4 @@
-
+from vogue.exceptions import MissingApplicationTag
 
 def build_application_tag(app_tag: dict)-> dict:
     """Builds the application tag collection documents."""
@@ -7,7 +7,7 @@ def build_application_tag(app_tag: dict)-> dict:
     category = app_tag.get('category')
 
     if not tag:
-        return False
+        raise MissingApplicationTag
 
     mongo_application_tag = {'_id' : tag}
     if category:

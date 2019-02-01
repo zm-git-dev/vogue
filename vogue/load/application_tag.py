@@ -1,6 +1,7 @@
 import sys
 import logging
 from vogue.build.application_tag import build_application_tag
+from vogue.exceptions import MissingApplicationTag
 LOG = logging.getLogger(__name__)
    
 
@@ -12,6 +13,9 @@ def load_aplication_tags(adapter, db_json_list, dry_run=False):
         return
 
     for application_tag in db_json_list:
-        mongo_application_tag = build_application_tag(application_tag)
-        if isinstance(mongo_application_tag, dict):
+        try:
+            mongo_application_tag = build_application_tag(application_tag)
             adapter.add_or_update_application_tag(mongo_application_tag)
+        except MissingApplicationTag:
+            LOG.warning('ApplicationTag missing in JSON list')
+            
