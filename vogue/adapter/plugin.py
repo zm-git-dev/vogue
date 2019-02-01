@@ -17,7 +17,7 @@ class VougeAdapter(MongoAdapter):
         self.sample_collection = self.db.sample
         self.analysis_collection = self.db.analysis
         
-        LOG.info(f"Use database {db_name}.")
+        LOG.info("Use database %s.", db_name)
 
     def add_or_update_sample(self, sample_news: dict):
         """Adds/updates a sample in the database"""
@@ -28,13 +28,13 @@ class VougeAdapter(MongoAdapter):
         if not update_result.raw_result['updatedExisting']:
             self.db.sample.update_one({'_id' : lims_id}, 
                 {'$set': {'added': dt.today()}})
-            LOG.info(f"Added sample {lims_id}.")
+            LOG.info("Added sample %s.", lims_id)
         elif update_result.modified_count:
             self.db.sample.update_one({'_id' : lims_id}, 
                 {'$set': {'updated': dt.today()}})
-            LOG.info(f"Updated sample {lims_id}.")
+            LOG.info("Updated sample %s.", lims_id)
         else:
-            LOG.info(f"No updates for sample {lims_id}.")
+            LOG.info("No updates for sample %s.", lims_id)
 
     def add_or_update_application_tag(self, application_tag_news: dict):
         """Adds/updates a application_tag in the database"""
@@ -45,13 +45,13 @@ class VougeAdapter(MongoAdapter):
         if not update_result.raw_result['updatedExisting']:
             self.db.application_tag.update_one({'_id' : tag}, 
                 {'$set': {'added': dt.today()}})
-            LOG.info(f"Added application_tag {tag}.")
+            LOG.info("Added application_tag %s.", tag)
         elif update_result.modified_count:
             self.db.application_tag.update_one({'_id' : tag}, 
                 {'$set': {'updated': dt.today()}})
-            LOG.info(f"Updated application_tag {tag}.")
+            LOG.info("Updated application_tag %s.", tag)
         else:
-            LOG.info(f"No updates for application_tag {tag}.")
+            LOG.info("No updates for application_tag %s.", tag)
 
     def sample(self, lims_id):
         return self.sample_collection.find_one({'_id':lims_id})
