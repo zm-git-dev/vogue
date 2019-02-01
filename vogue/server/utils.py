@@ -89,33 +89,36 @@ def find_key_over_time( title: str, year : int, y_axis_label: str, y_unit : str,
 
     The "time" is allways in months and the "something" can be either number of samples of a 
     certain group, or the average of some value from all samples within a certain group.
-    If no group_queries is provided, all samples will be concidered as one group.
+    If no group_queries are provided, all samples will be concidered as one group.
 
     Args:
-        title :         Plot title.
-        year :          Data from this year will be shown in the plot.
-                        example: 2018
+        title : Plot title.
+        year :  Data from this year will be shown in the plot.
+                example: 2018
         group_queries : List of tuples (<group name>, <group query>)
-                        example: 
-        y_axis_key :    Key in database wich value will be plotted on the Y-axes (if given).
-                        example:
-        y_unit :        Determines what to plot on the y axis (average/nr samples) (if "nr samples", 
-                        no y_axis_key is needed).
-        y_axis_label :  What it seems to be :)
+                examples:   ('wgs', {'application_tag': {'$in': ['WGSPCFC030', 'WGSPCFC060',...]})
+                            ('standard', {'priority': {'$eq': 'standard'}})
+        y_axis_key : Key in database wich value will be plotted on the Y-axes (if given).
+                example: 'sequenced_to_delivered'
+        y_unit : Determines what to plot on the y axis (average/nr samples) (if "nr samples", no 
+                y_axis_key is needed).
+        y_axis_label : What it seems to be :)
 
-    Returns:
-        plot_content:   {'axis' : {'y': 'Days'}, 
-                        'title' : 'Time from recieved to delivered (grouped by application tag)', 
-                        'labels' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-                        'group' : {'rml': {'data': [3.0, 4.6, 6.3, 3.6, 3.3, 3.4, 3.2, 3.3, 4.5, 4.6, 3.7, 9.2], 
-                                           'color': ('RGB(255, 0, 0)', 'RGB(255, 0, 0, 0.2)')}, 
-                                   'wes': {'data': [None, None, None, 83.0, None, 9.0, None, None, None, None, None, None], 
-                                           'color': ('RGB(128, 0, 128)', 'RGB(128, 0, 128, 0.2)')}, 
-                                   'tga': {'data': [None, 13.2, 18.0, 16.6, None, None, None, None, None, None, None, None], 
-                                           'color': ('RGB(128, 0, 0)', 'RGB(128, 0, 0,0.2)')}, 
-                                   'wgs': {'data': [12.6, 13.0, 11.6, 15.3, 16.4, 12.1, 12.7, 13.4, 38.8, 12.0, 14.2, 28.1], 
-                                           'color': ('RGB(128, 128, 0)', 'RGB(128, 128, 0,0.2)')}} 
-                                            }
+    Returns: 
+        Dict with data needed to generate the plot.  
+        example: 
+        
+        {'axis' : {'y': 'Days'}, 
+        'title' : 'Time from recieved to delivered (grouped by application tag)', 
+        'labels' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        'group' :  {'rml': {'data': [3.0, 4.6, 6.3, 3.6, 3.3, 3.4, 3.2, 3.3, 4.5, 4.6, 3.7, 9.2], 
+                            'color': ('RGB(255, 0, 0)', 'RGB(255, 0, 0, 0.2)')}, 
+                    'wes': {'data': [None, None, None, 83.0, None, 9.0, None, None, None, None, None, None], 
+                            'color': ('RGB(128, 0, 128)', 'RGB(128, 0, 128, 0.2)')}, 
+                    'tga': {'data': [None, 13.2, 18.0, 16.6, None, None, None, None, None, None, None, None], 
+                            'color': ('RGB(128, 0, 0)', 'RGB(128, 0, 0,0.2)')}, 
+                    'wgs': {'data': [12.6, 13.0, 11.6, 15.3, 16.4, 12.1, 12.7, 13.4, 38.8, 12.0, 14.2, 28.1], 
+                            'color': ('RGB(128, 128, 0)', 'RGB(128, 128, 0,0.2)')}}}
         """
 
     plot_content = {'axis' : {'y' : y_axis_label}, 
