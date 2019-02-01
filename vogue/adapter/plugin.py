@@ -16,6 +16,7 @@ class VougeAdapter(MongoAdapter):
         self.db_name = db_name
         self.sample_collection = self.db.sample
         self.analysis_collection = self.db.analysis
+        self.app_tag_collection = self.db.application_tag
         
         LOG.info("Use database %s.", db_name)
 
