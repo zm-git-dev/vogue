@@ -45,12 +45,10 @@ class VougeAdapter(MongoAdapter):
                             {'$set': application_tag_news}, upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
-            self.db.application_tag.update_one({'_id' : tag}, 
-                {'$set': {'added': dt.today()}})
+            self.db.application_tag.update_one({'_id' : tag}, {'$set': {'added': dt.today()}})
             LOG.info("Added application_tag %s.", tag)
         elif update_result.modified_count:
-            self.db.application_tag.update_one({'_id' : tag}, 
-                {'$set': {'updated': dt.today()}})
+            self.db.application_tag.update_one({'_id' : tag}, {'$set': {'updated': dt.today()}})
             LOG.info("Updated application_tag %s.", tag)
         else:
             LOG.info("No updates for application_tag %s.", tag)

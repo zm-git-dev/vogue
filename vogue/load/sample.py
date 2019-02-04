@@ -1,8 +1,10 @@
 from genologics.entities import Sample
 from genologics.lims import Lims
 
+
 import logging
 from vogue.build.lims import build_sample
+from vogue.parse.application_tag import parse_application_tag
 LOG = logging.getLogger(__name__)
    
 
@@ -34,6 +36,15 @@ def load_all_samples(adapter, lims, dry_run=False, start_sample = None):
             load_one_sample(adapter, lims_sample=sample, dry_run=dry_run, lims=lims)
         elif start_sample and start_sample == sample.id:
             start_sample = None
+
+def update_category(json_list:list):
+    application_tags = parse_application_tag(json_list)
+    all_samples = mongo.....
+    for sample in all_samples:
+        app_tag = sample.....
+        categoory = application_tags.get(app_tag)
+        if categoory:
+            sample.update.....
 
 
         

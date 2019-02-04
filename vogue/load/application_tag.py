@@ -24,4 +24,12 @@ def load_aplication_tags(adapter, json_list, dry_run=False):
             adapter.add_or_update_application_tag(mongo_application_tag)
         except MissingApplicationTag:
             LOG.warning('ApplicationTag missing in JSON list')
-            
+
+
+
+
+
+
+
+
+
