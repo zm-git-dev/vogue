@@ -5,7 +5,7 @@ from vogue.exceptions import MissingApplicationTag
 
 
 def test_build_application_tag():
-    ## GIVEN a app_tag with missing requiered keys 'tag' and 'category'
+    ## GIVEN a app_tag with requiered keys 'tag' and 'category'
     app_tag = {'tag':'MELPCFR030', 'category':'wgs', 'gunnar': 25}
 
     ## WHEN building a mongo application tag
