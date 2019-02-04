@@ -37,14 +37,15 @@ def load_all_samples(adapter, lims, dry_run=False, start_sample = None):
         elif start_sample and start_sample == sample.id:
             start_sample = None
 
-def update_category(json_list:list):
+def update_category(adapter, json_list:list):
     application_tags = parse_application_tag(json_list)
-    all_samples = mongo.....
+    all_samples = list(adapter.find_samples({}))
     for sample in all_samples:
-        app_tag = sample.....
-        categoory = application_tags.get(app_tag)
-        if categoory:
-            sample.update.....
+        app_tag = sample.get('application_tag')
+        category = application_tags.get(app_tag)
+        if category:
+            sample['category'] = category
+            adapter.add_or_update_sample(sample)
 
 
         

@@ -2,6 +2,7 @@ import logging
 import click
 import json
 from vogue.load.application_tag import load_aplication_tags
+from vogue.load.sample import update_category
 
 LOG = logging.getLogger(__name__)
 
@@ -35,3 +36,4 @@ def application_tags(context, application_tags: list):
 
     LOG.info("json is read.")
     load_aplication_tags(adapter, json_list)
+    update_category(adapter, json_list)
