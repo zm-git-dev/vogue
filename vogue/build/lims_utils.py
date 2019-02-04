@@ -115,6 +115,8 @@ def get_output_artifact(process_types: list, lims_id: str, lims: Lims, last: boo
     for art in artifacts:
         # Get the date of the artifact
         new_date = str_to_datetime(art.parent_process.date_run)
+        if not new_date:
+            continue
         # If this is the first artifact we initialise the variables
         if not date:
             date = new_date
