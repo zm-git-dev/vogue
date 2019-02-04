@@ -1,7 +1,6 @@
 from genologics.entities import Sample
 from genologics.lims import Lims
 
-
 import logging
 from vogue.build.lims import build_sample
 from vogue.parse.application_tag import parse_application_tag
