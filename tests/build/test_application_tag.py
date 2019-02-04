@@ -1,4 +1,7 @@
 from vogue.build.application_tag import build_application_tag
+import pytest
+from vogue.exceptions import MissingApplicationTag
+
 
 
 def test_build_application_tag():
@@ -17,11 +20,6 @@ def test_build_application_tag_wrong_input():
     app_tag = {'tage':'ABC', 'categoryy':'wgs', 'gunnar': 25}
 
     ## WHEN building a mongo application tag
-    try:
-        mongo_application_tag = build_application_tag(app_tag)
-    except MissingApplicationTag:
-        LOG.warning('ApplicationTag missing in JSON list')
-
     ## THEN assert mongo_application_tag is None
-    assert mongo_application_tag is None
-
+    with pytest.raises(MissingApplicationTag):
+        build_application_tag(app_tag)
