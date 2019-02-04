@@ -11,10 +11,12 @@ LOG = logging.getLogger(__name__)
 @click.pass_context
 
 
-def application_tags(context, application_tags):
+def application_tags(context, application_tags: list):
     """Reads list of dicts of application tags as string. eg:
     
-        application_tags = '[{'tag':'MELPCFR030', 'category':'wgs',...},...]'
+        Args: 
+            application_tags(list(dict)): '[{'tag':'MELPCFR030', 'category':'wgs',...},...]'
+            context:
     """
 
     adapter = context.obj['adapter']

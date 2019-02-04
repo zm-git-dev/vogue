@@ -40,7 +40,8 @@ class VougeAdapter(MongoAdapter):
         """Adds/updates a application_tag in the database"""
 
         tag = application_tag_news['_id']
-        update_result = self.db.application_tag.update_one({'_id' : tag}, {'$set': application_tag_news}, upsert=True)
+        update_result = self.db.application_tag.update_one({'_id' : tag}, 
+                            {'$set': application_tag_news}, upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
             self.db.application_tag.update_one({'_id' : tag}, 

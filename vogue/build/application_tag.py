@@ -1,7 +1,12 @@
 from vogue.exceptions import MissingApplicationTag
 
 def build_application_tag(app_tag: dict)-> dict:
-    """Builds the application tag collection documents."""
+    """Builds the application tag collection documents.
+    
+    Args: 
+        app_tag(dict): {'tag':'MELPCFR030', 'category':'wgs',...}
+    Return:
+        mongo_application_tag(dict): {'_id':'MELPCFR030', 'category':'wgs'} """
 
     tag = app_tag.get('tag')
     category = app_tag.get('category')
