@@ -7,7 +7,7 @@ LOG = logging.getLogger(__name__)
 
 
 @click.command("apptag", short_help="Reads json with application tag info.")
-@click.option('-a', '--application-tags', required=True, help='json formatted application tags')
+@click.argument('application-tags', type=click.STRING)
 @click.pass_context
 
 
