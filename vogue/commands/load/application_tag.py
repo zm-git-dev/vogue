@@ -15,7 +15,7 @@ def application_tags(context, application_tags: str):
     """Reads list of dicts of application tags as string. eg:
     
         Args: 
-            application_tags(list(dict)): '[{'tag':'MELPCFR030', 'category':'wgs',...},...]'
+            application_tags(list(dict)): '[{"tag":"MELPCFR030", "category":"wgs",...},...]'
             context:
     """
 

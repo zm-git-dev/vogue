@@ -58,6 +58,9 @@ class VougeAdapter(MongoAdapter):
     def sample(self, lims_id):
         return self.sample_collection.find_one({'_id':lims_id})
 
+    def app_tag(self, tag):
+        return self.app_tag_collection.find_one({'_id':tag})
+
     def delete_sample(self):
         return None
 
