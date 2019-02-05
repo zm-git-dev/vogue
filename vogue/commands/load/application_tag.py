@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 @click.pass_context
 
 
-def application_tags(context, application_tags: list):
+def application_tags(context, application_tags: str):
     """Reads list of dicts of application tags as string. eg:
     
         Args: 
