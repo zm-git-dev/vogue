@@ -3,7 +3,6 @@ import pytest
 from vogue.exceptions import MissingApplicationTag	
 
 
-
 def test_build_application_tag():	
    ## GIVEN a app_tag with requiered keys 'tag' and 'category'	
    app_tag = {'tag':'MELPCFR030', 'category':'wgs', 'gunnar': 25}	
