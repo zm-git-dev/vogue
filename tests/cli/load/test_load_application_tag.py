@@ -29,7 +29,7 @@ def test_application_tag_wrong_input(database):
     app_tags = "[{'tag':'MELPCFR030', 'category':'wgs'}]}"
 
     ## WHEN adding a application tags
-    ## THEN assert error
+    ## THEN assert Badly formated json! Can not load json and build application tags.
     runner = app.test_cli_runner()
     with pytest.raises(ValueError):
         result = runner.invoke(cli, ['load', 'apptag', '-a', app_tags])

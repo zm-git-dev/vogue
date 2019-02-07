@@ -23,15 +23,15 @@ def test_lims(database):
 
 
 
-def test_lims_wrong_input(database):
+def test_lims_wrong_sample_id(database):
     app.db = database
 
     ## GIVEN a non existing lims  sample id
     sample_id = 'WRONGID'
 
     ## WHEN adding the sample
-    ## THEN assert error
     runner = app.test_cli_runner()
-    with pytest.raises(ValueError):
-        result = runner.invoke(cli, ['load', 'lims', '-s', sample_id])
-        #Not working" Need help!
+    result = runner.invoke(cli, ['load', 'lims', '-s', sample_id])
+
+    ## THEN assert Sample Id not existing in LIMS, no sample added to database.
+    assert app.adapter.sample(sample_id) is None
