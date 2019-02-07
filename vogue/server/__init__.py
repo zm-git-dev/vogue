@@ -2,7 +2,7 @@ import os
 from pymongo import MongoClient
 import logging
 from flask import Flask
-from .extentions import adapter
+from vogue.adapter.plugin import VougeAdapter
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
@@ -13,9 +13,10 @@ def create_app():
     app.config.from_pyfile('config.py')
 
     client = MongoClient(app.config['DB_URI'])
+    db_name = app.config['DB_NAME']
     app.client = client
-    app.db = client[app.config['DB_NAME']]
-    app.adapter = adapter
+    app.db = client[db_name]
+    app.adapter = VougeAdapter(client, db_name = db_name)
 
     app.register_blueprint(blueprint)
     return app
