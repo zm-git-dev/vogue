@@ -3,6 +3,7 @@ from vogue.commands.load.application_tag import application_tags
 from vogue.server import create_app
 from vogue.commands.base import cli
 import pytest
+from click import Abort
 
 app = create_app()
 
@@ -29,8 +30,8 @@ def test_application_tag_wrong_input(database):
     app_tags = "[{'tag':'MELPCFR030', 'category':'wgs'}]}"
 
     ## WHEN adding a application tags
-    ## THEN assert Badly formated json! Can not load json and build application tags.
     runner = app.test_cli_runner()
-    with pytest.raises(ValueError):
-        result = runner.invoke(cli, ['load', 'apptag', '-a', app_tags])
-        #Not working" Need help!
+    result = runner.invoke(cli, ['load', 'apptag', '-a', app_tags])
+
+    ## THEN assert Badly formated json! Can not load json. Exiting. 
+    assert result.exit_code == 1
