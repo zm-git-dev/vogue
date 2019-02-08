@@ -8,11 +8,6 @@ from genologics.entities import Sample
 from genologics.config import BASEURI,USERNAME,PASSWORD
 from genologics.lims import Lims
 
-
-#from vogue.load.lims import build_sample
-
-#DATABASE = 'vogue'
-
 DATABASE = 'testdb'
 
 @pytest.fixture(scope='function')
@@ -30,6 +25,7 @@ def database(request, pymongo_client):
     mongo_client = pymongo_client
     database = mongo_client[DATABASE]
     return database
+
 
 
 

@@ -3,13 +3,15 @@ from vogue.commands.load.lims import lims
 from vogue.server import create_app
 from vogue.commands.base import cli
 import pytest
+from vogue.adapter.plugin import VougeAdapter
 
-app = create_app()
+app = create_app(test= True)
 
 
 
 def test_lims(database):
     app.db = database
+    app.adapter = VougeAdapter(database.client, db_name = database.name)
 
     ## GIVEN a lims sample ID
     sample_id = 'MIC3559A64'
