@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from mongo_adapter import get_client
-from extentions import adapter
 from datetime import datetime as dt
 import numpy as np
 from vogue.constants.constants import MONTHS, COLORS
@@ -59,7 +58,7 @@ def get_percentiles(samples: list, key: str)-> float:
 
     return percentiles
 
-def build_app_tag_group_queries()-> list:
+def build_app_tag_group_queries(adapter)-> list:
     """Returns List of tuples (<group name>, <group query>), 
         <group name>        the app tag category (wgs, rml, etc) 
         <group query>       the query for all app tags in the category"""
@@ -72,7 +71,7 @@ def build_app_tag_group_queries()-> list:
     return queries
 
 
-def build_group_queries_from_key(group_key)-> list:
+def build_group_queries_from_key(adapter, group_key)-> list:
     """Returns List of tuples (<group name>, <group query>), 
         <group name>        any value hold by group_key
         <group query>       the query for that group"""
@@ -82,7 +81,7 @@ def build_group_queries_from_key(group_key)-> list:
     return queries
 
 
-def find_key_over_time( title: str, year : int, y_axis_label: str, y_unit : str, adapter = adapter, 
+def find_key_over_time( adapter, title: str, year : int, y_axis_label: str, y_unit : str, 
                         group_queries: list = [('no_group',{})], y_axis_key: str=None)-> dict:
 
     """Prepares data for plots showing progress of "something" over "time".
@@ -153,7 +152,7 @@ def find_key_over_time( title: str, year : int, y_axis_label: str, y_unit : str,
     return plot_content
 
 
-def find_concentration_amount(year : int = None, adapter = adapter)-> dict:
+def find_concentration_amount(adapter, year : int = None)-> dict:
     """Prepares data for a scatter plot showning Concentration agains Amount."""
 
     date1, date2 = get_dates_of_year(int(year))
@@ -172,7 +171,7 @@ def find_concentration_amount(year : int = None, adapter = adapter)-> dict:
 
     return amount
 
-def find_concentration_defrosts(year : int = None, adapter = adapter)-> dict:
+def find_concentration_defrosts(adapter, year : int = None)-> dict:
     """Prepares data for a plot showning Number of defrosts agains Concentration"""
 
     group_by_key = 'lotnr'
