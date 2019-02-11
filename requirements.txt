@@ -9,5 +9,3 @@ coloredlogs
 mongo_adapter
 multiqc
 lzstring
-flask_login
-flask_oauthlib

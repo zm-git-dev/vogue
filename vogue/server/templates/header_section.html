@@ -5,7 +5,7 @@
     <div class="btn-group mr-2">
       <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
     </div>
-    <form action="{{ url_for('index')}}" method="POST">
+    <form action="{{ url_for('server.index')}}" method="POST">
       <input type="hidden" name="page" value="{{page_id}}">
       <select name="year" class="form-control" required onchange="this.form.submit()">
         {% for year in years %}

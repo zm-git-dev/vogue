@@ -8,9 +8,25 @@ from genologics.entities import Sample
 from genologics.config import BASEURI,USERNAME,PASSWORD
 from genologics.lims import Lims
 
-#from vogue.load.lims import build_sample
+DATABASE = 'testdb'
 
-DATABASE = 'vogue'
+@pytest.fixture(scope='function')
+def pymongo_client(request):
+    """Get a client to the mongo database"""
+    mock_client = MongoClient()
+    def teardown():
+        mock_client.drop_database(DATABASE)
+    request.addfinalizer(teardown)
+    return mock_client
+
+@pytest.fixture(scope='function')
+def database(request, pymongo_client):
+    """Get an adapter connected to mongo database"""
+    mongo_client = pymongo_client
+    database = mongo_client[DATABASE]
+    return database
+
+
 
 
 class MockProcess():
