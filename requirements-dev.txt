@@ -1,0 +1,4 @@
+flask_debugtoolbar
+pytest>=3.6
+pytest-flask
+pytest-cov
