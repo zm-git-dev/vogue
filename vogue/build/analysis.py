@@ -16,13 +16,10 @@ def validate_conf(analysis_conf: dict):
     # This line will extract all the second level keys.
     analysis_names = [e for key in analysis_model.ANALYSIS_SETS if isinstance(analysis_model.ANALYSIS_SETS[key], dict)
             for e in analysis_model.ANALYSIS_SETS[key].keys()]
-    print(analysis_names)
 
     # Now we need to know which analysis tools or bioinformatic tools in <analysis_conf>'s first level keys are among
     # valid analysis_names above. If indices needed, change i,e and extract i.
-    print(list(analysis_conf.keys()))
     valid_analysis = [e for e in list(analysis_conf.keys()) if e in analysis_names]
-    print(valid_analysis)
 
     if not valid_analysis:
         return None
@@ -30,22 +27,19 @@ def validate_conf(analysis_conf: dict):
     LOG.info(f'The following keys were found in the input config: {valid_analysis}') 
     return valid_analysis
 
-def build_analysis(multiqc_dict: dict, analysis_type: str):
-    """build a analysis object"""
+def build_analysis(analysis_dict: dict, analysis_type: str, valid_analysis: str):
+    '''
+    Builds analysis dictionary based on input analysis_dict. This function will remove analysis json that are not part
+    of the matching model. analysis_type is a single key matching ANALYSIS_SETS's first level keys.
+    '''
 
-    if not analysis_type in analysis_model.ANALYSIS_SETS.keys():
-        LOG.warning(
-            f'Analysis did not match the analysis type: {analysis_type}')
-        return None
+    # Match valid_analysis with the analysis_type of ANALYSIS_SETS
+    analysis_common_keys = [e for e in valid_analysis if e in list(analysis_model.ANALYSIS_SETS[analysis_type].keys())] 
 
+    # A new dictionary is constructed instead of dropping unrelevant keys. Or maybe one could deepcopy analysis_dict and
+    # remove the irrelevant keys.
     analysis = dict()
-
-    # Find common analysis between predefined set and config file loaded.
-    analysis_common_keys = set(
-        analysis_model.ANALYSIS_SETS[analysis_type].keys()) & set(
-            multiqc_dict['report_saved_raw_data'].keys())
-
     for common_key in analysis_common_keys:
-        analysis[common_key] = multiqc_dict['report_saved_raw_data'][common_key]
+        analysis[common_key] = analysis_dict[common_key]
 
     return analysis
