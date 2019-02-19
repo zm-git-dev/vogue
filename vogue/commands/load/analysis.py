@@ -76,19 +76,18 @@ def analysis(context, sample_id, analysis_config, analysis_type):
     ready_analysis = dict()
     if 'all' in analysis_type:
         for my_analysis in analysis_model.ANALYSIS_DESC.keys():
-            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis)
+            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis, valid_analysis)
             if tmp_analysis_dict:
                 ready_analysis = {**ready_analysis, **tmp_analysis_dict}
     else:
         for my_analysis in analysis_type:
-            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis)
+            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis, valid_analysis)
             if tmp_analysis_dict:
                 ready_analysis = {**ready_analysis, **tmp_analysis_dict}
 
     if ready_analysis:
         LOG.info(
-            f'The following keys were found {list(ready_analysis.keys())}')
-        print(ready_analysis)
+            f'Values for {list(ready_analysis.keys())} loaded for sample {sample_id}')
     else:
         LOG.warning(
             f'No enteries were found for the given analysis type: {analysis_type}'
