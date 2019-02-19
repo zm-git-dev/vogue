@@ -127,7 +127,8 @@ def find_key_over_time( adapter, title: str, year : int, y_axis_label: str, y_un
 
     y_axis_query = {y_axis_key : {'$exists' : True}} if y_axis_key else {}
 
-    for i, group_query in enumerate(group_queries):
+    i=0
+    for group_query in group_queries:
         group, query = group_query
         if not group:
             continue
@@ -149,6 +150,7 @@ def find_key_over_time( adapter, title: str, year : int, y_axis_label: str, y_un
 
         if list(set(data)) != [None]:
             plot_content['group'][group] = {'data' : data, 'color' : COLORS[i]}
+            i+=1
     return plot_content
 
 
