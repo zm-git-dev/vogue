@@ -12,12 +12,23 @@ def validate_conf(analysis_conf: dict):
     exist, disqualifies the file and returns False
     """
 
-    if not 'report_saved_raw_data' in analysis_conf.keys():
-        LOG.warning('Input does not seem to be a multiqc report')
-        return False
+    # Second level keys in ANALYSIS_SETS are bioinformatic tool name OR analysis name.
+    # This line will extract all the second level keys.
+    analysis_names = [e for key in analysis_model.ANALYSIS_SETS if isinstance(analysis_model.ANALYSIS_SETS[key], dict)
+            for e in analysis_model.ANALYSIS_SETS[key].keys()]
+    print(analysis_names)
 
-    LOG.info('Input seems to be a valid multiqc report')
-    return True
+    # Now we need to know which analysis tools or bioinformatic tools in <analysis_conf>'s first level keys are among
+    # valid analysis_names above. If indices needed, change i,e and extract i.
+    print(list(analysis_conf.keys()))
+    valid_analysis = [e for e in list(analysis_conf.keys()) if e in analysis_names]
+    print(valid_analysis)
+
+    if not valid_analysis:
+        return None
+
+    LOG.info(f'The following keys were found in the input config: {valid_analysis}') 
+    return valid_analysis
 
 def build_analysis(multiqc_dict: dict, analysis_type: str):
     """build a analysis object"""
