@@ -7,11 +7,26 @@ from vogue.tools.cli_utils import yaml_read
 from vogue.tools.cli_utils import check_file
 from vogue.build.analysis import validate_conf
 from vogue.build.analysis import build_analysis
+from vogue.tools.cli_utils import add_doc as doc
 import vogue.models.analysis as analysis_model
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
 
+def concat_dict_keys(my_dict: dict, key_name = "", out_key_list=list()):
+    '''
+    Recursively create a list of key:key1,key2 from a nested dictionary
+    '''
+
+    if isinstance(my_dict, dict):
+
+        if key_name != "":
+            out_key_list.append(key_name + ":" + ", ".join(list(my_dict.keys())))
+
+        for k in my_dict.keys():
+            concat_dict_keys(my_dict[k], key_name=k, out_key_list=out_key_list)
+
+    return out_key_list
 
 @click.command("analysis", short_help="Read files from analysis workflows")
 @click.option('-s', '--sample-id', required=True, help='Input sample id')
@@ -19,20 +34,24 @@ LOG = logging.getLogger(__name__)
     '-a',
     '--analysis-config',
     type=click.Path(),
-    required=True,
+        required=True,
     help='Input config file. Accepted format: JSON, YAML')
 @click.option(
     '-t',
     '--analysis-type',
     type=click.Choice(list(analysis_model.ANALYSIS_DESC.keys()) + ['all']),
     multiple=True,
-    default='all',
+    default=['all'],
     help='Type of analysis results to load.')
 @click.pass_context
-def analysis(context, sample_id, analysis_config, analysis_type):
-    """
+@doc(f"""
     Read and load analysis results. These are either QC or analysis output files.
-    """
+
+    The inputs are unique ID with an analysis config file (JSON/YAML) which includes analysis results matching the
+    analysis model. Analysis types recognize the following keys in the input file: {" ".join(concat_dict_keys(analysis_model.ANALYSIS_SETS,key_name=""))}
+        """)
+def analysis(context, sample_id, analysis_config, analysis_type):
+
     LOG.info("Reading and validating config file.")
     try:
         check_file(analysis_config)
@@ -49,12 +68,13 @@ def analysis(context, sample_id, analysis_config, analysis_type):
             context.abort()
 
     LOG.info("Validating config file")
-    if not validate_conf(analysis_dict):
-        LOG.error("Input config file is not valid format")
+    valid_analysis = validate_conf(analysis_dict)
+    if valid_analysis is None:
+        LOG.error("Input config file is not valid.")
         context.abort()
 
     ready_analysis = dict()
-    if analysis_type == 'all':
+    if 'all' in analysis_type:
         for my_analysis in analysis_model.ANALYSIS_DESC.keys():
             tmp_analysis_dict = build_analysis(analysis_dict, my_analysis)
             if tmp_analysis_dict:
@@ -68,6 +88,7 @@ def analysis(context, sample_id, analysis_config, analysis_type):
     if ready_analysis:
         LOG.info(
             f'The following keys were found {list(ready_analysis.keys())}')
+        print(ready_analysis)
     else:
         LOG.warning(
             f'No enteries were found for the given analysis type: {analysis_type}'
