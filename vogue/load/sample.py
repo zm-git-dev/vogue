@@ -37,6 +37,11 @@ def load_all_samples(adapter, lims, dry_run=False, start_sample = None):
             start_sample = None
 
 def update_category(adapter, json_list:list):
+    """Will add cathegory to all samples in the database that has a valid application tag.
+    Args:
+        json_list list of dicts with apptag and category. 
+        Eg: [{"tag":"WGSPCFC030","category":"wgs"}, {"tag":"WGSPCFC100","category":"wgs"},...]"""
+             
     application_tags = parse_application_tag(json_list)
     all_samples = list(adapter.find_samples({}))
     for sample in all_samples:
@@ -45,6 +50,9 @@ def update_category(adapter, json_list:list):
         if category:
             sample['category'] = category
             adapter.add_or_update_sample(sample)
+        else:
+            LOG.error("Sample %s has a non valid application tag.", sample['_id'])
+            continue
 
 
         
