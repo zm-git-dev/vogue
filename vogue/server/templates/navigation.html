@@ -3,7 +3,7 @@
   <div class="sidebar-sticky">
     <ul class="nav flex-column">
       <li class="nav-item">
-        <a class="nav-link active" href="{{ url_for('index') }}">
+        <a class="nav-link active" href="{{ url_for('server.index') }}">
           <span data-feather="home"></span>
           Home <span class="sr-only">(current)</span>
         </a>
@@ -14,9 +14,9 @@
           Common trends
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="{{ url_for('turn_around_times', year_of_interest=year_of_interest) }}">Turnaround
+          <a class="dropdown-item" href="{{ url_for('server.turn_around_times', year_of_interest=year_of_interest) }}">Turnaround
             Times</a>
-          <a class="dropdown-item" href="{{ url_for('common_samples', year_of_interest=year_of_interest) }}">Samples</a>
+          <a class="dropdown-item" href="{{ url_for('server.common_samples', year_of_interest=year_of_interest) }}">Samples</a>
         </div>
       </li>
       <li class="nav-item dropdown">
@@ -25,11 +25,11 @@
           Preps
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="{{ url_for('microbial' , year_of_interest=year_of_interest) }}">Microbial</a>
-          <a class="dropdown-item" href="{{ url_for('wgs' , year_of_interest=year_of_interest) }}">WGS Illumina
+          <a class="dropdown-item" href="{{ url_for('server.microbial' , year_of_interest=year_of_interest) }}">Microbial</a>
+          <a class="dropdown-item" href="{{ url_for('server.wgs' , year_of_interest=year_of_interest) }}">WGS Illumina
             PCR-free</a>
-          <a class="dropdown-item" href="{{ url_for('lucigen' , year_of_interest=year_of_interest) }}">Lucigen PCR-free</a>
-          <a class="dropdown-item" href="{{ url_for('target_enrichment' , year_of_interest=year_of_interest) }}">Targeted
+          <a class="dropdown-item" href="{{ url_for('server.lucigen' , year_of_interest=year_of_interest) }}">Lucigen PCR-free</a>
+          <a class="dropdown-item" href="{{ url_for('server.target_enrichment' , year_of_interest=year_of_interest) }}">Targeted
             enrichment (exome/panels)</a>
         </div>
       </li>
@@ -39,8 +39,8 @@
           Sequencing
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="{{ url_for('novaseq' , year_of_interest=year_of_interest) }}">NovaSeq</a>
-          <a class="dropdown-item" href="{{ url_for('hiseqx' , year_of_interest=year_of_interest) }}">Hiseq X</a>
+          <a class="dropdown-item" href="{{ url_for('server.novaseq' , year_of_interest=year_of_interest) }}">NovaSeq</a>
+          <a class="dropdown-item" href="{{ url_for('server.hiseqx' , year_of_interest=year_of_interest) }}">Hiseq X</a>
           <a class="dropdown-item" href="#">Hiseq 2500</a>
         </div>
       </li>
