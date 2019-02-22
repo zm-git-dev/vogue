@@ -1,4 +1,9 @@
 import logging
+import copy
+
+from genologics.entities import Sample
+from genologics.lims import Lims
+
 LOG = logging.getLogger(__name__)
 
 import vogue.models.analysis as analysis_model
@@ -27,7 +32,7 @@ def validate_conf(analysis_conf: dict):
     LOG.info(f'The following keys were found in the input config: {valid_analysis}') 
     return valid_analysis
 
-def build_analysis(analysis_dict: dict, analysis_type: str, valid_analysis: str):
+def build_analysis(analysis_dict: dict, analysis_type: str, valid_analysis: str, sample_id):
     '''
     Builds analysis dictionary based on input analysis_dict. This function will remove analysis json that are not part
     of the matching model. analysis_type is a single key matching ANALYSIS_SETS's first level keys.
@@ -42,4 +47,10 @@ def build_analysis(analysis_dict: dict, analysis_type: str, valid_analysis: str)
     for common_key in analysis_common_keys:
         analysis[common_key] = analysis_dict[common_key]
 
+    mongo_sample = copy.deepcopy(analysis)
+    mongo_sample['_id'] = sample_id
+
+    print(mongo_sample)
+
     return analysis
+
