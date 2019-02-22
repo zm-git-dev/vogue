@@ -43,7 +43,7 @@ def update_category(adapter, json_list:list):
         Eg: [{"tag":"WGSPCFC030","category":"wgs"}, {"tag":"WGSPCFC100","category":"wgs"},...]"""
              
     application_tags = parse_application_tag(json_list)
-    all_samples = list(adapter.find_samples({}))
+    all_samples = list(adapter.find_samples({})) ####ändra ta bort list
     for sample in all_samples:
         app_tag = sample.get('application_tag')
         category = application_tags.get(app_tag)
@@ -51,7 +51,7 @@ def update_category(adapter, json_list:list):
             sample['category'] = category
             adapter.add_or_update_sample(sample)
         else:
-            LOG.error("Sample %s has a non valid application tag.", sample['_id'])
+            LOG.warning("Sample %s has a non valid application tag.", sample['_id'])
             continue
 
 
