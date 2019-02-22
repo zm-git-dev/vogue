@@ -3,16 +3,18 @@ from genologics.lims import Lims
 
 import logging
 from vogue.build.lims import build_sample
-from vogue.parse.application_tag import parse_application_tag
 LOG = logging.getLogger(__name__)
    
 
 def load_one_sample(adapter, lims_id=None, lims_sample=None, lims=None, dry_run=False):
+
     lims_sample = lims_sample or Sample(lims, id = lims_id)
     if not lims_sample:
         LOG.critical("The sample does not exist in the database in the LIMS database.")
         raise SyntaxError()
-    mongo_sample = build_sample(lims_sample, lims)
+
+    mongo_sample = build_sample(lims_sample, lims, adapter)
+
     
     if dry_run:
         existing_sample = adapter.sample(lims_sample.id)
@@ -23,6 +25,7 @@ def load_one_sample(adapter, lims_id=None, lims_sample=None, lims=None, dry_run=
         LOG.info("Sample informamtion from lims to add/update: \n %s", mongo_sample)
         return
     
+
     adapter.add_or_update_sample(mongo_sample)
 
 def load_all_samples(adapter, lims, dry_run=False, start_sample = None):
@@ -36,23 +39,7 @@ def load_all_samples(adapter, lims, dry_run=False, start_sample = None):
         elif start_sample and start_sample == sample.id:
             start_sample = None
 
-def update_category(adapter, json_list:list):
-    """Will add cathegory to all samples in the database that has a valid application tag.
-    Args:
-        json_list list of dicts with apptag and category. 
-        Eg: [{"tag":"WGSPCFC030","category":"wgs"}, {"tag":"WGSPCFC100","category":"wgs"},...]"""
-             
-    application_tags = parse_application_tag(json_list)
-    all_samples = list(adapter.find_samples({})) ####ändra ta bort list
-    for sample in all_samples:
-        app_tag = sample.get('application_tag')
-        category = application_tags.get(app_tag)
-        if category:
-            sample['category'] = category
-            adapter.add_or_update_sample(sample)
-        else:
-            LOG.warning("Sample %s has a non valid application tag.", sample['_id'])
-            continue
+ 
 
 
         

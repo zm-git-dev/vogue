@@ -75,3 +75,7 @@ class VougeAdapter(MongoAdapter):
     def find_samples(self, query:dict)-> list:
         samples = self.sample_collection.find(query)
         return list(samples)
+
+    def get_category(self, app_tag):
+        tag = self.app_tag_collection.find_one({'_id' : app_tag})
+        return tag.get('category')

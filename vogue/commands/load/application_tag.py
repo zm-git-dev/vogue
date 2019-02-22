@@ -3,7 +3,6 @@ import click
 import json
 from flask.cli import with_appcontext, current_app
 from vogue.load.application_tag import load_aplication_tags
-from vogue.load.sample import update_category
 
 LOG = logging.getLogger(__name__)
 
@@ -33,5 +32,4 @@ def application_tags(application_tags: str):
 
     LOG.info("json is read.")
     load_aplication_tags(current_app.adapter, json_list)
-    update_category(current_app.adapter, json_list)
 
