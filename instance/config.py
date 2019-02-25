@@ -1,6 +1,9 @@
-DEBUG = True
+# encoding: utf-8
+import os
 
-SECRET_KEY = 'MySuperSecretKey'
+# mongo
+DB_URI = os.environ['MONGO_URI']
+DB_NAME = os.environ['MONGO_DBNAME']
 
-DB_URI =  "mongodb://localhost:27017"
-DB_NAME = 'trending'
+DEBUG = os.environ['VOGUE_DEBUG']
+SECRET_KEY = os.environ['VOGUE_SECRET_KEY']
