@@ -47,20 +47,20 @@ def concat_dict_keys(my_dict: dict, key_name = "", out_key_list=list()):
     multiple=True,
     default=['all'],
     help='Type of analysis results to load.')
-@click.pass_context
 @doc(f"""
     Read and load analysis results. These are either QC or analysis output files.
 
     The inputs are unique ID with an analysis config file (JSON/YAML) which includes analysis results matching the
     analysis model. Analysis types recognize the following keys in the input file: {" ".join(concat_dict_keys(analysis_model.ANALYSIS_SETS,key_name=""))}
         """)
-def analysis(context, sample_id, analysis_config, analysis_type):
+@with_appcontext
+def analysis(sample_id, analysis_config, analysis_type):
 
     LOG.info("Reading and validating config file.")
     try:
         check_file(analysis_config)
     except FileNotFoundError as e:
-        context.abort()
+        click.Abort()
 
     LOG.info("Trying JSON format")
     analysis_dict = json_read(analysis_config)
@@ -69,13 +69,13 @@ def analysis(context, sample_id, analysis_config, analysis_type):
         analysis_dict = yaml_read(analysis_config)
         if not isinstance(analysis_dict, dict):
             LOG.error("Cannot read input analysis config file. Type unknown.")
-            context.abort()
+            click.Abort()
 
     LOG.info("Validating config file")
     valid_analysis = validate_conf(analysis_dict)
     if valid_analysis is None:
         LOG.error("Input config file is not valid.")
-        context.abort()
+        click.Abort()
 
     ready_analysis = dict()
     if 'all' in analysis_type:
@@ -97,4 +97,5 @@ def analysis(context, sample_id, analysis_config, analysis_type):
             f'No enteries were found for the given analysis type: {analysis_type}'
         )
 
+    print(ready_analysis)
     load_analysis(current_app.adapter, ready_analysis)
