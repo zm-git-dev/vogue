@@ -8,31 +8,17 @@ from flask.cli import with_appcontext, current_app
 from vogue.tools.cli_utils import json_read
 from vogue.tools.cli_utils import yaml_read
 from vogue.tools.cli_utils import check_file
-from vogue.build.analysis import validate_conf
+from vogue.tools.cli_utils import concat_dict_keys 
 from vogue.build.analysis import build_analysis
 from vogue.tools.cli_utils import add_doc as doc
 from vogue.load.analysis import load_analysis
+from vogue.parse.analysis import validate_conf
 import vogue.models.analysis as analysis_model
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
 
 
-def concat_dict_keys(my_dict: dict, key_name="", out_key_list=list()):
-    '''
-    Recursively create a list of key:key1,key2 from a nested dictionary
-    '''
-
-    if isinstance(my_dict, dict):
-
-        if key_name != "":
-            out_key_list.append(key_name + ":" +
-                                ", ".join(list(my_dict.keys())))
-
-        for k in my_dict.keys():
-            concat_dict_keys(my_dict[k], key_name=k, out_key_list=out_key_list)
-
-    return out_key_list
 
 
 @click.command("analysis", short_help="Read files from analysis workflows")
@@ -104,4 +90,4 @@ def analysis(sample_id, dry, analysis_config, analysis_type):
             f'No enteries were found for the given analysis type: {analysis_type}'
         )
 
-    load_analysis(adapter=current_app.adapter, dry_run=dry, analysis=ready_analysis)
+    load_analysis(adapter=current_app.adapter, lims_id = sample_id, dry_run=dry, analysis=ready_analysis)
