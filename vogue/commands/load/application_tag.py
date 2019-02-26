@@ -8,14 +8,11 @@ LOG = logging.getLogger(__name__)
 
 
 @click.command("apptag", short_help="Reads json with application tag info.")
-@click.option('-a', '--application-tags', required=True, help='json formatted application tags')
+@click.argument('application-tags')
 
 @with_appcontext
-def application_tags(application_tags: str):
-    """Reads list of dicts of application tags as string. eg:
-    
-        Args: 
-            application_tags(list(dict)): '[{"tag":"MELPCFR030", "category":"wgs",...},...]'
+def application_tags(application_tags):
+    """Reads json string with application tags. Eg:'[{"tag":"MELPCFR030", "category":"wgs",...},...]'
     """
 
     LOG.info("Reading json.")

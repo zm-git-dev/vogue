@@ -150,7 +150,7 @@ def find_key_over_time( adapter, title: str, year : int, y_axis_label: str, y_un
 
         if list(set(data)) != [None]:
             plot_content['group'][group] = {'data' : data, 'color' : COLORS[i]}
-            i+=1
+            i=0 if i==len(COLORS)-1 else i+1
     return plot_content
 
 
