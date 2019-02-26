@@ -50,7 +50,5 @@ def build_analysis(analysis_dict: dict, analysis_type: str, valid_analysis: str,
     mongo_sample = copy.deepcopy(analysis)
     mongo_sample['_id'] = sample_id
 
-    print(mongo_sample)
-
     return analysis
 
