@@ -64,11 +64,21 @@ class VougeAdapter(MongoAdapter):
     def delete_sample(self):
         return None
 
-    def load_analysis(self, analysis_obj):
-        """Insert an analysis into the database"""
-        res = self.analysis_collection.insert_one(analysis_obj)
-        
-        return res.inserted_id
+    def add_or_update_analysis(self, analysis_result: dict):
+        """Functionality to add or update analysis sample"""
+        lims_id = analysis_result['_id']
+        update_result = self.db.analysis.update_one({'_id' : lims_id}, {'$set': analysis_result}, upsert=True)
+
+        if not update_result.raw_result['updatedExisting']:
+            self.db.analysis.update_one({'_id' : lims_id}, 
+                {'$set': {'added': dt.today()}})
+            LOG.info("Added analysis sample %s.", lims_id)
+        elif update_result.modified_count:
+            self.db.analysis.update_one({'_id' : lims_id}, 
+                {'$set': {'updated': dt.today()}})
+            LOG.info("Updated analysis for sample %s.", lims_id)
+        else:
+            LOG.info("No analysis updates for sample %s.", lims_id)
 
     def analysis(self, analysis_id: str):
         """Functionality to get analyses results"""

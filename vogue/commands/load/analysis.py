@@ -11,6 +11,7 @@ from vogue.tools.cli_utils import check_file
 from vogue.build.analysis import validate_conf
 from vogue.build.analysis import build_analysis
 from vogue.tools.cli_utils import add_doc as doc
+from vogue.load.analysis import load_analysis 
 import vogue.models.analysis as analysis_model
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
@@ -95,3 +96,5 @@ def analysis(context, sample_id, analysis_config, analysis_type):
         LOG.warning(
             f'No enteries were found for the given analysis type: {analysis_type}'
         )
+
+    load_analysis(current_app.adapter, ready_analysis)
