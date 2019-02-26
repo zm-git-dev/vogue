@@ -19,8 +19,4 @@ def create_app(test = False):
         app.db = client[db_name]
         app.adapter = VougeAdapter(client, db_name = db_name)
 
-    app.register_blueprint(blueprint)
     return app
-
-
-from .views import blueprint

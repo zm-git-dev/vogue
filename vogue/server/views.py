@@ -1,13 +1,16 @@
 from flask import  url_for, redirect, render_template, request, current_app, Blueprint
-from vogue.constants.constants import YEARS, THIS_YEAR
+from werkzeug.contrib.fixers import ProxyFix
 
+from vogue.constants.constants import YEARS, THIS_YEAR
+from vogue.server import create_app
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount,   
                                 find_key_over_time, build_group_queries_from_key, 
                                 build_app_tag_group_queries)
 
 blueprint = Blueprint('server', __name__)
-
-app = current_app
+app = create_app()
+app.wsgi_app = ProxyFix(app.wsgi_app)
+app.register_blueprint(blueprint)
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
