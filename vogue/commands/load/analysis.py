@@ -11,13 +11,14 @@ from vogue.tools.cli_utils import check_file
 from vogue.build.analysis import validate_conf
 from vogue.build.analysis import build_analysis
 from vogue.tools.cli_utils import add_doc as doc
-from vogue.load.analysis import load_analysis 
+from vogue.load.analysis import load_analysis
 import vogue.models.analysis as analysis_model
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
 
-def concat_dict_keys(my_dict: dict, key_name = "", out_key_list=list()):
+
+def concat_dict_keys(my_dict: dict, key_name="", out_key_list=list()):
     '''
     Recursively create a list of key:key1,key2 from a nested dictionary
     '''
@@ -25,12 +26,14 @@ def concat_dict_keys(my_dict: dict, key_name = "", out_key_list=list()):
     if isinstance(my_dict, dict):
 
         if key_name != "":
-            out_key_list.append(key_name + ":" + ", ".join(list(my_dict.keys())))
+            out_key_list.append(key_name + ":" +
+                                ", ".join(list(my_dict.keys())))
 
         for k in my_dict.keys():
             concat_dict_keys(my_dict[k], key_name=k, out_key_list=out_key_list)
 
     return out_key_list
+
 
 @click.command("analysis", short_help="Read files from analysis workflows")
 @click.option('-s', '--sample-id', required=True, help='Input sample id')
@@ -38,7 +41,7 @@ def concat_dict_keys(my_dict: dict, key_name = "", out_key_list=list()):
     '-a',
     '--analysis-config',
     type=click.Path(),
-        required=True,
+    required=True,
     help='Input config file. Accepted format: JSON, YAML')
 @click.option(
     '-t',
@@ -47,6 +50,7 @@ def concat_dict_keys(my_dict: dict, key_name = "", out_key_list=list()):
     multiple=True,
     default=['all'],
     help='Type of analysis results to load.')
+@click.option('--dry', is_flag=True, help='Load from sample or not. (dry-run)')
 @doc(f"""
     Read and load analysis results. These are either QC or analysis output files.
 
@@ -80,22 +84,24 @@ def analysis(sample_id, analysis_config, analysis_type):
     ready_analysis = dict()
     if 'all' in analysis_type:
         for my_analysis in analysis_model.ANALYSIS_DESC.keys():
-            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis, valid_analysis, sample_id)
+            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis,
+                                               valid_analysis, sample_id)
             if tmp_analysis_dict:
                 ready_analysis = {**ready_analysis, **tmp_analysis_dict}
     else:
         for my_analysis in analysis_type:
-            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis, valid_analysis, sample_id)
+            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis,
+                                               valid_analysis, sample_id)
             if tmp_analysis_dict:
                 ready_analysis = {**ready_analysis, **tmp_analysis_dict}
 
     if ready_analysis:
         LOG.info(
-            f'Values for {list(ready_analysis.keys())} loaded for sample {sample_id}')
+            f'Values for {list(ready_analysis.keys())} loaded for sample {sample_id}'
+        )
     else:
         LOG.warning(
             f'No enteries were found for the given analysis type: {analysis_type}'
         )
 
-    print(ready_analysis)
-    load_analysis(current_app.adapter, ready_analysis)
+    load_analysis(adapter=current_app.adapter, analysis=ready_analysis)
