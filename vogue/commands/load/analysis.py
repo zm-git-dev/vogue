@@ -58,7 +58,7 @@ def concat_dict_keys(my_dict: dict, key_name="", out_key_list=list()):
     analysis model. Analysis types recognize the following keys in the input file: {" ".join(concat_dict_keys(analysis_model.ANALYSIS_SETS,key_name=""))}
         """)
 @with_appcontext
-def analysis(sample_id, analysis_config, analysis_type):
+def analysis(sample_id, dry, analysis_config, analysis_type):
 
     LOG.info("Reading and validating config file.")
     try:
@@ -104,4 +104,4 @@ def analysis(sample_id, analysis_config, analysis_type):
             f'No enteries were found for the given analysis type: {analysis_type}'
         )
 
-    load_analysis(adapter=current_app.adapter, analysis=ready_analysis)
+    load_analysis(adapter=current_app.adapter, dry_run=dry, analysis=ready_analysis)
