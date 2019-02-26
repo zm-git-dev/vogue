@@ -31,5 +31,5 @@ def load_analysis(adapter, lims_id=None, dry_run=False, analysis : dict={}):
         LOG.info("Sample information from analysis to add/update: \n %s", mongo_sample)
         return
 
-    adapter.add_or_update_analysis(alaysis)
+    adapter.add_or_update_analysis(analysis)
 
