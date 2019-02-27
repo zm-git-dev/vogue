@@ -1,7 +1,7 @@
 import os
 import logging
 
-from flask import Flask, Blueprint
+from flask import Flask
 from pymongo import MongoClient
 
 from vogue.adapter.plugin import VougeAdapter
