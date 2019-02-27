@@ -1,16 +1,11 @@
-from flask import  url_for, redirect, render_template, request, current_app, Blueprint
-from werkzeug.contrib.fixers import ProxyFix
+from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
 from vogue.constants.constants import YEARS, THIS_YEAR
-from vogue.server import create_app
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount,   
                                 find_key_over_time, build_group_queries_from_key, 
                                 build_app_tag_group_queries)
 
 blueprint = Blueprint('server', __name__)
-app = create_app()
-app.wsgi_app = ProxyFix(app.wsgi_app)
-app.register_blueprint(blueprint)
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
@@ -42,65 +37,65 @@ def turn_around_times(year_of_interest):
 
 
     received_to_delivered = {'tag' : find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_app_tag_group_queries(app.adapter), 
+                                group_queries = build_app_tag_group_queries(current_app.adapter), 
                                 y_axis_key ='received_to_delivered', 
                                 title = 'Time from recieved to delivered (grouped by application tag)', 
                                 y_axis_label = 'Days', 
                                 y_unit = 'average'),
                             'prio' : find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority"), 
+                                group_queries = build_group_queries_from_key(adapter = current_app.adapter, group_key = "priority"), 
                                 y_axis_key ='received_to_delivered', 
                                 title = 'Time from recieved to delivered (grouped by priority)', 
                                 y_axis_label = 'Days', 
                                 y_unit = 'average')}
     received_to_prepped = {'tag' : find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_app_tag_group_queries(app.adapter), 
+                                group_queries = build_app_tag_group_queries(current_app.adapter), 
                                 y_axis_key ='received_to_prepped' , 
                                 title = 'Time from recieved to prepped (grouped by application tag)', 
                                 y_axis_label = 'Days', 
                                 y_unit = 'average'),
                             'prio' : find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority"), 
+                                group_queries = build_group_queries_from_key(adapter = current_app.adapter, group_key = "priority"), 
                                 y_axis_key ='received_to_prepped' , 
                                 title = 'Time from recieved to prepped (grouped by priority)', 
                                 y_axis_label = 'Days', 
                                 y_unit = 'average')}
     prepped_to_sequenced = {'tag' : find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_app_tag_group_queries(app.adapter), 
+                                group_queries = build_app_tag_group_queries(current_app.adapter), 
                                 y_axis_key ='prepped_to_sequenced' , 
                                 title = 'Time from prepped to sequenced (grouped by application tag)', 
                                 y_axis_label = 'Days', 
                                 y_unit = 'average'),
                             'prio' : find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority"), 
+                                group_queries = build_group_queries_from_key(adapter = current_app.adapter, group_key = "priority"), 
                                 y_axis_key ='prepped_to_sequenced' , 
                                 title = 'Time from prepped to sequenced (grouped by priority)', 
                                 y_axis_label = 'Days', 
                                 y_unit = 'average')}
     sequenced_to_delivered = {'tag' : find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_app_tag_group_queries(app.adapter), 
+                                group_queries = build_app_tag_group_queries(current_app.adapter), 
                                 y_axis_key ='sequenced_to_delivered', 
                                 title = 'Time from sequenced to delivered (grouped by application tag)', 
                                 y_axis_label = 'Days', 
                                 y_unit = 'average'),
                             'prio' : find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority"), 
+                                group_queries = build_group_queries_from_key(adapter = current_app.adapter, group_key = "priority"), 
                                 y_axis_key ='sequenced_to_delivered', 
                                 title = 'Time from sequenced to delivered (grouped by priority)', 
                                 y_axis_label = 'Days', 
@@ -120,17 +115,17 @@ def turn_around_times(year_of_interest):
 @blueprint.route('/common/samples/<year_of_interest>')
 def common_samples(year_of_interest):
     group_by = ['research','standard','priority']#,'express']
-    group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority")
-    app_tag_group_queries = build_app_tag_group_queries(app.adapter)
+    group_queries = build_group_queries_from_key(adapter = current_app.adapter, group_key = "priority")
+    app_tag_group_queries = build_app_tag_group_queries(current_app.adapter)
     received = find_key_over_time(
-                    adapter = app.adapter,
+                    adapter = current_app.adapter,
                     year = year_of_interest, 
                     group_queries = group_queries, 
                     title = 'Received samples per month (grouped by priority)', 
                     y_axis_label = 'Nr of samples', 
                     y_unit = 'number samples')
     received_application = find_key_over_time(
-                    adapter = app.adapter,
+                    adapter = current_app.adapter,
                     year = year_of_interest, 
                     group_queries = app_tag_group_queries, 
                     title = 'Received samples per month (grouped by aplication tag)', 
@@ -148,9 +143,9 @@ def common_samples(year_of_interest):
 
 @blueprint.route('/prepps/microbial/<year_of_interest>')
 def microbial(year_of_interest):
-    group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "strain")
+    group_queries = build_group_queries_from_key(adapter = current_app.adapter, group_key = "strain")
     microbial_concentration_time = find_key_over_time(
-                                        adapter = app.adapter,
+                                        adapter = current_app.adapter,
                                         year = year_of_interest, 
                                         group_queries = group_queries, 
                                         y_axis_key ='microbial_library_concentration', 
@@ -169,17 +164,17 @@ def microbial(year_of_interest):
 @blueprint.route('/prepps/target_enrichment/<year_of_interest>')
 def target_enrichment(year_of_interest):
     library_size_post_hyb = find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "source"), 
+                                group_queries = build_group_queries_from_key(adapter = current_app.adapter, group_key = "source"), 
                                 y_axis_key ='library_size_post_hyb', 
                                 title = 'Post-hybridization QC', 
                                 y_axis_label = 'library size',
                                 y_unit = 'average')
     library_size_pre_hyb = find_key_over_time(
-                                adapter = app.adapter,
+                                adapter = current_app.adapter,
                                 year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "source"), 
+                                group_queries = build_group_queries_from_key(adapter = current_app.adapter, group_key = "source"), 
                                 y_axis_key ='library_size_pre_hyb', 
                                 title = 'Pre-hybridization QC', 
                                 y_axis_label = 'library size',
@@ -196,9 +191,9 @@ def target_enrichment(year_of_interest):
 
 @blueprint.route('/prepps/wgs/<year_of_interest>')
 def wgs(year_of_interest):
-    concentration_defrosts = find_concentration_defrosts(adapter = app.adapter, year = year_of_interest)
+    concentration_defrosts = find_concentration_defrosts(adapter = current_app.adapter, year = year_of_interest)
     concentration_time = find_key_over_time(
-                            adapter = app.adapter,
+                            adapter = current_app.adapter,
                             year = year_of_interest, 
                             y_axis_key ='nr_defrosts-concentration', 
                             title = 'wgs illumina PCR-free', 
@@ -216,13 +211,13 @@ def wgs(year_of_interest):
 @blueprint.route('/prepps/lucigen/<year_of_interest>')
 def lucigen(year_of_interest):
     amount_concentration_time = find_key_over_time(
-                                        adapter = app.adapter, 
+                                        adapter = current_app.adapter, 
                                         year = year_of_interest, 
                                         y_axis_key ='amount-concentration', 
                                         title = 'lucigen PCR-free',
                                         y_axis_label = 'Concentration (nM)' ,
                                         y_unit = 'average')
-    concentration_amount = find_concentration_amount(adapter = app.adapter, year = year_of_interest)
+    concentration_amount = find_concentration_amount(adapter = current_app.adapter, year = year_of_interest)
     return render_template('lucigen.html',
         header = 'Lucigen PCR-free',
         page_id = 'lucigen',
@@ -250,4 +245,3 @@ def hiseqx(year_of_interest):
         page_id = 'hiseqx',
         year_of_interest=year_of_interest,
         years = YEARS)
-
