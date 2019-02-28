@@ -1,13 +1,12 @@
-from flask import  url_for, redirect, render_template, request, current_app, Blueprint
-from vogue.constants.constants import YEARS, THIS_YEAR
+from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
+from vogue.constants.constants import YEARS, THIS_YEAR
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount,   
                                 find_key_over_time, build_group_queries_from_key, 
                                 build_app_tag_group_queries)
 
-blueprint = Blueprint('server', __name__)
-
 app = current_app
+blueprint = Blueprint('server', __name__)
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
@@ -247,4 +246,3 @@ def hiseqx(year_of_interest):
         page_id = 'hiseqx',
         year_of_interest=year_of_interest,
         years = YEARS)
-

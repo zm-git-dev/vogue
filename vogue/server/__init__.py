@@ -1,8 +1,11 @@
 import os
-from pymongo import MongoClient
 import logging
+
 from flask import Flask
+from pymongo import MongoClient
+
 from vogue.adapter.plugin import VougeAdapter
+from vogue.server.views import blueprint
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
@@ -18,9 +21,11 @@ def create_app(test = False):
         app.client = client
         app.db = client[db_name]
         app.adapter = VougeAdapter(client, db_name = db_name)
+        app.register_blueprint(blueprint)
 
-    app.register_blueprint(blueprint)
+        if app.config['DEBUG']:
+            from flask_debugtoolbar import DebugToolbarExtension
+            toolbar = DebugToolbarExtension(app)
+
+
     return app
-
-
-from .views import blueprint
