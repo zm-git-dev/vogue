@@ -6,7 +6,7 @@ import logging
 from vogue.tools.cli_utils import json_read
 from vogue.tools.cli_utils import yaml_read
 from vogue.tools.cli_utils import check_file
-from vogue.build.analysis import validate_conf
+from vogue.parse.analysis import validate_conf
 from vogue.build.analysis import build_analysis
 
 INVALID_JSON = 'tests/fixtures/not_a_multiqc_report.json'
