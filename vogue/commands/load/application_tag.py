@@ -29,3 +29,4 @@ def application_tags(application_tags):
 
     LOG.info("json is read.")
     load_aplication_tags(current_app.adapter, json_list)
+

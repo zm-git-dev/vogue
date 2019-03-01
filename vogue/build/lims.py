@@ -4,16 +4,18 @@ from genologics.lims import Lims
 from vogue.build.lims_utils import *
 
 
-def build_sample(sample: Sample, lims: Lims)-> dict:
+def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     """Parse lims sample"""
     application_tag = sample.udf.get('Sequencing Analysis')
-
+    category = adapter.get_category(application_tag) 
+    
     mongo_sample = {'_id' : sample.id}
     mongo_sample['family'] = sample.udf.get('Family')
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
     mongo_sample['priority'] = sample.udf.get('priority')
     mongo_sample['application_tag'] = application_tag
+    mongo_sample['category'] = category
 
     conc_and_amount = get_final_conc_and_amount_dna(application_tag, sample.id, lims)
     mongo_sample['amount'] = conc_and_amount.get('amount')

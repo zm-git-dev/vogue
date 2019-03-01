@@ -2,8 +2,6 @@
 from vogue.commands.load.application_tag import application_tags
 from vogue.server import create_app
 from vogue.commands.base import cli
-import pytest
-from click import Abort
 from vogue.adapter.plugin import VougeAdapter
 
 
