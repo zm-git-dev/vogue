@@ -23,7 +23,7 @@ def create_app(test = False):
         app.adapter = VougeAdapter(client, db_name = db_name)
         app.register_blueprint(blueprint)
 
-        if app.config['DEBUG']:
+        if app.config['DEBUG']==1:
             from flask_debugtoolbar import DebugToolbarExtension
             toolbar = DebugToolbarExtension(app)
 
