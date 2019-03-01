@@ -77,5 +77,5 @@ class VougeAdapter(MongoAdapter):
         return list(samples)
 
     def get_category(self, app_tag):
-        tag = self.app_tag_collection.find_one({'_id' : app_tag} , { "category.$": 1 })
+        tag = self.app_tag_collection.find_one({'_id' : app_tag} , { "category": 1 })
         return tag.get('category') if tag else None

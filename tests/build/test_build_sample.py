@@ -15,6 +15,7 @@ def test_build_sample(lims_sample, lims, database):
     
 
     ## THEN the sample should have been parsed in the correct way
+    assert mongo_sample['category'] == 'wgs'
     assert mongo_sample['_id'] == lims_sample.id
 
 
