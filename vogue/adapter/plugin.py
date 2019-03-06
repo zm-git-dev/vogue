@@ -96,7 +96,8 @@ class VougeAdapter(MongoAdapter):
 
     def aggregate_group_month(self, year: str, y_vals: str, group_key:str):
         "Run aggregation pipeline"
-        match_received = {'$match': {'received_date': {'$exists': True},
+        match = {'$match': {'received_date': {'$exists': True},
+                            '_id' : {}
                                      group_key: {'$exists': True}}}
         match_year = {'$match': {'year': {'$eq': year}}}
         sort = {'$sort': {'_id.' + group_key: 1, '_id.month': 1}}
@@ -110,6 +111,6 @@ class VougeAdapter(MongoAdapter):
             project['$project'][y_val] = 1
             group['$group'][y_val] = {'$avg': '$' + y_val}
         
-        pipe = [match_received, project, match_year, group, sort]
+        pipe = [match, project, match_year, group, sort]
         
         return self.sample_collection.aggregate(pipe)

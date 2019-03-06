@@ -16,4 +16,6 @@ COLORS = [('RGB(128, 128, 128)','RGB(128, 128, 128, 0.2)'),('RGB(255, 0, 0)','RG
 
 THIS_YEAR = date.today().year
 
+
+
 YEARS = [str(y) for y in range(2017, THIS_YEAR + 1)]
