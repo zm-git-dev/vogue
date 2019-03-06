@@ -6,6 +6,7 @@ import numpy as np
 from vogue.constants.constants import MONTHS, COLORS
 
 
+
 def get_dates_of_month(month: int, year: int)-> list:
     """Returns:
         date1 = first date of month (datetime) 
@@ -58,6 +59,7 @@ def get_percentiles(samples: list, key: str)-> float:
 
     return percentiles
 
+
 def build_app_tag_group_queries(adapter)-> list:
     """Returns List of tuples (<group name>, <group query>), 
         <group name>        the app tag category (wgs, rml, etc) 
@@ -65,6 +67,7 @@ def build_app_tag_group_queries(adapter)-> list:
 
     groups = adapter.app_tag_collection.aggregate([{ "$group" : { "_id" : "$category", 
                                                      "app_tags" : { "$push": "$_id" } } }])
+    print(list(groups))
     queries = []
     for group in groups:
         queries.append((group['_id'], {'application_tag': {'$in' : group['app_tags'] }}))
@@ -79,6 +82,9 @@ def build_group_queries_from_key(adapter, group_key)-> list:
     group_by = list(adapter.sample_collection.distinct(group_key))
     queries = [(group, {group_key : { '$eq' : group }}) for group in group_by]
     return queries
+
+
+        
 
 
 def find_key_over_time( adapter, title: str, year : int, y_axis_label: str, y_unit : str, 
@@ -127,6 +133,7 @@ def find_key_over_time( adapter, title: str, year : int, y_axis_label: str, y_un
 
     y_axis_query = {y_axis_key : {'$exists' : True}} if y_axis_key else {}
 
+    data = adapter.aggregate_group_month(year, group_key)
     i=0
     for group_query in group_queries:
         group, query = group_query
@@ -137,9 +144,7 @@ def find_key_over_time( adapter, title: str, year : int, y_axis_label: str, y_un
         for month_number, month_name in MONTHS:
             date1, date2 = get_dates_of_month(month_number, int(year))
             query['received_date'] = {'$gte' : date1, '$lt' : date2}
-
             samples = list(adapter.find_samples(query))
-
             if y_unit == 'number samples':
                 y = len(samples)
             elif y_unit == 'average':
