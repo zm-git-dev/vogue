@@ -3,24 +3,10 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import MONTHS, COLORS
+from vogue.constants.constants import MONTHS, COLORS, TEST_SAMPLES
 
 
-
-def get_dates_of_month(month: int, year: int)-> list:
-    """Returns:
-        date1 = first date of month (datetime) 
-        date2 = first date of next month (datetime) """
-
-    date1 = dt(year, month, 1, 0, 0)
-    if month == 12:
-        date2 = dt(year + 1, 1, 1, 0, 0)
-    else:
-        date2 = dt(year, month +1 , 1, 0, 0)
-
-    return date1, date2
-
-def get_dates_of_year(year: int)-> list:
+def get_dates_of_year(year: int)-> list: # TO BE REMOVED
     """Returns:
         date1 = first jan 'this' year
         date2 = first jan 'next' year """
@@ -30,19 +16,6 @@ def get_dates_of_year(year: int)-> list:
 
     return date1, date2
 
-def get_average(samples: list, key: str)-> float:
-    """Calculates the averages of the key value for all samples."""
-
-    values = []
-    average = None
-    for sample in samples:
-        value = sample.get(key)
-        if isinstance(value, int) or isinstance(value, float):
-            values.append(value)
-    if values:
-        average = sum(values) / float(len(values))
-
-    return average
 
 def get_percentiles(samples: list, key: str)-> float:
     """Calculates percentiles of the key value for all samples."""
@@ -60,104 +33,144 @@ def get_percentiles(samples: list, key: str)-> float:
     return percentiles
 
 
-def build_app_tag_group_queries(adapter)-> list:
-    """Returns List of tuples (<group name>, <group query>), 
-        <group name>        the app tag category (wgs, rml, etc) 
-        <group query>       the query for all app tags in the category"""
+def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
+    """Build aggregation pipeline to get information for one or more plots.
 
-    groups = adapter.app_tag_collection.aggregate([{ "$group" : { "_id" : "$category", 
-                                                     "app_tags" : { "$push": "$_id" } } }])
-    print(list(groups))
-    queries = []
-    for group in groups:
-        queries.append((group['_id'], {'application_tag': {'$in' : group['app_tags'] }}))
-    return queries
+    A plot is going to show some value (determined by y_vals) per month, 
+    grouped by some group (determined by group_key). And it will only show 
+    data from a specific year (determined by year).
 
+    The number of values in the list y_vals, is the number of plots that we are preparing data for.
+     
+    Arguments:
+        year(int):      Any year.
+        y_vals(list):   A list of keys (of a sample document) that we want to plot.
+                        The list can also contain the element: 'count'.
+        group_key(str): A key (of the sample document) on wich we want to group. Can be None!
 
-def build_group_queries_from_key(adapter, group_key)-> list:
-    """Returns List of tuples (<group name>, <group query>), 
-        <group name>        any value hold by group_key
-        <group query>       the query for that group"""
-
-    group_by = list(adapter.sample_collection.distinct(group_key))
-    queries = [(group, {group_key : { '$eq' : group }}) for group in group_by]
-    return queries
-
-
+    eg:  
+        y_vals = ['library_size_post_hyb', 'count'] 
+        year = 2018
+        group_key = 'source'
         
+        will prepare data for two plots. 
+            1) The average library_size_post_hyb/month for all samples during 2018 grouped by source
+            2) Number of revieved samples/month during 2018 grouped by source. """
 
-
-def find_key_over_time( adapter, title: str, year : int, y_axis_label: str, y_unit : str, 
-                        group_queries: list = [('no_group',{})], y_axis_key: str=None)-> dict:
-
-    """Prepares data for plots showing progress of "something" over "time".
-
-    The "time" is allways in months and the "something" can be either number of samples of a 
-    certain group, or the average of some value from all samples within a certain group.
-    If no group_queries are provided, all samples will be concidered as one group.
-
-    Args:
-        title : Plot title.
-        year :  Data from this year will be shown in the plot.
-                example: 2018
-        group_queries : List of tuples (<group name>, <group query>)
-                examples:   ('wgs', {'application_tag': {'$in': ['WGSPCFC030', 'WGSPCFC060',...]})
-                            ('standard', {'priority': {'$eq': 'standard'}})
-        y_axis_key : Key in database wich value will be plotted on the Y-axes (if given).
-                example: 'sequenced_to_delivered'
-        y_unit : Determines what to plot on the y axis (average/nr samples) (if "nr samples", no 
-                y_axis_key is needed).
-        y_axis_label : What it seems to be :)
-
-    Returns: 
-        Dict with data needed to generate the plot.  
-        example: 
+    if group_key: # grouping by month and group_key
+        match = {'$match':{
+                    'received_date' : {'$exists' : True},
+                    '_id' : {'$nin' : TEST_SAMPLES},
+                    group_key : {'$exists' : True}
+                    }}
+        project = {'$project': {
+                    'month' : {'$month' : '$received_date'}, 
+                    'year' : {'$year' : '$received_date'},  
+                    group_key : 1
+                    }}
+        match_year = {'$match': {
+                        'year': {'$eq': year}
+                        }}
+        group = {'$group': {'_id': {
+                                group_key : '$' + group_key, 
+                                'month': '$month'}
+                    }}
+        sort = {'$sort': {
+                    '_id.' + group_key: 1, 
+                    '_id.month': 1
+                    }}
+    else: # grouping only by month
+        match = {'$match':{
+                    'received_date' : {'$exists' : True},
+                    '_id' : {'$nin' : TEST_SAMPLES}
+                    }}
+        project = {'$project': {
+                    'month' : {'$month' : '$received_date'}, 
+                    'year' : {'$year' : '$received_date'}
+                    }}
+        match_year = {'$match': {
+                        'year': {'$eq': year}
+                        }}
+        group = {'$group': {
+                '_id': {'month': '$month'}
+                }}
+        sort = {'$sort': {
+                    '_id.month': 1
+                    }}
+    
+    for y_val in y_vals:
+        if y_val == 'count':
+            # count nr samples per month:
+            group['$group'][y_val] = {'$sum': 1}
+        else:
+            # get average of y_val:
+            project['$project'][y_val] = 1
+            group['$group'][y_val] = {'$avg': '$' + y_val}
+ 
+    return [match, project, match_year, group, sort]
+    
+def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
+    """Reformatses the raw output from the aggregateion query to the format requiered by the plots.
+    
+    Arguments:
+        aggregate_result (list): output from aggregation query.
+        y_vals(list):   A list of keys (of a sample document) that we want to plot.
+                        The list can also contain the element: 'count'.
+        group_key(str): A key (of the sample document) on wich we want to group. Can be None!
+    Returns:
+        results_reformated (dict): see example   
         
-        {'axis' : {'y': 'Days'}, 
-        'title' : 'Time from recieved to delivered (grouped by application tag)', 
-        'labels' : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        'group' :  {'rml': {'data': [3.0, 4.6, 6.3, 3.6, 3.3, 3.4, 3.2, 3.3, 4.5, 4.6, 3.7, 9.2], 
-                            'color': ('RGB(255, 0, 0)', 'RGB(255, 0, 0, 0.2)')}, 
-                    'wes': {'data': [None, None, None, 83.0, None, 9.0, None, None, None, None, None, None], 
-                            'color': ('RGB(128, 0, 128)', 'RGB(128, 0, 128, 0.2)')}, 
-                    'tga': {'data': [None, 13.2, 18.0, 16.6, None, None, None, None, None, None, None, None], 
-                            'color': ('RGB(128, 0, 0)', 'RGB(128, 0, 0,0.2)')}, 
-                    'wgs': {'data': [12.6, 13.0, 11.6, 15.3, 16.4, 12.1, 12.7, 13.4, 38.8, 12.0, 14.2, 28.1], 
-                            'color': ('RGB(128, 128, 0)', 'RGB(128, 128, 0,0.2)')}}}
+    Example: 
+        aggregate_result: 
+        [{'_id': {'strain': 'A. baumannii', 'month': 1}, 'microbial_library_concentration': 21.96}, 
+         {'_id': {'strain': 'A. baumannii', 'month': 3}, 'microbial_library_concentration': 43.25},
+         ...,
+         {'_id': {'strain': 'E. coli', 'month': 2}, 'microbial_library_concentration': 7.68},
+         ...]
+    
+        results_reformated:
+        {'microbial_library_concentration': {'A. baumannii': {'data': [21.96, None, 43.25,...],
+                                                              'color': ('RGB(33, 97, 140)', 
+                                                                        'RGB(33, 97, 140, 0.2)},
+                                            'E. coli': {'data': [None, 7.68, ...],
+                                                        'color': ('RGB(0, 0, 255)', 
+                                                                   'RGB(0, 0, 255, 0.9)')},
+                                            ...}
         """
 
-    plot_content = {'axis' : {'y' : y_axis_label}, 
-                    'group' : {}, 
-                    'title' : title, 
-                    'labels' : [m[1] for m in MONTHS]}
+    results_reformated = {}
+    for plot in y_vals:
+        plot_data = {}
+        i = 0
+        for group in aggregate_result: 
+            if group_key:
+                group_name = group['_id'][group_key]
+            else:
+                group_name = 'all_samples'
+            month = group['_id']['month']
+            value = group[plot]
 
-    y_axis_query = {y_axis_key : {'$exists' : True}} if y_axis_key else {}
+            if group_name not in plot_data:
+                plot_data[group_name] = {'data' : [None]*12, 'color' : COLORS[i]}
+                i=0 if i==len(COLORS)-1 else i+1
+            plot_data[group_name]['data'][month -1] = value
 
-    data = adapter.aggregate_group_month(year, group_key)
-    i=0
-    for group_query in group_queries:
-        group, query = group_query
-        if not group:
-            continue
-        data = []
-        query.update(y_axis_query)
-        for month_number, month_name in MONTHS:
-            date1, date2 = get_dates_of_month(month_number, int(year))
-            query['received_date'] = {'$gte' : date1, '$lt' : date2}
-            samples = list(adapter.find_samples(query))
-            if y_unit == 'number samples':
-                y = len(samples)
-            elif y_unit == 'average':
-                average = get_average(samples, y_axis_key)
-                y = round(average,1) if average else None
+        results_reformated[plot] = plot_data
+    return results_reformated
 
-            data.append(y) if y else data.append(None)
+def value_per_month(adapter, year: str, y_vals: list, group_key: str = None):
+    """Wraper function that will build a pipe, aggregate results from database and 
+    prepare the data for the plots."""
 
-        if list(set(data)) != [None]:
-            plot_content['group'][group] = {'data' : data, 'color' : COLORS[i]}
-            i=0 if i==len(COLORS)-1 else i+1
-    return plot_content
+    pipe = pipe_value_per_month(int(year), y_vals, group_key)
+    aggregate_result = adapter.samples_aggregate(pipe)
+    return reformat_aggregate_results(list(aggregate_result), y_vals, group_key)
 
+def plot_atributes( y_axis_label: str, title: str):
+    """Prepares some plot atributes"""
+    return {'axis' : {'y' : y_axis_label}, 
+            'title' : title, 
+            'labels' : [m[1] for m in MONTHS]}
 
 def find_concentration_amount(adapter, year : int = None)-> dict:
     """Prepares data for a scatter plot showning Concentration agains Amount."""
@@ -190,7 +203,8 @@ def find_concentration_defrosts(adapter, year : int = None)-> dict:
     defrosts = {'axis' : {'x' : 'Number of Defrosts', 'y' : 'Concentration (nM)'}, 
                 'data': {}, 'title' : 'wgs illumina PCR-free', 'labels':nr_defrosts}
 
-    for i, group in enumerate(group_by):
+    i = 0
+    for group in group_by:
         group_has_any_valid_data = False
         median = []
         quartile = []
@@ -210,5 +224,6 @@ def find_concentration_defrosts(adapter, year : int = None)-> dict:
         if group_has_any_valid_data:
             defrosts['data'][group] = {'median' : median,'quartile': quartile, 'color' : COLORS[i], 
                                         'nr_samples' : nr_samples}
+            i=0 if i==len(COLORS)-1 else i+1
             
     return defrosts

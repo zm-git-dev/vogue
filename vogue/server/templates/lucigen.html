@@ -62,16 +62,16 @@
 
 <script>
     var data = []
-    {% if amount_concentration_time.group.no_group is defined %}
-    var data = {{ amount_concentration_time.group.no_group.data | tojson }}
+    {% if amount_concentration_time.all_samples is defined %}
+    var data = {{ amount_concentration_time.all_samples.data | tojson }}
     {% endif %}
 
     Highcharts.chart('amount_concentration_time', {
         chart: { type: 'spline' },
-        title: { text: '{{amount_concentration_time.title}}'},
+        title: { text: '{{plot_atributes.title}}'},
         subtitle: { text: '' },
-        xAxis: { categories: {{ amount_concentration_time.labels| tojson }}},
-        yAxis: { title: { text: {{ amount_concentration_time.axis.y | tojson }}}},
+        xAxis: { categories: {{ plot_atributes.labels| tojson }}},
+        yAxis: { title: { text: {{ plot_atributes.axis.y | tojson }}}},
         legend: { enabled: false },
         tooltip: { crosshairs: true, shared: true },
         plotOptions: {

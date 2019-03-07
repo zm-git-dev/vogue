@@ -1,248 +1,163 @@
 from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
 from vogue.constants.constants import YEARS, THIS_YEAR
-from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount,   
-                                find_key_over_time, build_group_queries_from_key, 
-                                build_app_tag_group_queries)
+from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, value_per_month, plot_atributes)
 
 app = current_app
 blueprint = Blueprint('server', __name__)
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
+    year = request.form.get('year')
+    if not year:
+        year = THIS_YEAR
+
     if request.form.get('page') == 'turn_around_times':
-        year = request.form.get('year')
-        return redirect(url_for('server.turn_around_times', year_of_interest=year))
+        return redirect(url_for('server.turn_around_times', year=year))
     if request.form.get('page') == 'samples':
-        year = request.form.get('year')
-        return redirect(url_for('server.common_samples', year_of_interest=year))
+        return redirect(url_for('server.common_samples', year=year))
     if request.form.get('page') == 'microbial':
-        year = request.form.get('year')
-        return redirect(url_for('server.microbial', year_of_interest=year))
+        return redirect(url_for('server.microbial', year=year))
     if request.form.get('page') == 'wgs':
-        year = request.form.get('year')
-        return redirect(url_for('server.wgs', year_of_interest=year))
+        return redirect(url_for('server.wgs', year=year))
     if request.form.get('page') == 'lucigen':
-        year = request.form.get('year')
-        return redirect(url_for('server.lucigen', year_of_interest=year))
+        return redirect(url_for('server.lucigen', year=year))
     if request.form.get('page') == 'target_enrichment':
-        year = request.form.get('year')
-        return redirect(url_for('server.target_enrichment', year_of_interest=year))
+        return redirect(url_for('server.target_enrichment', year=year))
 
     return render_template(
         'index.html',
-        year_of_interest = THIS_YEAR)
+        year_of_interest = year)
 
-@blueprint.route('/common/turn_around_times/<year_of_interest>')
-def turn_around_times(year_of_interest):
+@blueprint.route('/common/turn_around_times/<year>')
+def turn_around_times(year):
 
+    y_vals = ['received_to_delivered', 'received_to_prepped', 'prepped_to_sequenced', 'sequenced_to_delivered']
 
-    received_to_delivered = {'tag' : find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_app_tag_group_queries(app.adapter), 
-                                y_axis_key ='received_to_delivered', 
-                                title = 'Time from recieved to delivered (grouped by application tag)', 
-                                y_axis_label = 'Days', 
-                                y_unit = 'average'),
-                            'prio' : find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority"), 
-                                y_axis_key ='received_to_delivered', 
-                                title = 'Time from recieved to delivered (grouped by priority)', 
-                                y_axis_label = 'Days', 
-                                y_unit = 'average')}
-    received_to_prepped = {'tag' : find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_app_tag_group_queries(app.adapter), 
-                                y_axis_key ='received_to_prepped' , 
-                                title = 'Time from recieved to prepped (grouped by application tag)', 
-                                y_axis_label = 'Days', 
-                                y_unit = 'average'),
-                            'prio' : find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority"), 
-                                y_axis_key ='received_to_prepped' , 
-                                title = 'Time from recieved to prepped (grouped by priority)', 
-                                y_axis_label = 'Days', 
-                                y_unit = 'average')}
-    prepped_to_sequenced = {'tag' : find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_app_tag_group_queries(app.adapter), 
-                                y_axis_key ='prepped_to_sequenced' , 
-                                title = 'Time from prepped to sequenced (grouped by application tag)', 
-                                y_axis_label = 'Days', 
-                                y_unit = 'average'),
-                            'prio' : find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority"), 
-                                y_axis_key ='prepped_to_sequenced' , 
-                                title = 'Time from prepped to sequenced (grouped by priority)', 
-                                y_axis_label = 'Days', 
-                                y_unit = 'average')}
-    sequenced_to_delivered = {'tag' : find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_app_tag_group_queries(app.adapter), 
-                                y_axis_key ='sequenced_to_delivered', 
-                                title = 'Time from sequenced to delivered (grouped by application tag)', 
-                                y_axis_label = 'Days', 
-                                y_unit = 'average'),
-                            'prio' : find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority"), 
-                                y_axis_key ='sequenced_to_delivered', 
-                                title = 'Time from sequenced to delivered (grouped by priority)', 
-                                y_axis_label = 'Days', 
-                                y_unit = 'average')}
-    
+    results_grouped_by_prio = value_per_month(app.adapter, year, y_vals, "priority")
+    results_grouped_by_cat = value_per_month(app.adapter, year, y_vals, "category")
+    y_axis_label = 'Days'
+
+    # plot titles
+    r2d_c = 'Time from recieved to delivered (grouped by application tag category)'
+    r2d_p = 'Time from recieved to delivered (grouped by priority)'
+    r2p_c = 'Time from recieved to prepped (grouped by application tag category)'
+    r2p_p = 'Time from recieved to prepped (grouped by priority)'
+    p2s_c = 'Time from prepped to sequenced (grouped by application tag category)'
+    p2s_p = 'Time from prepped to sequenced (grouped by priority)'                            
+    s2d_c = 'Time from sequenced to delivered (grouped by application tag category)'
+    s2d_p = 'Time from sequenced to delivered (grouped by priority)'
+
     return render_template('turn_around_times.html',
         header = 'Turn Around Times',
         page_id = 'turn_around_times',
-        received_to_delivered = received_to_delivered,
-        received_to_prepped = received_to_prepped,
-        prepped_to_sequenced = prepped_to_sequenced,
-        sequenced_to_delivered = sequenced_to_delivered,
-        year_of_interest=year_of_interest,
+        data_prio = results_grouped_by_prio,
+        data_cat = results_grouped_by_cat,
+        received_to_delivered_cat = plot_atributes( title = r2d_c , y_axis_label = y_axis_label),
+        received_to_delivered_prio = plot_atributes( title = r2d_p , y_axis_label = y_axis_label),
+        received_to_prepped_cat = plot_atributes( title = r2p_c , y_axis_label = y_axis_label),
+        received_to_prepped_prio = plot_atributes( title = r2p_p , y_axis_label = y_axis_label),
+        prepped_to_sequenced_cat = plot_atributes( title = p2s_c , y_axis_label = y_axis_label),
+        prepped_to_sequenced_prio = plot_atributes( title = p2s_p , y_axis_label = y_axis_label),
+        sequenced_to_delivered_cat = plot_atributes( title = s2d_c , y_axis_label = y_axis_label),
+        sequenced_to_delivered_prio = plot_atributes( title = s2d_p , y_axis_label = y_axis_label),
+        year_of_interest=year,
         years = YEARS)
 
 
-@blueprint.route('/common/samples/<year_of_interest>')
-def common_samples(year_of_interest):
-    group_by = ['research','standard','priority']#,'express']
-    group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "priority")
-    app_tag_group_queries = build_app_tag_group_queries(app.adapter)
-    received = find_key_over_time(
-                    adapter = app.adapter,
-                    year = year_of_interest, 
-                    group_queries = group_queries, 
-                    title = 'Received samples per month (grouped by priority)', 
-                    y_axis_label = 'Nr of samples', 
-                    y_unit = 'number samples')
-    received_application = find_key_over_time(
-                    adapter = app.adapter,
-                    year = year_of_interest, 
-                    group_queries = app_tag_group_queries, 
-                    title = 'Received samples per month (grouped by aplication tag)', 
-                    y_axis_label = 'Nr of samples', 
-                    y_unit = 'number samples')
+@blueprint.route('/common/samples/<year>')
+def common_samples(year):
+    y_vals = ['count']
+    data_cat = value_per_month(app.adapter, year, y_vals, 'category')
+    data_prio = value_per_month(app.adapter, year, y_vals, 'priority')
+    y_axis_label = 'Nr of samples'
 
     return render_template('samples.html',
         header = 'Samples',
         page_id = 'samples',
-        received = received,
-        received_application = received_application,
-        year_of_interest=year_of_interest,
+        data_prio = data_prio['count'],
+        data_cat = data_cat['count'],
+        plot_prio = plot_atributes( title = 'Received samples per month (grouped by priority)' , y_axis_label = y_axis_label),
+        plot_cat = plot_atributes( title = 'Received samples per month (grouped by aplication tag)' , y_axis_label = y_axis_label),
+        year_of_interest=year,
         years = YEARS)
 
 
-@blueprint.route('/prepps/microbial/<year_of_interest>')
-def microbial(year_of_interest):
-    group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "strain")
-    microbial_concentration_time = find_key_over_time(
-                                        adapter = app.adapter,
-                                        year = year_of_interest, 
-                                        group_queries = group_queries, 
-                                        y_axis_key ='microbial_library_concentration', 
-                                        title = 'Microbial',
-                                        y_axis_label = 'Concentration (nM)',
-                                        y_unit = 'average')
-
+@blueprint.route('/prepps/microbial/<year>')
+def microbial(year):
+    y_vals = ['microbial_library_concentration']
+    data = value_per_month(app.adapter, year, y_vals, "strain")
     return render_template('microbial.html',
         header = 'Microbial Samples',
         page_id = 'microbial',
-        microbial_concentration_time = microbial_concentration_time,
-        year_of_interest=year_of_interest,
+        data = data['microbial_library_concentration'], 
+        plot_atributes = plot_atributes( title = 'Microbial' , y_axis_label = 'Concentration (nM)'),
+        year_of_interest=year,
         years = YEARS)
 
 
-@blueprint.route('/prepps/target_enrichment/<year_of_interest>')
-def target_enrichment(year_of_interest):
-    library_size_post_hyb = find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "source"), 
-                                y_axis_key ='library_size_post_hyb', 
-                                title = 'Post-hybridization QC', 
-                                y_axis_label = 'library size',
-                                y_unit = 'average')
-    library_size_pre_hyb = find_key_over_time(
-                                adapter = app.adapter,
-                                year = year_of_interest, 
-                                group_queries = build_group_queries_from_key(adapter = app.adapter, group_key = "source"), 
-                                y_axis_key ='library_size_pre_hyb', 
-                                title = 'Pre-hybridization QC', 
-                                y_axis_label = 'library size',
-                                y_unit = 'average')
+@blueprint.route('/prepps/target_enrichment/<year>')
+def target_enrichment(year):
+    y_vals = ['library_size_post_hyb', 'library_size_pre_hyb']
+    data = value_per_month(app.adapter, year, y_vals, "source")
+    y_axis_label = 'library size'
 
     return render_template('target_enrichment.html',
         header = 'Target enrichment (exom/panels)',
         page_id = 'target_enrichment',
-        library_size_pre_hyb = library_size_pre_hyb,
-        library_size_post_hyb = library_size_post_hyb,
-        year_of_interest=year_of_interest,
+        data_pre_hyb = data['library_size_pre_hyb'],
+        data_post_hyb = data['library_size_post_hyb'],
+        plot_post_hyb = plot_atributes( title = 'Post-hybridization QC' , y_axis_label = y_axis_label),
+        plot_pre_hyb = plot_atributes( title = 'Pre-hybridization QC' , y_axis_label = y_axis_label),
+        year_of_interest=year,
         years = YEARS)
 
 
-@blueprint.route('/prepps/wgs/<year_of_interest>')
-def wgs(year_of_interest):
-    concentration_defrosts = find_concentration_defrosts(adapter = app.adapter, year = year_of_interest)
-    concentration_time = find_key_over_time(
-                            adapter = app.adapter,
-                            year = year_of_interest, 
-                            y_axis_key ='nr_defrosts-concentration', 
-                            title = 'wgs illumina PCR-free', 
-                            y_axis_label = 'Concentration (nM)',
-                            y_unit = 'average')
+@blueprint.route('/prepps/wgs/<year>')
+def wgs(year):
+    concentration_time = value_per_month(app.adapter, year, ['nr_defrosts-concentration'])
+    concentration_defrosts = find_concentration_defrosts(adapter = app.adapter, year = year)
+
     return render_template('wgs.html',
         header = 'WGS illumina PCR-free',
         page_id = 'wgs',
         concentration_defrosts = concentration_defrosts,
-        concentration_time = concentration_time,
-        year_of_interest=year_of_interest,
+        concentration_time = concentration_time['nr_defrosts-concentration'],
+        plot_atributes = plot_atributes( title = 'wgs illumina PCR-free' , y_axis_label = 'Concentration (nM)'),
+        year_of_interest=year,
         years = YEARS)
 
 
-@blueprint.route('/prepps/lucigen/<year_of_interest>')
-def lucigen(year_of_interest):
-    amount_concentration_time = find_key_over_time(
-                                        adapter = app.adapter, 
-                                        year = year_of_interest, 
-                                        y_axis_key ='amount-concentration', 
-                                        title = 'lucigen PCR-free',
-                                        y_axis_label = 'Concentration (nM)' ,
-                                        y_unit = 'average')
-    concentration_amount = find_concentration_amount(adapter = app.adapter, year = year_of_interest)
+@blueprint.route('/prepps/lucigen/<year>')
+def lucigen(year):
+    amount_concentration_time = value_per_month(app.adapter, year, ['amount-concentration'])
+    concentration_amount = find_concentration_amount(adapter = app.adapter, year = year)
+
     return render_template('lucigen.html',
         header = 'Lucigen PCR-free',
         page_id = 'lucigen',
-        amount_concentration_time = amount_concentration_time,
+        amount_concentration_time = amount_concentration_time['amount-concentration'],
+        plot_atributes = plot_atributes( title = 'lucigen PCR-free', y_axis_label = 'Concentration (nM)'),
         amount = concentration_amount,
-        year_of_interest=year_of_interest,
+        year_of_interest=year,
         years = YEARS)
 
 
-@blueprint.route('/sequencing/novaseq/<year_of_interest>')
-def novaseq(year_of_interest):
+@blueprint.route('/sequencing/novaseq/<year>')
+def novaseq(year):
 
     return render_template('novaseq.html',
         header = 'Nova Seq',
         page_id = 'novaseq',
-        year_of_interest=year_of_interest,
+        year_of_interest=year,
         years = YEARS)
 
 
-@blueprint.route('/sequencing/hiseqx/<year_of_interest>')
-def hiseqx(year_of_interest):
+@blueprint.route('/sequencing/hiseqx/<year>')
+def hiseqx(year):
 
     return render_template('hiseqx.html',
         header = 'HiseqX',
         page_id = 'hiseqx',
-        year_of_interest=year_of_interest,
+        year_of_interest=year,
         years = YEARS)

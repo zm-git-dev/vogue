@@ -77,40 +77,6 @@ class VougeAdapter(MongoAdapter):
     def find_samples(self, query:dict)-> list:
         samples = self.sample_collection.find(query)
         return list(samples)
-
-    def aggregate_group_month_simple(self, year: str, y_val: str, group_key:str):
-        "Run aggregation pipeline"
-        match_received = {'$match': {'received_date': {'$exists': True},
-                                     group_key: {'$exists': True}}}
-        project = {'$project': {'month' : {'$month': '$received_date'}, 
-                                'year' : {'$year': '$received_date'}, 
-                                y_val : 1, 
-                                group_key : 1}}
-        match_year = {'$match': {'year': {'$eq': year}}}
-        group = {'$group': {'_id': {group_key: '$'+group_key, 'month': '$month'}, 
-                            y_val: {'$avg': '$' + y_val}}}
-        sort = {'$sort': {'_id.' + group_key: 1, '_id.month': 1}}
-        pipe = [match_received, project, match_year, group, sort]
-
-        return self.sample_collection.aggregate(pipe)
-
-    def aggregate_group_month(self, year: str, y_vals: str, group_key:str):
-        "Run aggregation pipeline"
-        match = {'$match': {'received_date': {'$exists': True},
-                            '_id' : {}
-                                     group_key: {'$exists': True}}}
-        match_year = {'$match': {'year': {'$eq': year}}}
-        sort = {'$sort': {'_id.' + group_key: 1, '_id.month': 1}}
-        group = {'$group': {'_id': {group_key: '$'+group_key, 'month': '$month'}}}
-        project = {'$project': {'month' : {'$month': '$received_date'}, 
-                                'year' : {'$year': '$received_date'},  
-                                group_key : 1}}
         
-        # add y_vals to project and group
-        for y_val in y_vals:
-            project['$project'][y_val] = 1
-            group['$group'][y_val] = {'$avg': '$' + y_val}
-        
-        pipe = [match, project, match_year, group, sort]
-        
+    def samples_aggregate(self, pipe : list):
         return self.sample_collection.aggregate(pipe)
