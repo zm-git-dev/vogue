@@ -1,6 +1,6 @@
 from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
-from vogue.constants.constants import THIS_YEAR
+from vogue.constants.constants import YEARS, THIS_YEAR
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, value_per_month, plot_attributes)
 
 app = current_app
@@ -61,7 +61,8 @@ def turn_around_times(year):
         prepped_to_sequenced_prio = plot_attributes( title = p2s_p , y_axis_label = y_axis_label),
         sequenced_to_delivered_cat = plot_attributes( title = s2d_c , y_axis_label = y_axis_label),
         sequenced_to_delivered_prio = plot_attributes( title = s2d_p , y_axis_label = y_axis_label),
-        year_of_interest=year)
+        year_of_interest=year,
+        years = YEARS)
 
 
 @blueprint.route('/common/samples/<year>')
@@ -78,7 +79,8 @@ def common_samples(year):
         data_cat = data_cat['count'],
         plot_prio = plot_attributes( title = 'Received samples per month (grouped by priority)' , y_axis_label = y_axis_label),
         plot_cat = plot_attributes( title = 'Received samples per month (grouped by aplication tag)' , y_axis_label = y_axis_label),
-        year_of_interest=year)
+        year_of_interest=year,
+        years = YEARS)
 
 
 @blueprint.route('/prepps/microbial/<year>')
@@ -90,7 +92,8 @@ def microbial(year):
         page_id = 'microbial',
         data = data['microbial_library_concentration'], 
         plot_attributes = plot_attributes( title = 'Microbial' , y_axis_label = 'Concentration (nM)'),
-        year_of_interest=year)
+        year_of_interest=year,
+        years = YEARS)
 
 
 @blueprint.route('/prepps/target_enrichment/<year>')
@@ -106,7 +109,8 @@ def target_enrichment(year):
         data_post_hyb = data['library_size_post_hyb'],
         plot_post_hyb = plot_attributes( title = 'Post-hybridization QC' , y_axis_label = y_axis_label),
         plot_pre_hyb = plot_attributes( title = 'Pre-hybridization QC' , y_axis_label = y_axis_label),
-        year_of_interest=year)
+        year_of_interest=year,
+        years = YEARS)
 
 
 @blueprint.route('/prepps/wgs/<year>')
@@ -120,7 +124,8 @@ def wgs(year):
         concentration_defrosts = concentration_defrosts,
         concentration_time = concentration_time['nr_defrosts-concentration'],
         plot_attributes = plot_attributes( title = 'wgs illumina PCR-free' , y_axis_label = 'Concentration (nM)'),
-        year_of_interest=year)
+        year_of_interest=year,
+        years = YEARS)
 
 
 @blueprint.route('/prepps/lucigen/<year>')
@@ -134,8 +139,8 @@ def lucigen(year):
         amount_concentration_time = amount_concentration_time['amount-concentration'],
         plot_attributes = plot_attributes( title = 'lucigen PCR-free', y_axis_label = 'Concentration (nM)'),
         amount = concentration_amount,
-        year_of_interest=year
-        )
+        year_of_interest=year,
+        years = YEARS)
 
 
 @blueprint.route('/sequencing/novaseq/<year>')
@@ -144,8 +149,8 @@ def novaseq(year):
     return render_template('novaseq.html',
         header = 'Nova Seq',
         page_id = 'novaseq',
-        year_of_interest=year
-        )
+        year_of_interest=year,
+        years = YEARS)
 
 
 @blueprint.route('/sequencing/hiseqx/<year>')
@@ -154,5 +159,5 @@ def hiseqx(year):
     return render_template('hiseqx.html',
         header = 'HiseqX',
         page_id = 'hiseqx',
-        year_of_interest=year
-        )
+        year_of_interest=year,
+        years = YEARS)
