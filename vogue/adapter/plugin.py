@@ -73,6 +73,7 @@ class VougeAdapter(MongoAdapter):
         return self.analysis_collection.find_one({'_id':analysis_id})
         
     def find_samples(self, query:dict)-> list:
+        """Function to find samples in samples collection based on query"""
         samples = self.sample_collection.find(query)
         return list(samples)
 
@@ -80,6 +81,3 @@ class VougeAdapter(MongoAdapter):
         """Function to make a aggregation on the sample colleciton"""
         return self.sample_collection.aggregate(pipe)
 
-    def get_category(self, app_tag):
-        tag = self.app_tag_collection.find_one({'_id' : app_tag} , { "category": 1 })
-        return tag.get('category') if tag else None

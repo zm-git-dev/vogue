@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import MONTHS, TEST_SAMPLES
+from vogue.constants.constants import (MONTHS, TEST_SAMPLES)
 
 
 def get_dates_of_year(year: int)-> list: # TO BE REMOVED
@@ -56,47 +56,30 @@ def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
         will prepare data for two plots. 
             1) The average library_size_post_hyb/month for all samples during 2018 grouped by source
             2) Number of revieved samples/month during 2018 grouped by source. """
-
-    if group_key: # grouping by month and group_key
-        match = {'$match':{
-                    'received_date' : {'$exists' : True},
-                    '_id' : {'$nin' : TEST_SAMPLES},
-                    group_key : {'$exists' : True}
-                    }}
-        project = {'$project': {
-                    'month' : {'$month' : '$received_date'}, 
-                    'year' : {'$year' : '$received_date'},  
-                    group_key : 1
-                    }}
-        match_year = {'$match': {
-                        'year': {'$eq': year}
-                        }}
-        group = {'$group': {'_id': {
-                                group_key : '$' + group_key, 
-                                'month': '$month'}
-                    }}
-        sort = {'$sort': {
-                    '_id.' + group_key: 1, 
-                    '_id.month': 1
-                    }}
-    else: # grouping only by month
-        match = {'$match':{
+    
+    match = {'$match':{
                     'received_date' : {'$exists' : True},
                     '_id' : {'$nin' : TEST_SAMPLES}
                     }}
-        project = {'$project': {
+    project = {'$project': {
                     'month' : {'$month' : '$received_date'}, 
                     'year' : {'$year' : '$received_date'}
                     }}
-        match_year = {'$match': {
+    match_year = {'$match': {
                         'year': {'$eq': year}
                         }}
-        group = {'$group': {
+    group = {'$group': {
                 '_id': {'month': '$month'}
                 }}
-        sort = {'$sort': {
+    sort = {'$sort': {
                     '_id.month': 1
                     }}
+
+    if group_key: # grouping by group_key
+        match['$match'][group_key] = {'$exists' : True}
+        project['$project'][group_key] = 1
+        group['$group']['_id'][group_key] = '$' + group_key
+        sort['$sort']['_id.' + group_key] =  1
     
     for y_val in y_vals:
         if y_val == 'count':
@@ -110,7 +93,7 @@ def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
     return [match, project, match_year, group, sort]
     
 def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
-    """Reformatses the raw output from the aggregateion query to the format requiered by the plots.
+    """Reformats raw output from the aggregation query to the format required by the plots.
     
     Arguments:
         aggregate_result (list): output from aggregation query.
@@ -160,8 +143,13 @@ def value_per_month(adapter, year: str, y_vals: list, group_key: str = None):
     aggregate_result = adapter.samples_aggregate(pipe)
     return reformat_aggregate_results(list(aggregate_result), y_vals, group_key)
 
-def plot_atributes( y_axis_label: str, title: str):
-    """Prepares some plot atributes"""
+def plot_attributes( y_axis_label: str, title: str):
+    """Prepares some plot atributes general for plots showing some data per month.
+
+    Arguments:
+        y_axis_label(str): eg. 'Concentration (nM)' or 'Days' 
+        title(str): Title of the plot."""
+
     return {'axis' : {'y' : y_axis_label}, 
             'title' : title, 
             'labels' : [m[1] for m in MONTHS]}
