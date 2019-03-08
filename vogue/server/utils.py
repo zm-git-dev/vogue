@@ -5,6 +5,7 @@ from datetime import datetime as dt
 import numpy as np
 from vogue.constants.constants import (MONTHS, COLORS, TEST_SAMPLES)
 
+
 def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
     """Build aggregation pipeline to get information for one or more plots.
 
@@ -64,6 +65,7 @@ def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
  
     return [match, project, match_year, group, sort]
     
+
 def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
     """Reformats raw output from the aggregation query to the format required by the plots.
     
