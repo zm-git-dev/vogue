@@ -1,6 +1,6 @@
 from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
-from vogue.constants.constants import THIS_YEAR, YEARS
+from vogue.constants.constants import YEARS, THIS_YEAR
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, value_per_month, plot_attributes)
 
 app = current_app
@@ -27,8 +27,7 @@ def index():
 
     return render_template(
         'index.html',
-        year_of_interest = year,
-        years = YEARS)
+        year_of_interest = year)
 
 @blueprint.route('/common/turn_around_times/<year>')
 def turn_around_times(year):
