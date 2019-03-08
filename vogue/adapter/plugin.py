@@ -81,3 +81,7 @@ class VougeAdapter(MongoAdapter):
         """Function to make a aggregation on the sample colleciton"""
         return self.sample_collection.aggregate(pipe)
 
+    def get_category(self, app_tag):
+        """Function get category based on application tag from the application tag collection"""
+        tag = self.app_tag_collection.find_one({'_id' : app_tag} , { "category": 1 })
+        return tag.get('category') if tag else None
