@@ -31,13 +31,14 @@
             lineColor: '#666666',
             lineWidth: 1
         },
-        color: {{ concentration_defrosts.data[group].color[0] | tojson }}},
+        color: Highcharts.getOptions().colors[{{ loop.index }}]
+        },
         {name: 'Interquartile Range',
         data: {{ concentration_defrosts.data[group].quartile | tojson }},
         type: 'arearange',
         lineWidth: 0,
         linkedTo: ':previous',
-        color: {{ concentration_defrosts.data[group].color[1] | tojson }},
+        color: Highcharts.getOptions().colors[{{ loop.index }}],
         fillOpacity: 0.3,
         zIndex: 0,
         marker: {
