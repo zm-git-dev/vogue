@@ -15,20 +15,20 @@
 
 <script>
     var series = []
-    {% for name in received.group %}
+    {% for group in data_prio %}
     series.push({
-        name: "{{name}}",
-        data: {{ received.group[name].data | tojson }},
-        color: "{{received.group[name].color[0]}}",
+        name: "{{group}}",
+        data: {{ data_prio[group].data | tojson }},
+        color: "{{data_prio[group].color[0]}}",
         marker: { symbol: 'circle' },
-        fillColor: "{{received.group[name].color[1]}}"})
+        fillColor: "{{data_prio[group].color[1]}}"})
     {% endfor %}
 
     Highcharts.chart('received', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received.title | tojson }} },
-        xAxis: { categories: {{ received.labels| tojson }}},
-        yAxis: { title: { text: {{ received.axis.y | tojson }} } },
+        title: { text: {{ plot_prio.title | tojson }} },
+        xAxis: { categories: {{ plot_prio.labels| tojson }}},
+        yAxis: { title: { text: {{ plot_prio.axis.y | tojson }} } },
         tooltip: {
             shared: true,
             valueSuffix: ' days'
@@ -36,20 +36,20 @@
         series: series});
 
     var series = []
-    {% for name in received_application.group %}
+    {% for group in data_cat %}
     series.push({
-        name: "{{name}}",
-        data: {{ received_application.group[name].data | tojson }},
-        color: "{{received_application.group[name].color[0]}}",
+        name: "{{group}}",
+        data: {{ data_cat[group].data | tojson }},
+        color: "{{data_cat[group].color[0]}}",
         marker: { symbol: 'circle' },
-        fillColor: "{{received_application.group[name].color[1]}}"})
+        fillColor: "{{data_cat[group].color[1]}}"})
     {% endfor %}
 
     Highcharts.chart('received_application', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_application.title | tojson }} },
-        xAxis: { categories: {{ received_application.labels| tojson }}},
-        yAxis: { title: { text: {{ received_application.axis.y | tojson }}}},
+        title: { text: {{ plot_cat.title | tojson }} },
+        xAxis: { categories: {{ plot_cat.labels| tojson }}},
+        yAxis: { title: { text: {{ plot_cat.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
