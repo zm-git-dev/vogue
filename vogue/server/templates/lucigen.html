@@ -68,10 +68,10 @@
 
     Highcharts.chart('amount_concentration_time', {
         chart: { type: 'spline' },
-        title: { text: '{{plot_atributes.title}}'},
+        title: { text: '{{plot_attributes.title}}'},
         subtitle: { text: '' },
-        xAxis: { categories: {{ plot_atributes.labels| tojson }}},
-        yAxis: { title: { text: {{ plot_atributes.axis.y | tojson }}}},
+        xAxis: { categories: {{ plot_attributes.labels| tojson }}},
+        yAxis: { title: { text: {{ plot_attributes.axis.y | tojson }}}},
         legend: { enabled: false },
         tooltip: { crosshairs: true, shared: true },
         plotOptions: {
