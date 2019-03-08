@@ -93,7 +93,7 @@ def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
     return [match, project, match_year, group, sort]
     
 def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
-    """Reformatses the raw output from the aggregateion query to the format requiered by the plots.
+    """Reformats raw output from the aggregation query to the format required by the plots.
     
     Arguments:
         aggregate_result (list): output from aggregation query.
