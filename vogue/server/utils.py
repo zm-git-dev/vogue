@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import MONTHS, COLORS, TEST_SAMPLES
+from vogue.constants.constants import MONTHS, TEST_SAMPLES
 
 
 def get_dates_of_year(year: int)-> list: # TO BE REMOVED
@@ -129,19 +129,14 @@ def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
          ...]
     
         results_reformated:
-        {'microbial_library_concentration': {'A. baumannii': {'data': [21.96, None, 43.25,...],
-                                                              'color': ('RGB(33, 97, 140)', 
-                                                                        'RGB(33, 97, 140, 0.2)},
-                                            'E. coli': {'data': [None, 7.68, ...],
-                                                        'color': ('RGB(0, 0, 255)', 
-                                                                   'RGB(0, 0, 255, 0.9)')},
+        {'microbial_library_concentration': {'A. baumannii': {'data': [21.96, None, 43.25,...]},
+                                            'E. coli': {'data': [None, 7.68, ...]},
                                             ...}
         """
 
     results_reformated = {}
     for plot in y_vals:
         plot_data = {}
-        i = 0
         for group in aggregate_result: 
             if group_key:
                 group_name = group['_id'][group_key]
@@ -151,8 +146,7 @@ def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
             value = group[plot]
 
             if group_name not in plot_data:
-                plot_data[group_name] = {'data' : [None]*12, 'color' : COLORS[i]}
-                i=0 if i==len(COLORS)-1 else i+1
+                plot_data[group_name] = {'data' : [None]*12}
             plot_data[group_name]['data'][month -1] = value
 
         results_reformated[plot] = plot_data
@@ -203,7 +197,6 @@ def find_concentration_defrosts(adapter, year : int = None)-> dict:
     defrosts = {'axis' : {'x' : 'Number of Defrosts', 'y' : 'Concentration (nM)'}, 
                 'data': {}, 'title' : 'wgs illumina PCR-free', 'labels':nr_defrosts}
 
-    i = 0
     for group in group_by:
         group_has_any_valid_data = False
         median = []
@@ -222,8 +215,7 @@ def find_concentration_defrosts(adapter, year : int = None)-> dict:
                 nr_samples.append(len(samples))
                 group_has_any_valid_data = True
         if group_has_any_valid_data:
-            defrosts['data'][group] = {'median' : median,'quartile': quartile, 'color' : COLORS[i], 
+            defrosts['data'][group] = {'median' : median,'quartile': quartile, 
                                         'nr_samples' : nr_samples}
-            i=0 if i==len(COLORS)-1 else i+1
             
     return defrosts

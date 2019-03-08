@@ -31,9 +31,7 @@
     series.push({
         name: "{{name}}",
         data: {{ data_prio.sequenced_to_delivered[name].data | tojson }},
-        color: "{{data_prio.sequenced_to_delivered[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_prio.sequenced_to_delivered[name].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('sequenced_to_delivered_prio', {
@@ -45,6 +43,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
 
@@ -53,9 +52,7 @@
     series.push({
         name: "{{name}}",
         data: {{ data_prio.prepped_to_sequenced[name].data | tojson }},
-        color: "{{data_prio.prepped_to_sequenced[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_prio.prepped_to_sequenced[name].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('prepped_to_sequenced_prio', {
@@ -67,6 +64,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
@@ -74,9 +72,7 @@
     series.push({
         name: "{{name}}",
         data: {{ data_prio.received_to_prepped[name].data | tojson }},
-        color: "{{data_prio.received_to_prepped[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_prio.received_to_prepped[name].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_to_prepped_prio', {
@@ -88,6 +84,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
@@ -95,9 +92,7 @@
     series.push({
         name: "{{name}}",
         data: {{ data_prio.received_to_delivered[name].data | tojson }},
-        color: "{{data_prio.received_to_delivered[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_prio.received_to_delivered[name].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_to_delivered_prio', {
@@ -109,6 +104,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
@@ -116,9 +112,7 @@
     series.push({
         name: "{{name}}",
         data: {{ data_cat.sequenced_to_delivered[name].data | tojson }},
-        color: "{{data_cat.sequenced_to_delivered[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_cat.sequenced_to_delivered[name].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('sequenced_to_delivered_tag', {
@@ -130,6 +124,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
 
@@ -138,9 +133,7 @@
     series.push({
         name: "{{name}}",
         data: {{ data_cat.prepped_to_sequenced[name].data | tojson }},
-        color: "{{data_cat.prepped_to_sequenced[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_cat.prepped_to_sequenced[name].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('prepped_to_sequenced_tag', {
@@ -152,6 +145,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
@@ -159,9 +153,7 @@
     series.push({
         name: "{{name}}",
         data: {{ data_cat.received_to_prepped[name].data | tojson }},
-        color: "{{data_cat.received_to_prepped[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_cat.received_to_prepped[name].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_to_prepped_tag', {
@@ -173,6 +165,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
@@ -180,9 +173,7 @@
     series.push({
         name: "{{name}}",
         data: {{ data_cat.received_to_delivered[name].data | tojson }},
-        color: "{{data_cat.received_to_delivered[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_cat.received_to_delivered[name].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_to_delivered_tag', {
@@ -194,6 +185,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 </script>
 {% endblock %}
