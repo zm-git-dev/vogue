@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import (MONTHS, COLORS, TEST_SAMPLES)
+from vogue.constants.constants import (MONTHS, TEST_SAMPLES)
 
 
 def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
@@ -86,19 +86,14 @@ def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
          ...]
     
         results_reformated:
-        {'microbial_library_concentration': {'A. baumannii': {'data': [21.96, None, 43.25,...],
-                                                              'color': ('RGB(33, 97, 140)', 
-                                                                        'RGB(33, 97, 140, 0.2)},
-                                            'E. coli': {'data': [None, 7.68, ...],
-                                                        'color': ('RGB(0, 0, 255)', 
-                                                                   'RGB(0, 0, 255, 0.9)')},
+        {'microbial_library_concentration': {'A. baumannii': {'data': [21.96, None, 43.25,...]},
+                                            'E. coli': {'data': [None, 7.68, ...]},
                                             ...}
         """
 
     results_reformated = {}
     for plot in y_vals:
         plot_data = {}
-        i = 0
         for group in aggregate_result: 
             if group_key:
                 group_name = group['_id'][group_key]
@@ -108,8 +103,7 @@ def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
             value = group[plot]
 
             if group_name not in plot_data:
-                plot_data[group_name] = {'data' : [None]*12, 'color' : COLORS[i]}
-                i=0 if i==len(COLORS)-1 else i+1
+                plot_data[group_name] = {'data' : [None]*12}
             plot_data[group_name]['data'][month -1] = value
 
         results_reformated[plot] = plot_data
