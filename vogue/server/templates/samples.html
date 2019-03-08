@@ -19,9 +19,7 @@
     series.push({
         name: "{{group}}",
         data: {{ data_prio[group].data | tojson }},
-        color: "{{data_prio[group].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_prio[group].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received', {
@@ -33,6 +31,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
@@ -40,9 +39,7 @@
     series.push({
         name: "{{group}}",
         data: {{ data_cat[group].data | tojson }},
-        color: "{{data_cat[group].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{data_cat[group].color[1]}}"})
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_application', {
@@ -54,6 +51,7 @@
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
 </script>
