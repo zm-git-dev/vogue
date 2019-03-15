@@ -6,33 +6,6 @@ import numpy as np
 from vogue.constants.constants import (MONTHS, TEST_SAMPLES)
 
 
-def get_dates_of_year(year: int)-> list: # TO BE REMOVED
-    """Returns:
-        date1 = first jan 'this' year
-        date2 = first jan 'next' year """
-
-    date1 = dt(year, 1, 1, 0, 0)
-    date2 = dt(year + 1, 1, 1, 0, 0)
-
-    return date1, date2
-
-
-def get_percentiles(samples: list, key: str)-> float:
-    """Calculates percentiles of the key value for all samples."""
-
-    values = []
-    percentiles = []
-    for sample in samples:
-        value = sample.get(key)
-        if isinstance(value, int) or isinstance(value, float):
-            values.append(value)
-    if values:
-        values = np.array(values)
-        percentiles = [np.percentile(values,25), np.percentile(values,50), np.percentile(values,75)]
-
-    return percentiles
-
-
 def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
     """Build aggregation pipeline to get information for one or more plots.
 
@@ -92,6 +65,7 @@ def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
  
     return [match, project, match_year, group, sort]
     
+
 def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
     """Reformats raw output from the aggregation query to the format required by the plots.
     
@@ -154,56 +128,76 @@ def plot_attributes( y_axis_label: str, title: str):
             'title' : title, 
             'labels' : [m[1] for m in MONTHS]}
 
+
 def find_concentration_amount(adapter, year : int = None)-> dict:
     """Prepares data for a scatter plot showning Concentration agains Amount."""
 
-    date1, date2 = get_dates_of_year(int(year))
     amount = {'axis' : {'x' : 'Amount (ng)', 'y' : 'Concentration (nM)'}, 
                 'data': [], 'title' : 'lucigen PCR-free'}
-    query = {'received_date' : {'$gte' : date1, '$lt' : date2},
-                'amount' : { '$exists' : True},
-                'amount-concentration': { '$exists' : True}}
+    pipe = [{'$match': {
+                'received_to_delivered': {'$exists': True}, 
+                'amount': {'$exists': True}, 
+                'amount-concentration': {'$exists': True}}
+                }, {
+            '$project': {
+                'year': {'$year': '$received_date'}, 
+                'amount': 1, 
+                'amount-concentration': 1}
+                }, {
+            '$match': {
+                'year': {'$eq': int(year)}
+                }
+            }]
 
-    samples = adapter.find_samples(query)
-    for sample in samples:
+    aggregate_result = adapter.samples_aggregate(pipe)
+    for sample in aggregate_result:
         if sample['amount']>200:
             sample['amount'] = 200
         amount['data'].append({'x' : sample['amount'], 'y': round(sample['amount-concentration'], 2), 
                                 'name': sample['_id'] })
-
     return amount
 
-def find_concentration_defrosts(adapter, year : int = None)-> dict:
-    """Prepares data for a plot showning Number of defrosts agains Concentration"""
+def find_concentration_defrosts(adapter, year : int)-> dict:
+    """Prepares data for a plot showning Number of defrosts against Concentration"""
 
-    group_by_key = 'lotnr'
-    date1, date2 = get_dates_of_year(int(year))
-    group_by = list(adapter.sample_collection.distinct(group_by_key))
     nr_defrosts = list(adapter.sample_collection.distinct('nr_defrosts'))
-    nr_defrosts.sort()
-
     defrosts = {'axis' : {'x' : 'Number of Defrosts', 'y' : 'Concentration (nM)'}, 
-                'data': {}, 'title' : 'wgs illumina PCR-free', 'labels':nr_defrosts}
+                'data': {}, 'title' : 'wgs illumina PCR-free', 'labels':nr_defrosts.sort()}
 
-    for group in group_by:
-        group_has_any_valid_data = False
-        median = []
-        quartile = []
-        nr_samples = []
-        for nr in nr_defrosts:
-            query = {'lotnr' : group, 
-                'received_date' : {'$gte' : date1, '$lt' : date2},
-                'nr_defrosts-concentration' : { '$exists' : True},
-                'nr_defrosts': { '$eq' : nr}}
-            samples = list(adapter.find_samples(query))
-            percentiles = get_percentiles(samples, 'nr_defrosts-concentration')
-            if percentiles:
-                median.append([nr ,round(percentiles[1], 2)])
-                quartile.append([nr, round(percentiles[0], 2), round(percentiles[2], 2)])
-                nr_samples.append(len(samples))
-                group_has_any_valid_data = True
-        if group_has_any_valid_data:
-            defrosts['data'][group] = {'median' : median,'quartile': quartile, 
-                                        'nr_samples' : nr_samples}
+    pipe = [{'$match': {
+                'received_to_delivered': {'$exists': True}, 
+                'nr_defrosts-concentration': {'$exists': True}, 
+                'nr_defrosts': {'$exists': True}, 
+                'lotnr': {'$exists': True}}
+            }, {
+            '$project': {
+                'year': {'$year': '$received_date'}, 
+                'nr_defrosts-concentration': 1, 
+                'nr_defrosts': 1, 
+                'lotnr': 1}
+            }, {
+            '$match': {
+                'year': {'$eq': int(year)}}
+            }, {
+            '$group': {
+                '_id': {
+                    'nr_defrosts': '$nr_defrosts', 
+                    'lotnr': '$lotnr'}, 
+                'count': {'$sum': 1}, 
+                'values': {'$push': '$nr_defrosts-concentration'}}
+            }, {
+            '$sort': {'_id.nr_defrosts': 1}
+            }]
+    aggregate_result = adapter.samples_aggregate(pipe)
+
+    for result in aggregate_result:
+        group = result['_id']['lotnr']        
+        if group not in defrosts['data']:
+            defrosts['data'][group] = {'median' : [],'quartile': [], 'nr_samples' : []}
+        nr = result['_id']['nr_defrosts']
+        values = np.array(result['values'])
+        defrosts['data'][group]['median'].append([nr, round(np.percentile(values,50), 2)])
+        defrosts['data'][group]['quartile'].append([nr, round(np.percentile(values,25),2), round(np.percentile(values,75),2)])
+        defrosts['data'][group]['nr_samples'].append([nr, result['count']])
             
     return defrosts
