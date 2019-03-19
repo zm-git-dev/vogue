@@ -11,7 +11,7 @@ from genologics.config import BASEURI,USERNAME,PASSWORD
 
 LOG = logging.getLogger(__name__)
 
-@click.command("lims", short_help = "load lims into db.")
+@click.command("sample", short_help = "load sample/samples into db.")
 @click.option('-s', '--sample-lims-id', 
                 help = 'Input sample lims id')
 @click.option('-m', '--many', is_flag = True, 
@@ -25,7 +25,7 @@ LOG = logging.getLogger(__name__)
 @click.option('-d', '--date', 
                 help = 'Update only samples delivered after date')
 @with_appcontext
-def lims(sample_lims_id, dry, many, load_from, new, date):
+def sample(sample_lims_id, dry, many, load_from, new, date):
     """Read and load lims data for one ore all samples. When loading many smaples,
     the different options -f, -n, -d are used to delimit the subset of samples to load."""
     try:
