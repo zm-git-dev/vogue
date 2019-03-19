@@ -13,30 +13,31 @@ LOG = logging.getLogger(__name__)
 @click.command("lims", short_help = "load lims into db.")
 @click.option('-s', '--sample-lims-id', 
                 help = 'Input sample lims id')
-@click.option('-a', '--all-samples', is_flag = True, 
-                help = 'Loads all lims sample ids')
+@click.option('-m', '--many', is_flag = True, 
+                help = 'Loads all lims samples if no other options are selected')
 @click.option('--dry', is_flag = True, 
                 help = 'Load from sample or not. (dry-run)')
 @click.option('-f', '--load-from', 
                 help = 'load from this sample lims id. Use if load all broke. Start where it ended')
-@click.option('-n', '--new_only', is_flag = True,
+@click.option('-n', '--new', is_flag = True,
                 help = 'Use this flagg if you only want to load samples that dont exist in the database')
 @click.option('-d', '--date', 
                 help = 'Update only samples delivered after date')
 @with_appcontext
-def lims(sample_lims_id, dry, all_samples, load_from, new_only, date):
-    """Read and load lims data for a given sample id"""
+def lims(sample_lims_id, dry, many, load_from, new, date):
+    """Read and load lims data for one ore all samples. When loading many smaples,
+    the different options -f, -n, -d are used to delimit the subset of samples to load."""
     try:
         lims = Lims(BASEURI,USERNAME,PASSWORD)
     except Exception:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
 
-    if all_samples:
+    if many:
         if dry:
             load_all_dry()
         else:
-            load_all(current_app.adapter, lims=lims, start_sample=load_from, new_only=new_only, date=date)
+            load_all(current_app.adapter, lims=lims, start_sample=load_from, new_only=new, date=date)
     else:
         lims_sample = Sample(lims, id = sample_lims_id)
         if not lims_sample:

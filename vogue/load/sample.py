@@ -3,7 +3,7 @@ from vogue.build.lims import build_sample
 LOG = logging.getLogger(__name__)
 from vogue.constants.constants import TEST_SAMPLES
 from datetime import datetime
-   
+
 
 def load_one(adapter, lims_sample=None, lims=None, new_only=True, date=None):
     """Function to load one lims sample into the database"""
@@ -16,10 +16,13 @@ def load_one(adapter, lims_sample=None, lims=None, new_only=True, date=None):
         return
 
     if new_only and adapter.sample(lims_sample.id):
-        LOG.info('Sample allready in database.')
+        LOG.info('Sample already in database.')
         return
 
-    date = datetime.strptime(date, "%y%m%d").date()
+    try:
+        date = datetime.strptime(date, "%y%m%d").date()
+    except:
+        sys.exit('bla bla') ##How do i do I raise this exeption chiara?
     if date and (lims_sample.udf.get('Delivered') < date):
         LOG.info('Old sample. Will not be uploaded. ')
         return
@@ -42,9 +45,9 @@ def load_all(adapter, lims, start_sample = None, new_only=True, date = None):
 def load_one_dry(lims_sample, lims, adapter):
     existing_sample = adapter.sample(lims_sample.id)
     if existing_sample:
-        LOG.info("The sample exist in the database.")
+        LOG.info("The sample exists in the database.")
     else:
-        LOG.info("The sample does not exist in the database.")
+        LOG.info("The sample does not exists in the database.")
     mongo_sample = build_sample(lims_sample, lims, adapter)
     LOG.info("Sample informamtion from lims to add/update: \n %s", mongo_sample)
     return
