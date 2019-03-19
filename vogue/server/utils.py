@@ -201,3 +201,22 @@ def find_concentration_defrosts(adapter, year : int)-> dict:
         defrosts['data'][group]['nr_samples'].append([nr, result['count']])
             
     return defrosts
+
+
+def q30_instruments():
+    pipe=[{ '$project': {
+                'year': {'$year': '$date'}, 
+                'instrument': 1, 
+                'date': 1, 
+                'avg': 1}
+            }, {
+            '$match': {
+                'year': {'$eq': 2019}}
+            }, {
+            '$group': {
+                '_id': {'instrument': '$instrument'}, 
+                'Q30': {'$push': '$avg.% Bases >=Q30'}, 
+                'date': {'$push': '$date'}}
+        }]
+    aggregate_result = adapter.flowcells_aggregate(pipe)
+    
