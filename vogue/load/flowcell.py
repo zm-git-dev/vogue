@@ -1,13 +1,22 @@
 from vogue.build.flowcell import build_run
-from vogue.constants.constants import RUN_TYPES
+from vogue.constants.constants import RUN_TYPES, INSTRUMENTS
 
 
 def load_one(adapter, run):
     """Function to load one lims flowcell into the database"""
-    mongo_run = build_run(run=run)
+
+
+    run_id = run.udf.get('Run ID')
+    if not run_id:
+        return
+    instrument = run_id.split('_')[1]
+    insrument_name =  INSTRUMENTS.get(instrument)
+    if not insrument_name:
+        return
+    print(insrument_name)
+    mongo_run = build_run(run=run, instrument = insrument_name)
     if mongo_run.get('_id'):
-        print('hej')
-        #adapter.add_or_update_run(mongo_run)
+        adapter.add_or_update_run(mongo_run)
 
 
 def load_all(adapter, lims):
