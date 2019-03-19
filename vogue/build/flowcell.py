@@ -2,16 +2,18 @@ from genologics.entities import Process
 from genologics.lims import Lims
 
 from vogue.parse.flowcell import run_data
-from datetime import datetime, date
+import datetime as dt
 
-def build_run(run: Process, instrument:str)-> dict:
+def build_run(run: Process, instrument:str, date:str)-> dict:
     """Parse lims sample"""
         
-    mongo_run = {'_id' : run.udf.get('Run ID'), 'instrument' : instrument}
+    mongo_run = {'_id' : run.udf.get('Run ID'), 
+                'instrument' : instrument, 
+                'date': dt.datetime.strptime(date, '%y%m%d')}
 
     for key, val in run.udf.items():
-        if isinstance(val, date):
-            val = datetime.strptime(val.isoformat(), '%Y-%m-%d')
+        if isinstance(val, dt.date):
+            val = dt.datetime.strptime(val.isoformat(), '%Y-%m-%d')
         mongo_run[key] = val
 
     lane_data, avg_data = run_data(run)

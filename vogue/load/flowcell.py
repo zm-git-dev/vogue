@@ -9,12 +9,12 @@ def load_one(adapter, run):
     run_id = run.udf.get('Run ID')
     if not run_id:
         return
-    instrument = run_id.split('_')[1]
+    date, instrument = run_id.split('_')[0:2]
     insrument_name =  INSTRUMENTS.get(instrument)
     if not insrument_name:
         return
     print(insrument_name)
-    mongo_run = build_run(run=run, instrument = insrument_name)
+    mongo_run = build_run(run=run, instrument = insrument_name, date=date)
     if mongo_run.get('_id'):
         adapter.add_or_update_run(mongo_run)
 
