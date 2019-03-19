@@ -11,4 +11,6 @@ TEST_SAMPLES = ['SIB603A6', 'ADM1852A2', 'SIB603A3', 'SER305A1', 'AND51A3', 'BRA
 YEARS = [str(y) for y in range(2017, THIS_YEAR + 1)]
 
 
-RUN_TYPES = ['AUTOMATED - NovaSeq Run', 'CG002 - Illumina Sequencing (Illumina SBS)']
+RUN_TYPES = ['AUTOMATED - NovaSeq Run'] #, 'CG002 - Illumina Sequencing (Illumina SBS)']
+
+LANE_UDFS = ['% Aligned R1', '% Aligned R2', '% Bases >=Q30 R1', '% Bases >=Q30 R2', '% Error Rate R1', '% Error Rate R2', '% Phasing R1', '% Prephasing R1', '% Prephasing R2', '%PF R1', '%PF R2', 'Cluster Density (K/mm^2) R1', 'Cluster Density (K/mm^2) R2', 'Intensity Cycle 1 R1', 'Intensity Cycle 1 R2', 'Reads PF (M) R1', 'Reads PF (M) R2', 'Yield PF (Gb) R1', 'Yield PF (Gb) R2', '% Phasing R2']

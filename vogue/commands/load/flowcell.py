@@ -15,7 +15,7 @@ LOG = logging.getLogger(__name__)
 @click.option('-a', '--all-runs', is_flag = True, help = 'Loads all lims flowcells ids')
 @click.option('--dry', is_flag = True, help = 'Load from flowcell or not. (dry-run)')
 @with_appcontext
-def lims(run_id, all_runs, dry):
+def flowcell(run_id, all_runs, dry):
     """Read and load lims data for a given sample id"""
     try:
         lims = Lims(BASEURI,USERNAME,PASSWORD)
