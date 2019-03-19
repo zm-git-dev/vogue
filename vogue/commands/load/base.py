@@ -12,8 +12,7 @@ LOG = logging.getLogger(__name__)
 from vogue.commands.load.analysis import analysis as analysis_command
 from vogue.commands.load.application_tag import application_tags as status_db_command
 from vogue.commands.load.flowcell import flowcell as flowcell_command
-
-from vogue.commands.load.lims import lims as lims_command
+from vogue.commands.load.sample import sample as sample_command
 
 # Get version and doc decorator
 from vogue import __version__
@@ -30,6 +29,6 @@ def load():
 
 load.add_command(analysis_command)
 load.add_command(status_db_command)
-load.add_command(lims_command)
+load.add_command(sample_command)
 load.add_command(flowcell_command)
 
