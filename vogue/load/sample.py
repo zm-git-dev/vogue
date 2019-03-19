@@ -2,7 +2,6 @@ import logging
 from vogue.build.lims import build_sample
 LOG = logging.getLogger(__name__)
 from vogue.constants.constants import TEST_SAMPLES
-from datetime import datetime
 
 
 def load_one(adapter, lims_sample=None, lims=None, new_only=True, date=None):
@@ -19,13 +18,11 @@ def load_one(adapter, lims_sample=None, lims=None, new_only=True, date=None):
         LOG.info('Sample already in database.')
         return
 
-    try:
-        date = datetime.strptime(date, "%y%m%d").date()
-    except:
-        sys.exit('bla bla') ##How do i do I raise this exeption chiara?
-    if date and (lims_sample.udf.get('Delivered') < date):
-        LOG.info('Old sample. Will not be uploaded. ')
-        return
+
+    if date:
+        if (lims_sample.udf.get('Delivered') < date):
+            LOG.info('Old sample. Will not be uploaded. ')
+            return
 
 
     mongo_sample = build_sample(lims_sample, lims, adapter)

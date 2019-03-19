@@ -2,6 +2,7 @@ import logging
 import click
 from vogue.load.sample import load_one, load_all, load_one_dry, load_all_dry
 from flask.cli import with_appcontext, current_app
+from datetime import datetime
 
 
 from genologics.lims import Lims
@@ -32,6 +33,13 @@ def lims(sample_lims_id, dry, many, load_from, new, date):
     except Exception:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
+    
+    if date:
+        try:
+            date = datetime.strptime(date, "%y%m%d").date()
+        except Exception as err:
+            LOG.error(err)
+            raise click.Abort()
 
     if many:
         if dry:
