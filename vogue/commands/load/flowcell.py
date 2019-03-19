@@ -27,4 +27,4 @@ def lims(run_id, all_runs, dry):
         load_all(current_app.adapter, lims=lims)
         return
 
-    load_one_sample(current_app.adapter, run_id, lims=lims)
+    load_one(current_app.adapter, lims=lims, run_id=run_id) 
