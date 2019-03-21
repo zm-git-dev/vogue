@@ -203,20 +203,36 @@ def find_concentration_defrosts(adapter, year : int)-> dict:
     return defrosts
 
 
-def q30_instruments():
-    pipe=[{ '$project': {
-                'year': {'$year': '$date'}, 
-                'instrument': 1, 
-                'date': 1, 
-                'avg': 1}
-            }, {
-            '$match': {
-                'year': {'$eq': 2019}}
-            }, {
-            '$group': {
-                '_id': {'instrument': '$instrument'}, 
-                'Q30': {'$push': '$avg.% Bases >=Q30'}, 
-                'date': {'$push': '$date'}}
-        }]
+def q30_instruments(adapter, year : int)-> dict:
+    instruments = {'axis' : {'y' : 'Average Q30'}, 
+                'data': {}, 'title' : 'Q30'}
+    pipe=[{
+        '$project': {
+            'year': {'$year': '$date'}, 
+            'instrument': 1, 
+            'date': 1, 
+            'avg': 1}
+        }, {
+        '$match': {'year': {'$eq': int(year)}}
+        }, {
+        '$group': {'_id': {'instrument': '$instrument'}, 
+                    'data': {'$push': {
+                    'Q30': '$avg.% Bases >=Q30', 
+                    'date': '$date', 
+                    'run_id': '$_id'}}}}]
+
     aggregate_result = adapter.flowcells_aggregate(pipe)
-    
+    for result in aggregate_result:
+        group = result['_id']['instrument'] 
+        data_tuples = [(d['date'], d['run_id'], d.get('Q30')) for d in result['data']]
+        data_sorted = sorted(data_tuples)
+        data = []
+        run_ids = []
+        for date, run_id, Q30 in data_sorted:
+            if Q30:
+                data.append([date, Q30])
+                run_ids.append(run_id)
+        if data:
+            instruments['data'][group] = {'data':data, 'run_id': run_ids}
+
+    return instruments

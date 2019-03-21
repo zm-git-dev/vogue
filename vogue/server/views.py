@@ -1,7 +1,7 @@
 from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
 from vogue.constants.constants import YEARS, THIS_YEAR
-from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, value_per_month, plot_attributes)
+from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, value_per_month, plot_attributes, q30_instruments)
 
 app = current_app
 blueprint = Blueprint('server', __name__)
@@ -24,6 +24,8 @@ def index():
         return redirect(url_for('server.lucigen', year=year))
     if request.form.get('page') == 'target_enrichment':
         return redirect(url_for('server.target_enrichment', year=year))
+    if request.form.get('page') == 'runs':
+        return redirect(url_for('server.runs', year=year))
 
     return render_template(
         'index.html',
@@ -143,12 +145,14 @@ def lucigen(year):
         years = YEARS)
 
 
-@blueprint.route('/sequencing/novaseq/<year>')
-def novaseq(year):
+@blueprint.route('/sequencing/runs/<year>')
+def runs(year):
+    aggregate_result = q30_instruments(app.adapter, year)
 
-    return render_template('novaseq.html',
-        header = 'Nova Seq',
-        page_id = 'novaseq',
+    return render_template('runs.html',
+        header = 'Sequencing Instruments',
+        page_id = 'runs',
+        results = aggregate_result,
         year_of_interest=year,
         years = YEARS)
 

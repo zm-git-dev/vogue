@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'navigation.html' %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            {% include 'header_section.html' %}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div id="q30"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+
+
+<script>
+    var series = []
+    {% for group in results['data'] %}
+        var data = []
+        {% for date, q30 in results.data[group].data %}
+            data.push([Date.UTC({{date.year}},{{date.month}},{{date.day}}), {{q30}}])
+        {% endfor %}
+        series.push({
+            name: "{{group}}",
+            data: data,
+            marker: { symbol: 'circle' } })
+    {% endfor %}
+
+    Highcharts.chart('q30', {
+        chart: {
+            type: 'spline'
+        },
+        title: {
+            text: '{{results.title}}'},
+        xAxis: {
+            type: 'datetime',
+            dateTimeLabelFormats: { // don't display the dummy year
+                month: '%e. %b',
+                year: '%b'}
+            },
+        yAxis: {
+            title: { text: {{ results.axis.y | tojson }} }
+            },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+        plotOptions: {
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            }
+        },
+        series: series 
+});
+
+</script>
+{% endblock %}
+

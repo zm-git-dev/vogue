@@ -7,9 +7,10 @@ import math
 
 def filter_none(mongo_dict):
     for key in list(mongo_dict.keys()):
-        if isinstance(key,str):
+        val = mongo_dict[key]
+        if isinstance(val,(dict, str, dt.datetime)):
             continue
-        if mongo_dict[key] is None or math.isnan(key): ###Cant get rid of NaN!!!
+        if val is None or math.isnan(val):
             mongo_dict.pop(key)
     return mongo_dict
 
