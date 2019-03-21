@@ -14,7 +14,7 @@ def create_app(test = False):
     #configuration files are relative to the instance folder
     app = Flask(__name__, instance_relative_config=True)
     if not test:
-        app.config.from_object(__name__.replace('app', 'config'))
+        app.config.from_object(f"{__name__}.config")
 
         client = MongoClient(app.config['DB_URI'])
         db_name = app.config['DB_NAME']
