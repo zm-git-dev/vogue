@@ -17,6 +17,7 @@ class VougeAdapter(MongoAdapter):
         self.sample_collection = self.db.sample
         self.analysis_collection = self.db.analysis
         self.app_tag_collection = self.db.application_tag
+        self.flowcell_collection = self.db.flowcell
         
         LOG.info("Use database %s.", db_name)
 
@@ -36,6 +37,23 @@ class VougeAdapter(MongoAdapter):
             LOG.info("Updated sample %s.", lims_id)
         else:
             LOG.info("No updates for sample %s.", lims_id)
+
+    def add_or_update_run(self, run_news: dict):
+        """Adds/updates a flowcell in the database"""
+
+        lims_id = run_news['_id']
+        update_result = self.db.flowcell.update_one({'_id' : lims_id}, {'$set': run_news}, upsert=True)
+
+        if not update_result.raw_result['updatedExisting']:
+            self.db.flowcell.update_one({'_id' : lims_id}, 
+                {'$set': {'added': dt.today()}})
+            LOG.info("Added flowcell %s.", lims_id)
+        elif update_result.modified_count:
+            self.db.flowcell.update_one({'_id' : lims_id}, 
+                {'$set': {'updated': dt.today()}})
+            LOG.info("Updated flowcell %s.", lims_id)
+        else:
+            LOG.info("No updates for flowcell %s.", lims_id)
 
     def add_or_update_application_tag(self, application_tag_news: dict):
         """Adds/updates a application_tag in the database"""
@@ -80,6 +98,10 @@ class VougeAdapter(MongoAdapter):
     def samples_aggregate(self, pipe : list):
         """Function to make a aggregation on the sample colleciton"""
         return self.sample_collection.aggregate(pipe)
+
+    def flowcells_aggregate(self, pipe : list):
+        """Function to make a aggregation on the flowcell colleciton"""
+        return self.flowcell_collection.aggregate(pipe)
 
     def get_category(self, app_tag):
         """Function get category based on application tag from the application tag collection"""
