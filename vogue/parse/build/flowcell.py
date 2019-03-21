@@ -1,8 +1,32 @@
 from vogue.constants.constants import LANE_UDFS
 import numpy as np
+import datetime as dt
+import math
+
+def filter_none(mongo_dict):
+    """Function to filter out Nones and NaN from a dict."""
+    for key in list(mongo_dict.keys()):
+        val = mongo_dict[key]
+        if isinstance(val,(dict, str, dt.datetime)):
+            continue
+        if val is None or math.isnan(val):
+            mongo_dict.pop(key)
+    return mongo_dict
 
 
 def run_data(run):
+    """Function to get run info from lanes in a lims sequecing process.
+    Reformates the data to be part of a document in the flowcell database.
+    
+    Arguments:
+        run (Process): lims Process instance of sequencing type
+    Returns: 
+        lane_data (dict): run info per lane. 
+            eq: {'Lane 1': {'% Aligned R2': 0.94, '% Bases >=Q30 R1': 90.67, '% Bases >=Q30 R2': 88.84,...}, 
+                'Lane 2': {'% Aligned R2': 0.92, '% Bases >=Q30 R1': 91.67, '% Bases >=Q30 R2': 83.84,...}}
+        avg_data (dict): average run info over all lanes. 
+            eg: {'% Phasing R2': 0.09, '% Bases >=Q30': 89.755, ...}
+        """
     lane_data = {}
     avg_data = {}
 

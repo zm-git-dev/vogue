@@ -1,21 +1,11 @@
 from genologics.entities import Process
 from genologics.lims import Lims
 
-from vogue.parse.flowcell import run_data
+from vogue.parse.build.flowcell import run_data, filter_none
 import datetime as dt
-import math
-
-def filter_none(mongo_dict):
-    for key in list(mongo_dict.keys()):
-        val = mongo_dict[key]
-        if isinstance(val,(dict, str, dt.datetime)):
-            continue
-        if val is None or math.isnan(val):
-            mongo_dict.pop(key)
-    return mongo_dict
 
 def build_run(run: Process, instrument:str, date:str)-> dict:
-    """Parse lims sample"""
+    """Build flowcell document from lims data."""
         
     mongo_run = {'_id' : run.udf.get('Run ID'), 
                 'instrument' : instrument, 
@@ -29,7 +19,6 @@ def build_run(run: Process, instrument:str, date:str)-> dict:
     lane_data, avg_data = run_data(run)
     mongo_run['avg'] = filter_none(avg_data)
     mongo_run['lanes'] = filter_none(lane_data)
-
 
     mongo_run = filter_none(mongo_run)
 
