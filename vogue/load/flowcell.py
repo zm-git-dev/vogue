@@ -19,7 +19,6 @@ def load_one(adapter, run):
 
 def load_all(adapter, lims):
     """Function to load all lims flowcell into the database"""
-    
     for run in lims.get_processes(type=RUN_TYPES):
         load_one(adapter, run)
       

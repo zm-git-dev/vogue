@@ -36,6 +36,10 @@ class MockProcess():
         self.udf = {}
         self.input_artifact_list = []
         self.id = pid
+        self.outputs = []
+
+    def all_outputs(self):
+        return self.outputs
     
     def __repr__(self):
         return f"Process:date_run={self.date_run},type={self.type}"
@@ -136,7 +140,6 @@ class MockLims():
                 "process_types={self.process_types},samples={self.samples}")
 
 
-
 class MockSample():
     def __init__(self, sample_id='sample', lims=MockLims(), udfs={}):
         self.id = sample_id
@@ -144,6 +147,7 @@ class MockSample():
 
     def __repr__(self):	
         return f"Sample:id={self.id},udf={self.udf}"
+
 
 
 
@@ -164,9 +168,12 @@ def family_sample():
 def simple_artifact():
     return MockArtifact()
 
-#@pytest.fixture
-#def mongo_sample(lims_sample):
-#    return build_sample(lims_sample)
+@pytest.fixture
+def run():
+    run = MockProcess(date_str = '2018-01-01', process_type = 'AUTOMATED - NovaSeq Run', pid = '24-100451' )
+    run.udf = {'Run ID':'190301_A00689_0010_AHHNTLDSXX'}
+    return MockProcess(udfs={}, )
+
 
 @pytest.fixture
 def test_sample():	
