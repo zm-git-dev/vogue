@@ -38,7 +38,7 @@ def run_data(run):
                 continue
             name = lane.location[1]
 
-        lane_data[name] ={}
+        lane_data[name] = {}
         for udf in LANE_UDFS:
             value = lane.udf.get(udf)
             lane_data[name][udf] = value
@@ -46,6 +46,7 @@ def run_data(run):
                 avg_data[udf] = []
             if isinstance(value, int) or isinstance(value, float):
                 avg_data[udf].append(value)
+        lane_data[name] = filter_none(lane_data[name])
 
     for udf, values in avg_data.items():
         avg_data[udf]= round(np.mean(values),2)
@@ -57,5 +58,6 @@ def run_data(run):
         avg_data.pop(q30_r1)
         avg_data.pop(q30_r2)
         avg_data['% Bases >=Q30'] = Q30
+    avg_data = filter_none(avg_data)    
 
-    return lane_data, avg_data 
+    return lane_data, avg_data

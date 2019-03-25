@@ -17,8 +17,8 @@ def build_run(run: Process, instrument:str, date:str)-> dict:
         mongo_run[key] = val
 
     lane_data, avg_data = run_data(run)
-    mongo_run['avg'] = filter_none(avg_data)
-    mongo_run['lanes'] = filter_none(lane_data)
+    mongo_run['avg'] = avg_data
+    mongo_run['lanes'] = lane_data
 
     mongo_run = filter_none(mongo_run)
 
