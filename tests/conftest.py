@@ -130,7 +130,7 @@ class MockLims():
         self.processes.append(process)
         return process
 
-    def _add_sample(self,sample_id):
+    def _add_sample(self, sample_id):
         sample = MockSample(sample_id = sample_id)
         self.samples.append(sample)
         return sample
@@ -171,8 +171,7 @@ def simple_artifact():
 @pytest.fixture
 def run():
     run = MockProcess(date_str = '2018-01-01', process_type = 'AUTOMATED - NovaSeq Run', pid = '24-100451' )
-    run.udf = {'Run ID':'190301_A00689_0010_AHHNTLDSXX'}
-    return MockProcess(udfs={}, )
+    return MockProcess()
 
 
 @pytest.fixture
