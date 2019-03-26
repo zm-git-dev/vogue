@@ -19,7 +19,7 @@ LOG = logging.getLogger(__name__)
 def flowcell(run_id, all_runs, dry):
     """Read and load lims data for a one or all many runs"""
     try:
-        lims = Lims(BASEURI,USERNAME,PASSWORD)
+        lims = current_app.lims
     except Exception:
         LOG.warning("Lims connection failed.")
         raise click.Abort()

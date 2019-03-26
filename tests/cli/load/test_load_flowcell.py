@@ -8,17 +8,15 @@ app = create_app(test= True)
 
 
 def test_flowcell(database):
+    ## GIVEN a app context with no lims connection 
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
 
-    ## GIVEN a lims with a process 24-100451, such as:
-    
-    
     ## WHEN adding a flowcell tags
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'flowcell', '-r', '24-100451'])
 
-    ## THEN assert the new flowcell should be added to the colleciton
-    assert app.adapter.flowcell(run_id) == {}
+    ## THEN assert abort
+    assert app.adapter.flowcell(run_id) =
 
 
