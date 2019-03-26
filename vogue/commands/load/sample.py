@@ -28,12 +28,12 @@ def sample(sample_lims_id, dry, many, load_from, new, date):
     """Read and load lims data for one ore all samples. When loading many smaples,
     the different options -f, -n, -d are used to delimit the subset of samples to load."""
     
-    try:
-        lims = current_app.lims
-    except Exception:
+    if not current_app.lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
 
+    lims = current_app.lims
+        
     if date:
         try:
             date = datetime.strptime(date, "%y%m%d").date()
