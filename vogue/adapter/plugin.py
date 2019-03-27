@@ -74,6 +74,9 @@ class VougeAdapter(MongoAdapter):
     def sample(self, lims_id):
         return self.sample_collection.find_one({'_id':lims_id})
 
+    def flowcell(self, run_id):
+        return self.flowcell_collection.find_one({'_id':run_id})
+
     def app_tag(self, tag):
         return self.app_tag_collection.find_one({'_id':tag})
 

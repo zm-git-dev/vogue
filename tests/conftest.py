@@ -10,6 +10,9 @@ from genologics.lims import Lims
 
 DATABASE = 'testdb'
 
+import logging
+LOG = logging.getLogger(__name__)
+
 @pytest.fixture(scope='function')
 def pymongo_client(request):
     """Get a client to the mongo database"""
@@ -72,46 +75,40 @@ class MockLims():
         self.processes = []
         self.process_types = []
         self.samples = []
-    
+
     def get_artifacts(self, process_type, samplelimsid)-> list:
         """"Get a list of artifacts."""
         if not isinstance(process_type,list):
             process_type=[process_type]
         arts = []
         for art in self.artifacts:
-            ok = True
             if process_type:
                 if not art.parent_process:
-                    ok = False
+                    continue
                 elif not art.parent_process.type.name in process_type:
-                    ok = False
+                    continue
             if samplelimsid:
                 if not samplelimsid in [s.id for s in art.samples]:
-                    ok = False
-            if ok:
-                arts.append(art)
-
+                    continue
+            arts.append(art)
         return arts
 
 
     def get_processes(self, type = None, udf = {}, inputartifactlimsid=None): 
         processes = []
-        
         for process in self.processes:
-            ok = True
-            if type and process.type.name != type:
-                ok = False
+            if isinstance( type, list) and (process.type.name not in type):
+                continue
+            elif isinstance( type, str) and (process.type.name != type):
+                continue
             if udf:
-                for key, val in udf.items():
-                    if not process.udf.get(key) or process.udf.get(key)!=val:
-                        ok = False
+                subset = {key : process.udf.get(key) for key in udf}
+                if subset != udf:
+                    continue
             if inputartifactlimsid:
                 if inputartifactlimsid not in [a.id for a in process.input_artifact_list]:
-                    ok = False
-            if ok:
-               processes.append(process)
-            
-
+                    continue
+            processes.append(process)
         return  processes
 
     
@@ -138,6 +135,8 @@ class MockLims():
     def __repr__(self):	
         return (f"Lims:artifacts={self.artifacts},process={self.processes},"	
                 "process_types={self.process_types},samples={self.samples}")
+
+    
 
 
 class MockSample():

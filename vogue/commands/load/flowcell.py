@@ -5,8 +5,8 @@ from flask.cli import with_appcontext, current_app
 
 
 from genologics.lims import Lims
-from genologics.entities import Process
 from genologics.config import BASEURI,USERNAME,PASSWORD
+from vogue.constants.constants import RUN_TYPES
 
 LOG = logging.getLogger(__name__)
 
@@ -18,15 +18,24 @@ LOG = logging.getLogger(__name__)
 @with_appcontext
 def flowcell(run_id, all_runs, dry):
     """Read and load lims data for a one or all many runs"""
-    try:
-        lims = current_app.lims
-    except Exception:
+    if not current_app.lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
+
+    lims = current_app.lims
 
     if all_runs:
         load_all(current_app.adapter, lims=lims)
         return
 
-    run = Process(lims, id=run_id)
+    runs = lims.get_processes(udf={'Run ID': run_id}, type=RUN_TYPES)
+    if runs == []:
+        LOG.warning("There is no run with this Run ID")
+        raise click.Abort()
+    if len(runs)>1:
+        LOG.warning("There is more than one run with this run ID. Picking the latest")
+        run = runs[-1]
+    else:
+        run = runs[0]
+
     load_one(current_app.adapter, run = run) 
