@@ -7,7 +7,6 @@ LOG = logging.getLogger(__name__)
 
 def load_one(adapter, run):
     """Function to load one lims flowcell into the database"""
-    print('ggggggggga')
     run_id = run.udf.get('Run ID')
     if not run_id:
         LOG.warning("Run ID is missing")
@@ -17,10 +16,8 @@ def load_one(adapter, run):
     if not instrument_name:
         LOG.warning("Run ID is missing")
         return
-    print('ggggggggg')
     mongo_run = build_run(run=run, instrument = instrument_name, date=date)
-    if mongo_run.get('_id'):
-        adapter.add_or_update_run(mongo_run)
+    adapter.add_or_update_run(mongo_run)
 
 
 def load_all(adapter, lims):
