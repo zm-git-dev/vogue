@@ -7,10 +7,11 @@ def filter_none(mongo_dict):
     """Function to filter out Nones and NaN from a dict."""
     for key in list(mongo_dict.keys()):
         val = mongo_dict[key]
-        if isinstance(val,(dict, str, dt.datetime)):
+        try:
+            if val is None or math.isnan(val):
+                mongo_dict.pop(key)
+        except Exception:
             continue
-        if val is None or math.isnan(val):
-            mongo_dict.pop(key)
     return mongo_dict
 
 
