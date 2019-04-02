@@ -5,9 +5,8 @@ from flask.cli import with_appcontext, current_app
 from datetime import datetime
 
 
-from genologics.lims import Lims
 from genologics.entities import Sample
-from genologics.config import BASEURI,USERNAME,PASSWORD
+
 
 LOG = logging.getLogger(__name__)
 
@@ -28,12 +27,13 @@ LOG = logging.getLogger(__name__)
 def sample(sample_lims_id, dry, many, load_from, new, date):
     """Read and load lims data for one ore all samples. When loading many smaples,
     the different options -f, -n, -d are used to delimit the subset of samples to load."""
-    try:
-        lims = Lims(BASEURI,USERNAME,PASSWORD)
-    except Exception:
+    
+    if not current_app.lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
-    
+
+    lims = current_app.lims
+        
     if date:
         try:
             date = datetime.strptime(date, "%y%m%d").date()
