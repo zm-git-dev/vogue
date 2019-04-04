@@ -7,7 +7,7 @@ import vogue.models.analysis as analysis_model
 
 
 
-def build_analysis(analysis_dict: dict, analysis_type: str, valid_analysis: str, sample_id):
+def build_analysis(analysis_dict: dict, analysis_type: str, valid_analysis: list, sample_id):
     '''
     Builds analysis dictionary based on input analysis_dict. This function will remove analysis json that are not part
     of the matching model. analysis_type is a single key matching ANALYSIS_SETS's first level keys.
