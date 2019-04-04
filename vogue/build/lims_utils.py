@@ -77,7 +77,7 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     This will return the first time a sample was delivered
     """
 
-    process_types = ['CG002 - Delivery']
+    process_types = ['CG002 - Delivery', 'Delivery']
     udf = 'Date delivered'
     
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)

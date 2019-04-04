@@ -2,15 +2,23 @@ import logging
 import click
 import yaml
 import json
+
+from flask.cli import with_appcontext, current_app
+
 from vogue.tools.cli_utils import json_read
 from vogue.tools.cli_utils import yaml_read
 from vogue.tools.cli_utils import check_file
-from vogue.build.analysis import validate_conf
+from vogue.tools.cli_utils import concat_dict_keys 
 from vogue.build.analysis import build_analysis
+from vogue.tools.cli_utils import add_doc as doc
+from vogue.load.analysis import load_analysis
+from vogue.parse.analysis import validate_conf
 import vogue.models.analysis as analysis_model
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
+
+
 
 
 @click.command("analysis", short_help="Read files from analysis workflows")
@@ -26,18 +34,23 @@ LOG = logging.getLogger(__name__)
     '--analysis-type',
     type=click.Choice(list(analysis_model.ANALYSIS_DESC.keys()) + ['all']),
     multiple=True,
-    default='all',
+    default=['all'],
     help='Type of analysis results to load.')
-@click.pass_context
-def analysis(context, sample_id, analysis_config, analysis_type):
-    """
+@click.option('--dry', is_flag=True, help='Load from sample or not. (dry-run)')
+@doc(f"""
     Read and load analysis results. These are either QC or analysis output files.
-    """
+
+    The inputs are unique ID with an analysis config file (JSON/YAML) which includes analysis results matching the
+    analysis model. Analysis types recognize the following keys in the input file: {" ".join(concat_dict_keys(analysis_model.ANALYSIS_SETS,key_name=""))}
+        """)
+@with_appcontext
+def analysis(sample_id, dry, analysis_config, analysis_type):
+
     LOG.info("Reading and validating config file.")
     try:
         check_file(analysis_config)
     except FileNotFoundError as e:
-        context.abort()
+        click.Abort()
 
     LOG.info("Trying JSON format")
     analysis_dict = json_read(analysis_config)
@@ -46,29 +59,35 @@ def analysis(context, sample_id, analysis_config, analysis_type):
         analysis_dict = yaml_read(analysis_config)
         if not isinstance(analysis_dict, dict):
             LOG.error("Cannot read input analysis config file. Type unknown.")
-            context.abort()
+            click.Abort()
 
     LOG.info("Validating config file")
-    if not validate_conf(analysis_dict):
-        LOG.error("Input config file is not valid format")
-        context.abort()
+    valid_analysis = validate_conf(analysis_dict)
+    if valid_analysis is None:
+        LOG.error("Input config file is not valid.")
+        click.Abort()
 
     ready_analysis = dict()
-    if analysis_type == 'all':
+    if 'all' in analysis_type:
         for my_analysis in analysis_model.ANALYSIS_DESC.keys():
-            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis)
+            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis,
+                                               valid_analysis, sample_id)
             if tmp_analysis_dict:
                 ready_analysis = {**ready_analysis, **tmp_analysis_dict}
     else:
         for my_analysis in analysis_type:
-            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis)
+            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis,
+                                               valid_analysis, sample_id)
             if tmp_analysis_dict:
                 ready_analysis = {**ready_analysis, **tmp_analysis_dict}
 
     if ready_analysis:
         LOG.info(
-            f'The following keys were found {list(ready_analysis.keys())}')
+            f'Values for {list(ready_analysis.keys())} loaded for sample {sample_id}'
+        )
     else:
         LOG.warning(
             f'No enteries were found for the given analysis type: {analysis_type}'
         )
+
+    load_analysis(adapter=current_app.adapter, lims_id = sample_id, dry_run=dry, analysis=ready_analysis)
