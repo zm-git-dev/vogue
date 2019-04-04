@@ -27,176 +27,165 @@
 
 <script>
     var series = []
-    {% for name in sequenced_to_delivered.prio.group %}
+    {% for name in data_prio.sequenced_to_delivered %}
     series.push({
         name: "{{name}}",
-        data: {{ sequenced_to_delivered.prio.group[name].data | tojson }},
-        color: "{{sequenced_to_delivered.prio.group[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{sequenced_to_delivered.prio.group[name].color[1]}}"})
+        data: {{ data_prio.sequenced_to_delivered[name].data | tojson }},
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('sequenced_to_delivered_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ sequenced_to_delivered.prio.title| tojson }}},
-        xAxis: { categories: {{ sequenced_to_delivered.prio.labels| tojson }}},
-        yAxis: { title: { text: {{ sequenced_to_delivered.prio.axis.y | tojson }}}},
+        title: { text: {{ sequenced_to_delivered_prio.title| tojson }}},
+        xAxis: { categories: {{ sequenced_to_delivered_prio.labels| tojson }}},
+        yAxis: { title: { text: {{ sequenced_to_delivered_prio.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
 
     var series = []
-    {% for name in prepped_to_sequenced.prio.group %}
+    {% for name in data_prio.prepped_to_sequenced %}
     series.push({
         name: "{{name}}",
-        data: {{ prepped_to_sequenced.prio.group[name].data | tojson }},
-        color: "{{prepped_to_sequenced.prio.group[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{prepped_to_sequenced.prio.group[name].color[1]}}"})
+        data: {{ data_prio.prepped_to_sequenced[name].data | tojson }},
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('prepped_to_sequenced_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ prepped_to_sequenced.prio.title| tojson }}},
-        xAxis: { categories: {{ prepped_to_sequenced.prio.labels| tojson }}},
-        yAxis: { title: { text: {{ prepped_to_sequenced.prio.axis.y | tojson }}}},
+        title: { text: {{ prepped_to_sequenced_prio.title| tojson }}},
+        xAxis: { categories: {{ prepped_to_sequenced_prio.labels| tojson }}},
+        yAxis: { title: { text: {{ prepped_to_sequenced_prio.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
-    {% for name in received_to_prepped.prio.group %}
+    {% for name in data_prio.received_to_prepped %}
     series.push({
         name: "{{name}}",
-        data: {{ received_to_prepped.prio.group[name].data | tojson }},
-        color: "{{received_to_prepped.prio.group[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{received_to_prepped.prio.group[name].color[1]}}"})
+        data: {{ data_prio.received_to_prepped[name].data | tojson }},
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_to_prepped_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_prepped.prio.title| tojson }}},
-        xAxis: { categories: {{ received_to_prepped.prio.labels| tojson }}},
-        yAxis: { title: { text: {{ received_to_prepped.prio.axis.y | tojson }}}},
+        title: { text: {{ received_to_prepped_prio.title| tojson }}},
+        xAxis: { categories: {{ received_to_prepped_prio.labels| tojson }}},
+        yAxis: { title: { text: {{ received_to_prepped_prio.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
-    {% for name in received_to_delivered.prio.group %}
+    {% for name in data_prio.received_to_delivered %}
     series.push({
         name: "{{name}}",
-        data: {{ received_to_delivered.prio.group[name].data | tojson }},
-        color: "{{received_to_delivered.prio.group[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{received_to_delivered.prio.group[name].color[1]}}"})
+        data: {{ data_prio.received_to_delivered[name].data | tojson }},
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_to_delivered_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_delivered.prio.title| tojson }}},
-        xAxis: { categories: {{ received_to_delivered.prio.labels| tojson }}},
-        yAxis: { title: { text: {{ received_to_delivered.prio.axis.y | tojson }}}},
+        title: { text: {{ received_to_delivered_prio.title| tojson }}},
+        xAxis: { categories: {{ received_to_delivered_prio.labels| tojson }}},
+        yAxis: { title: { text: {{ received_to_delivered_prio.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
-
-
-
     var series = []
-    {% for name in sequenced_to_delivered.tag.group %}
+    {% for name in data_cat.sequenced_to_delivered %}
     series.push({
         name: "{{name}}",
-        data: {{ sequenced_to_delivered.tag.group[name].data | tojson }},
-        color: "{{sequenced_to_delivered.tag.group[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{sequenced_to_delivered.tag.group[name].color[1]}}"})
+        data: {{ data_cat.sequenced_to_delivered[name].data | tojson }},
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('sequenced_to_delivered_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ sequenced_to_delivered.tag.title| tojson }}},
-        xAxis: { categories: {{ sequenced_to_delivered.tag.labels| tojson }}},
-        yAxis: { title: { text: {{ sequenced_to_delivered.tag.axis.y | tojson }}}},
+        title: { text: {{ sequenced_to_delivered_cat.title| tojson }}},
+        xAxis: { categories: {{ sequenced_to_delivered_cat.labels| tojson }}},
+        yAxis: { title: { text: {{ sequenced_to_delivered_cat.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
 
     var series = []
-    {% for name in prepped_to_sequenced.tag.group %}
+    {% for name in data_cat.prepped_to_sequenced %}
     series.push({
         name: "{{name}}",
-        data: {{ prepped_to_sequenced.tag.group[name].data | tojson }},
-        color: "{{prepped_to_sequenced.tag.group[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{prepped_to_sequenced.tag.group[name].color[1]}}"})
+        data: {{ data_cat.prepped_to_sequenced[name].data | tojson }},
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('prepped_to_sequenced_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ prepped_to_sequenced.tag.title| tojson }}},
-        xAxis: { categories: {{ prepped_to_sequenced.tag.labels| tojson }}},
-        yAxis: { title: { text: {{ prepped_to_sequenced.tag.axis.y | tojson }}}},
+        title: { text: {{ prepped_to_sequenced_cat.title| tojson }}},
+        xAxis: { categories: {{ prepped_to_sequenced_cat.labels| tojson }}},
+        yAxis: { title: { text: {{ prepped_to_sequenced_cat.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
-    {% for name in received_to_prepped.tag.group %}
+    {% for name in data_cat.received_to_prepped %}
     series.push({
         name: "{{name}}",
-        data: {{ received_to_prepped.tag.group[name].data | tojson }},
-        color: "{{received_to_prepped.tag.group[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{received_to_prepped.tag.group[name].color[1]}}"})
+        data: {{ data_cat.received_to_prepped[name].data | tojson }},
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_to_prepped_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_prepped.tag.title| tojson }}},
-        xAxis: { categories: {{ received_to_prepped.tag.labels| tojson }}},
-        yAxis: { title: { text: {{ received_to_prepped.tag.axis.y | tojson }}}},
+        title: { text: {{ received_to_prepped_cat.title| tojson }}},
+        xAxis: { categories: {{ received_to_prepped_cat.labels| tojson }}},
+        yAxis: { title: { text: {{ received_to_prepped_cat.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 
     var series = []
-    {% for name in received_to_delivered.tag.group %}
+    {% for name in data_cat.received_to_delivered %}
     series.push({
         name: "{{name}}",
-        data: {{ received_to_delivered.tag.group[name].data | tojson }},
-        color: "{{received_to_delivered.tag.group[name].color[0]}}",
-        marker: { symbol: 'circle' },
-        fillColor: "{{received_to_delivered.tag.group[name].color[1]}}"})
+        data: {{ data_cat.received_to_delivered[name].data | tojson }},
+        marker: { symbol: 'circle' }})
     {% endfor %}
 
     Highcharts.chart('received_to_delivered_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_delivered.tag.title| tojson }}},
-        xAxis: { categories: {{ received_to_delivered.tag.labels| tojson }}},
-        yAxis: { title: { text: {{ received_to_delivered.tag.axis.y | tojson }}}},
+        title: { text: {{ received_to_delivered_cat.title| tojson }}},
+        xAxis: { categories: {{ received_to_delivered_cat.labels| tojson }}},
+        yAxis: { title: { text: {{ received_to_delivered_cat.axis.y | tojson }}}},
         tooltip: {
             shared: true,
             valueSuffix: ' days'
         },
+        plotOptions: {areaspline: {fillOpacity: 0.2}},
         series: series});
 </script>
 {% endblock %}

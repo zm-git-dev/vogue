@@ -45,12 +45,10 @@ class VougeAdapter(MongoAdapter):
                             {'$set': application_tag_news}, upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
-            self.db.application_tag.update_one({'_id' : tag}, 
-                {'$set': {'added': dt.today()}})
+            self.db.application_tag.update_one({'_id' : tag}, {'$set': {'added': dt.today()}})
             LOG.info("Added application_tag %s.", tag)
         elif update_result.modified_count:
-            self.db.application_tag.update_one({'_id' : tag}, 
-                {'$set': {'updated': dt.today()}})
+            self.db.application_tag.update_one({'_id' : tag}, {'$set': {'updated': dt.today()}})
             LOG.info("Updated application_tag %s.", tag)
         else:
             LOG.info("No updates for application_tag %s.", tag)
@@ -85,5 +83,15 @@ class VougeAdapter(MongoAdapter):
         return self.analysis_collection.find_one({'_id':analysis_id})
         
     def find_samples(self, query:dict)-> list:
+        """Function to find samples in samples collection based on query"""
         samples = self.sample_collection.find(query)
         return list(samples)
+
+    def samples_aggregate(self, pipe : list):
+        """Function to make a aggregation on the sample colleciton"""
+        return self.sample_collection.aggregate(pipe)
+
+    def get_category(self, app_tag):
+        """Function get category based on application tag from the application tag collection"""
+        tag = self.app_tag_collection.find_one({'_id' : app_tag} , { "category": 1 })
+        return tag.get('category') if tag else None

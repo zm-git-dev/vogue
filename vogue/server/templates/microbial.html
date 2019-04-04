@@ -16,10 +16,10 @@
 
 <script>
     var series = []
-    {% for group in microbial_concentration_time.group %}
+    {% for group in data %}
     series.push({
         name: "{{group}}",
-        data: {{ microbial_concentration_time.group[group].data | tojson }},
+        data: {{ data[group].data | tojson }},
         marker: { symbol: 'circle' },
                 
                       })
@@ -30,11 +30,11 @@
             type: 'spline'
         },
         title: {
-            text: '{{microbial_concentration_time.title}}'},
+            text: '{{plot_attributes.title}}'},
         xAxis: {
-            categories: {{ microbial_concentration_time.labels| tojson }}},
+            categories: {{ plot_attributes.labels| tojson }}},
         yAxis: {
-            title: { text: {{ microbial_concentration_time.axis.y | tojson }}}},
+            title: { text: {{ plot_attributes.axis.y | tojson }}}},
         legend: {
             layout: 'vertical',
             align: 'right',

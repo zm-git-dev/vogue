@@ -1,36 +1,61 @@
 {% extends 'layout.html' %}
 {% block body %}
-{% include 'navigation.html' %}
 
-<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Vogue</h1>
-  </div>
+<div class="container-fluid">
+    <div class="row">
+    {% include 'navigation.html' %}
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h1">Vogue</h1>
+    </div>
+    
 
 
-  <h2>Bla bla general info maybe</h2>
-  <div class="table-responsive">
-    <table class="table table-striped table-sm">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Header</th>
-          <th>Header</th>
-          <th>Header</th>
-          <th>Header</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1,001</td>
-          <td>Lorem</td>
-          <td>ipsum</td>
-          <td>dolor</td>
-          <td>sit</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+
+  <h4>Welcome</h4>
+  <p>Welcome to clinical genomics new development site for trending.
+    Here you can see the current status of the trending project that is ongoing here at CG. 
+    We intend to keep this view updated with what is going on so that you can follow our work.
+    Please look around to see what is in place right now.
+
+
+    
+  </p>
+  
+  <h4>Feature requests</h4>
+  <p>The project is still on a early stage and we encourage you to come with suggestions on new plots and features to help us improve what we have at the moment. 
+    Write your feature request <a href="https://github.com/Clinical-Genomics/vogue/issues/new/choose" target="_blank" data-v-04c1a7ec="">here</a>. 
+    You can look at existing requests <a href="https://github.com/Clinical-Genomics/vogue/projects/2" target="_blank" data-v-04c1a7ec="">here</a>. Right now there are none.</p>
+    
+
+  <h4>Plans in general</h4>
+  <p>Currently working on / plan to work on very soon:
+  <ul>
+    <li>Include QC data to the trending database.</li>
+    <li>Restructure code and adding tests more tests.</li>  
+  </ul>
+  </p>
+
+  <p>Lower priority:
+      <ul>
+        <li>General layout of the web page.</li>
+        <li>More Plots.</li>
+        <li>Coveralls.</li>
+      </ul>
+  </p>
+  
+  <p>Recent fixes:
+    <ul>
+      <li>Refactored queries so that the views take little time to load.</li>
+      <li>Fetching application tag category from the samples collection.</li>
+      <li>Excluding test samples.</li>
+    </ul>
+</p>
+
+  <h4>Contributors</h4>
+  <p>We who are working on this project right now are Maya and Hassan, with support from Måns, Kenny, Ciara.</p>
 </main>
+</div>
+</div>
 
-{% endblock %}
+  {% endblock %}

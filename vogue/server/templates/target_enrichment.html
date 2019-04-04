@@ -23,10 +23,10 @@
 <script>
 
     var series = []
-    {% for group in library_size_post_hyb.group %}
+    {% for group in data_post_hyb %}
     series.push({
         name: "{{group}}",
-        data: {{ library_size_post_hyb.group[group].data | tojson }},
+        data: {{ data_post_hyb[group].data | tojson }},
         marker: { symbol: 'circle' },
                 
                       })
@@ -37,11 +37,11 @@
             type: 'spline'
         },
         title: {
-            text: '{{library_size_post_hyb.title}}'},
+            text: '{{plot_post_hyb.title}}'},
         xAxis: {
-            categories: {{ library_size_post_hyb.labels| tojson }}},
+            categories: {{ plot_post_hyb.labels| tojson }}},
         yAxis: {
-            title: { text: {{ library_size_post_hyb.axis.y | tojson }}}},
+            title: { text: {{ plot_post_hyb.axis.y | tojson }}}},
         legend: {
             layout: 'vertical',
             align: 'right',
@@ -69,10 +69,10 @@
 <script>
 
     var series = []
-    {% for group in library_size_pre_hyb.group %}
+    {% for group in data_pre_hyb %}
     series.push({
         name: "{{group}}",
-        data: {{ library_size_pre_hyb.group[group].data | tojson }},
+        data: {{ data_pre_hyb[group].data | tojson }},
         marker: { symbol: 'circle' },
                 
                       })
@@ -83,11 +83,11 @@
             type: 'spline'
         },
         title: {
-            text: '{{library_size_pre_hyb.title}}'},
+            text: '{{plot_pre_hyb.title}}'},
         xAxis: {
-            categories: {{ library_size_pre_hyb.labels| tojson }}},
+            categories: {{ plot_pre_hyb.labels| tojson }}},
         yAxis: {
-            title: { text: {{ library_size_pre_hyb.axis.y | tojson }}}},
+            title: { text: {{ plot_pre_hyb.axis.y | tojson }}}},
         legend: {
             layout: 'vertical',
             align: 'right',
