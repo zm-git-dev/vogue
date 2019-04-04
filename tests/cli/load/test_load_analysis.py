@@ -3,6 +3,7 @@ from vogue.commands.base import cli
 from vogue.adapter.plugin import VougeAdapter
 
 VALID_JSON = 'tests/fixtures/valid_multiqc.json'
+INVALID_JSON = 'tests/fixtures/not_a_multiqc_report.json'
 
 app = create_app(test= True)
 
@@ -22,7 +23,7 @@ def test_analysis(database):
     assert isinstance(app.adapter.analysis(sample_id), dict)
 
 
-def test_analysis_wrong_file(database):
+def test_analysis_no_file(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
 
@@ -36,3 +37,17 @@ def test_analysis_wrong_file(database):
     ## THEN assert  Can not load json. Exiting.
     assert result.exit_code == 1
 
+
+def test_analysis_invalid_file(database):
+    app.db = database
+    app.adapter = VougeAdapter(database.client, db_name = database.name)
+
+    ## GIVEN a invalid path to a json file
+    sample_id = 'some_id'
+    
+    ## WHEN adding a new analysis
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'analysis', '-s', sample_id ,'-a', INVALID_JSON ,'-t', 'QC' ])
+
+    ## THEN assert  Can not load json.
+    assert result.exit_code == 1
