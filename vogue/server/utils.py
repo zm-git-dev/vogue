@@ -204,6 +204,8 @@ def find_concentration_defrosts(adapter, year : int)-> dict:
 
 
 def q30_instruments(adapter, year : int)-> dict:
+    """Prepares data for a plot Q30 values for diferent runs over time"""
+
     instruments = {'axis' : {'y' : 'Average Q30'}, 
                 'data': {}, 'title' : 'Q30'}
     pipe=[{
