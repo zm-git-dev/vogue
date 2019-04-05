@@ -49,7 +49,7 @@ def turn_around_times(year):
     s2d_p = 'Time from sequenced to delivered (grouped by priority)'
 
     return render_template('turn_around_times.html',
-        header = 'Turn Around Times',
+        header = 'Turnaround Times',
         page_id = 'turn_around_times',
         data_prio = results_grouped_by_prio,
         data_cat = results_grouped_by_cat,
@@ -78,7 +78,7 @@ def common_samples(year):
         data_prio = data_prio['count'],
         data_cat = data_cat['count'],
         plot_prio = plot_attributes( title = 'Received samples per month (grouped by priority)' , y_axis_label = y_axis_label),
-        plot_cat = plot_attributes( title = 'Received samples per month (grouped by aplication tag)' , y_axis_label = y_axis_label),
+        plot_cat = plot_attributes( title = 'Received samples per month (grouped by application tag)' , y_axis_label = y_axis_label),
         year_of_interest=year,
         years = YEARS)
 
@@ -103,7 +103,7 @@ def target_enrichment(year):
     y_axis_label = 'library size'
 
     return render_template('target_enrichment.html',
-        header = 'Target enrichment (exom/panels)',
+        header = 'Target Enrichment (exom/panels)',
         page_id = 'target_enrichment',
         data_pre_hyb = data['library_size_pre_hyb'],
         data_post_hyb = data['library_size_post_hyb'],
@@ -123,7 +123,7 @@ def wgs(year):
         page_id = 'wgs',
         concentration_defrosts = concentration_defrosts,
         concentration_time = concentration_time['nr_defrosts-concentration'],
-        plot_attributes = plot_attributes( title = 'wgs illumina PCR-free' , y_axis_label = 'Concentration (nM)'),
+        plot_attributes = plot_attributes( title = 'WGS illumina PCR-free' , y_axis_label = 'Concentration (nM)'),
         year_of_interest=year,
         years = YEARS)
 
@@ -137,7 +137,7 @@ def lucigen(year):
         header = 'Lucigen PCR-free',
         page_id = 'lucigen',
         amount_concentration_time = amount_concentration_time['amount-concentration'],
-        plot_attributes = plot_attributes( title = 'lucigen PCR-free', y_axis_label = 'Concentration (nM)'),
+        plot_attributes = plot_attributes( title = 'Lucigen PCR-free', y_axis_label = 'Concentration (nM)'),
         amount = concentration_amount,
         year_of_interest=year,
         years = YEARS)
