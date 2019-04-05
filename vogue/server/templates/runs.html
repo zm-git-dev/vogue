@@ -21,6 +21,7 @@
     {% for group in results['data'] %}
         var data = []
         {% for date, q30, run_id in results.data[group].data %}
+            // in this context january is 0, february 1,..., december 11 thereby date.month-1
             data.push({'x': Date.UTC({{date.year}},{{date.month-1}},{{date.day}}), 'y': {{q30}},'name': {{run_id|tojson}}} )
         {% endfor %}
         series.push({
@@ -35,7 +36,7 @@
         chart: {type: 'spline'},
         title: {text: '{{results.title}}'},
         xAxis: {type: 'datetime',
-                dateTimeLabelFormats: { // don't display the dummy year
+                dateTimeLabelFormats: { 
                     month: '%e. %b',
                     year: '%b'}},
         yAxis: {title: {text: {{ results.axis.y | tojson }} },
