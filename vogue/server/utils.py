@@ -227,12 +227,10 @@ def q30_instruments(adapter, year : int)-> dict:
         data_tuples = [(d['date'], d['run_id'], d.get('Q30')) for d in result['data']]
         data_sorted = sorted(data_tuples)
         data = []
-        run_ids = []
         for date, run_id, Q30 in data_sorted:
             if Q30:
-                data.append([date, Q30])
-                run_ids.append(run_id)
+                data.append([date, Q30, run_id])
         if data:
-            instruments['data'][group] = {'data':data, 'run_id': run_ids}
+            instruments['data'][group] = {'data':data}
 
     return instruments

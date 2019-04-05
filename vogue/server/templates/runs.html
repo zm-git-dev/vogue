@@ -20,39 +20,41 @@
     var series = []
     {% for group in results['data'] %}
         var data = []
-        {% for date, q30 in results.data[group].data %}
-            data.push([Date.UTC({{date.year}},{{date.month}},{{date.day}}), {{q30}}])
+        {% for date, q30, run_id in results.data[group].data %}
+            data.push({'x': Date.UTC({{date.year}},{{date.month-1}},{{date.day}}), 'y': {{q30}},'name': {{run_id|tojson}}} )
         {% endfor %}
         series.push({
+            findNearestPointBy: 'xy',
             name: "{{group}}",
             data: data,
-            marker: { symbol: 'circle' } })
+            marker: { symbol: 'circle' } 
+            })
     {% endfor %}
 
     Highcharts.chart('q30', {
-        chart: {
-            type: 'spline'
-        },
-        title: {
-            text: '{{results.title}}'},
-        xAxis: {
-            type: 'datetime',
-            dateTimeLabelFormats: { // don't display the dummy year
-                month: '%e. %b',
-                year: '%b'}
-            },
-        yAxis: {
-            title: { text: {{ results.axis.y | tojson }} }
-            },
+        chart: {type: 'spline'},
+        title: {text: '{{results.title}}'},
+        xAxis: {type: 'datetime',
+                dateTimeLabelFormats: { // don't display the dummy year
+                    month: '%e. %b',
+                    year: '%b'}},
+        yAxis: {title: {text: {{ results.axis.y | tojson }} },
+                min: 0},
         legend: {
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle'
         },
+        tooltip: {
+        formatter: function () {
+            return 'Run ID: <b>' + this.point.name +'</b> <br> Q30: <b>'+ this.y + '</b>';
+        }
+    },
         plotOptions: {
             spline: {
                 marker: {
-                    radius: 4,
+                    enabled: true,
+                    radius: 2,
                     lineColor: '#666666',
                     lineWidth: 1
                 }
