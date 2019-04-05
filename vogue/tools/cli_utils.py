@@ -54,3 +54,19 @@ def check_file(fname):
     if not path.exists() or not path.is_file():
         LOG.error("File not found or input is not a file.")
         raise FileNotFoundError
+
+def concat_dict_keys(my_dict: dict, key_name="", out_key_list=list()):
+    '''
+    Recursively create a list of key:key1,key2 from a nested dictionary
+    '''
+
+    if isinstance(my_dict, dict):
+
+        if key_name != "":
+            out_key_list.append(key_name + ":" +
+                                ", ".join(list(my_dict.keys())))
+
+        for k in my_dict.keys():
+            concat_dict_keys(my_dict[k], key_name=k, out_key_list=out_key_list)
+
+    return out_key_list

@@ -5,26 +5,37 @@ from flask.cli import with_appcontext, current_app
 
 
 from genologics.lims import Lims
-from genologics.entities import Sample
 from genologics.config import BASEURI,USERNAME,PASSWORD
+from vogue.constants.constants import RUN_TYPES
 
 LOG = logging.getLogger(__name__)
 
 @click.command("flowcell", short_help = "load flowcell into db.")
-@click.option('-r', '--run-id', help = 'Input flowcell run id')
+@click.option('-r', '--run-id', help = 'Lims process id for the run. Eg: 24-100451')
 @click.option('-a', '--all-runs', is_flag = True, help = 'Loads all lims flowcells ids')
 @click.option('--dry', is_flag = True, help = 'Load from flowcell or not. (dry-run)')
+
 @with_appcontext
 def flowcell(run_id, all_runs, dry):
-    """Read and load lims data for a given sample id"""
-    try:
-        lims = Lims(BASEURI,USERNAME,PASSWORD)
-    except Exception:
+    """Read and load lims data for a one or all many runs"""
+    if not current_app.lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
+
+    lims = current_app.lims
 
     if all_runs:
         load_all(current_app.adapter, lims=lims)
         return
 
-    load_one(current_app.adapter, lims=lims, run_id=run_id) 
+    runs = lims.get_processes(udf={'Run ID': run_id}, type=RUN_TYPES)
+    if runs == []:
+        LOG.warning("There is no run with this Run ID")
+        raise click.Abort()
+    if len(runs)>1:
+        LOG.warning("There is more than one run with this run ID. Picking the latest")
+        run = runs[-1]
+    else:
+        run = runs[0]
+
+    load_one(current_app.adapter, run = run) 
