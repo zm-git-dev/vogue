@@ -14,4 +14,3 @@ ANALYSIS_SETS = {
         'multiqc json/yaml report key for picard insert size metrics'
     }
 }
-
