@@ -12,7 +12,7 @@ def test_analysis(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
 
-    ## GIVEN a correct foramted input file VALID_JSON
+    ## GIVEN a correct formatted input file VALID_JSON
     sample_id = 'some_id'
 
     ## WHEN adding a new analysis
