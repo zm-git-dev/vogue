@@ -14,7 +14,7 @@ def test_validate_conf():
     analysis_conf = json_read(VALID_JSON)
 
     ## WHEN extracting the valid keys from the json, using validate_conf
-    mongo_sample_analysis = validate_conf(analysis_conf=analysis_conf)
+    valid_key_list = validate_conf(analysis_conf=analysis_conf)
 
-    ## THEN the putput should be a list and not a empty list
-    assert isinstance(mongo_sample_analysis, list)
+    ## THEN the output should be a list
+    assert isinstance(valid_key_list, list)
