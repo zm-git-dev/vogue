@@ -48,9 +48,6 @@
         chart: { type: 'spline' },
         title: {
             text: '{{concentration_defrosts.title}}'},
-        subtitle: {
-            text: 'bla bla bla'
-        },
         xAxis: {
             categories: {{ concentration_defrosts.labels| tojson }},
         title: { text: {{ concentration_defrosts.axis.x | tojson }}}},
@@ -88,7 +85,6 @@
     Highcharts.chart('concentration_time', {
         chart: { type: 'spline' },
         title: { text: '{{plot_attributes.title}}'},
-        subtitle: { text: 'bla bla bla' },
         xAxis: { categories: {{ plot_attributes.labels| tojson }}},
         yAxis: { title: { text: {{ plot_attributes.axis.y | tojson }}}},
         legend: { enabled: false },
@@ -104,7 +100,7 @@
             }
         },
         series: [{
-            name: 'Average Concnetration',
+            name: 'Average Concentration',
             data: data,
             marker: { symbol: 'circle' }}] 
 });
