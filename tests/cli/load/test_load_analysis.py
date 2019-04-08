@@ -31,11 +31,12 @@ def test_analysis_no_file(database):
 
     ## GIVEN a invalid path to a json file
     sample_id = 'some_id'
+    json_path = '/invalid_path_to_json/wrong.json'
 
     ## WHEN adding a new analysis
     runner = app.test_cli_runner()
     result = runner.invoke(
-        cli, ['load', 'analysis', '-s', sample_id, '-a', 'path', '-t', 'QC'])
+        cli, ['load', 'analysis', '-s', sample_id, '-a', json_path, '-t', 'QC'])
 
     ## THEN assert  Can not load json. Exiting.
     assert result.exit_code == 1
