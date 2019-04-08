@@ -54,7 +54,7 @@ def sample(sample_lims_id, dry, many, load_from, new, date):
         if dry:
             load_one_dry(lims_sample)
         else:
-            load_one(current_app.adapter, lims_sample , lims=lims, new_only=new_only, date = date)
+            load_one(current_app.adapter, lims_sample , lims=lims, new_only=new, date = date)
 
 
 
