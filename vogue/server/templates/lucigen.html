@@ -25,6 +25,9 @@
         title: {
             text: "{{amount.title}}"
         },
+        subtitle: {
+            text: "With polynomial regression"
+        },
         xAxis: {
             title: { text: {{ amount.axis.x | tojson }}}},
         yAxis: {
@@ -32,29 +35,31 @@
         legend: {
             enabled: false
         },
+        tooltip: {
+        formatter: function () {
+            var output = ''
+            if (this.point.name ) {
+                output = output + 'Sample ID: <b>' + this.point.name +'</b> <br>'}
+            output = output + 'Concenration: <b>'+ this.y + '</b> <br> Amount: <b>'+ this.x + '</b>'
+            return output ;}
+        },
         plotOptions: {
-            scatter: {
-                dataLabels: {
-                    format: "{point.name}",
-                    enabled: true
-                },
-                enableMouseTracking: true
-            }
+            scatter:{marker: {
+                    enabled: true,
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }}
         },
         series: [{
             regression: true,
             regressionSettings: {
                 type: 'polynomial',
-                color: 'rgba(223, 183, 83, .9)',
                 dashStyle: 'dash'
             },
-            color: 'rgba(223, 83, 83, .5)',
             type: 'scatter',
-            data: {{ amount.data| tojson }},
-            marker: {
-            radius: 3
-        }
-    }]
+            data: {{ amount.data| tojson }}
+        }]
 });
 </script>
 
