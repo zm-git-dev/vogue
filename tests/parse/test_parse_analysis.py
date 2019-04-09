@@ -8,8 +8,8 @@ VALID_JSON = 'tests/fixtures/valid_multiqc.json'
 def test_validate_conf():
 
     # GIVEN a valid json file with some valid analysis keys
-    ## 1. read json file json_read
-    ## 2. validate input dict vid the analysis set models
+    # 1. read json file json_read
+    # 2. validate input dict vid the analysis set models
 
     analysis_conf = json_read(VALID_JSON)
 
