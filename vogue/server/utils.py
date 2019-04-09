@@ -133,7 +133,7 @@ def find_concentration_amount(adapter, year : int = None)-> dict:
     """Prepares data for a scatter plot showning Concentration agains Amount."""
 
     amount = {'axis' : {'x' : 'Amount (ng)', 'y' : 'Concentration (nM)'}, 
-                'data': [], 'title' : 'lucigen PCR-free'}
+                'data': [], 'title' : "Lucigen PCR-free, Library concentration vs Input amount"}
     pipe = [{'$match': {
                 'received_to_delivered': {'$exists': True}, 
                 'amount': {'$exists': True}, 

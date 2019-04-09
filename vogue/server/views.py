@@ -139,7 +139,7 @@ def lucigen(year):
         header = 'Lucigen PCR-free',
         page_id = 'lucigen',
         amount_concentration_time = amount_concentration_time['amount-concentration'],
-        plot_attributes = plot_attributes( title = 'Lucigen PCR-free', y_axis_label = 'Concentration (nM)'),
+        plot_attributes = plot_attributes( title = 'Lucigen PCR-free, Average Library concentration over time', y_axis_label = 'Concentration (nM)'),
         amount = concentration_amount,
         year_of_interest=year,
         years = YEARS)
