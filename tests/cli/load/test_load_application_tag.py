@@ -12,7 +12,7 @@ def test_application_tag(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
 
-    ## GIVEN a correct foramted input string
+    # GIVEN a correct foramted input string
     app_tags = '[{"tag":"MELPCFR030", "category":"wgs"}]'
     
     ## WHEN adding a application tags
@@ -26,7 +26,7 @@ def test_application_tag(database):
 def test_application_tag_wrong_input(database):
     app.db = database
 
-    ## GIVEN a badly foramted input string
+    # GIVEN a badly foramted input string
     app_tags = "[{'tag':'MELPCFR030', 'category':'wgs'}]}"
 
     ## WHEN adding a application tags

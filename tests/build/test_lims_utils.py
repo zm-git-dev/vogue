@@ -7,7 +7,7 @@ from vogue.build.lims_utils import (get_sequenced_date, get_number_of_days, get_
 
 
 def test_get_sequenced_date_no_udfs(lims_sample, lims):
-    ##GIVEN a sample without udfs
+    # GIVEN a sample without udfs
 
     udf = 'Passed Sequencing QC'
     assert not lims_sample.udf.get(udf)
@@ -22,7 +22,7 @@ def test_get_sequenced_date_no_udfs(lims_sample, lims):
 
 ############################# get_sequenced_date ############################
 def test_get_sequenced_date_no_artifacts(lims_sample, lims):
-    ##GIVEN a sample with udf: 'Passed Sequencing QC' and a lims without artifacts
+    # GIVEN a sample with udf: 'Passed Sequencing QC' and a lims without artifacts
     udf = 'Passed Sequencing QC'
     date = '18-12-31'
 
@@ -38,7 +38,7 @@ def test_get_sequenced_date_no_artifacts(lims_sample, lims):
     assert sequenced_date is None
 
 def test_get_sequenced_date_one_artifact(lims_sample, lims):
-    ##GIVEN a sample with udf: 'Passed Sequencing QC' and a lims with an artifact
+    # GIVEN a sample with udf: 'Passed Sequencing QC' and a lims with an artifact
     udf = 'Passed Sequencing QC'
     date = '2018-12-31'
 
@@ -59,7 +59,7 @@ def test_get_sequenced_date_one_artifact(lims_sample, lims):
 
 ############################# get_received_date ############################
 def test_get_received_date_no_artifacts(lims_sample, lims):
-    ##GIVEN a sample and a lims without artifacts
+    # GIVEN a sample and a lims without artifacts
     ##WHEN getting the received date
 
     received_date = get_received_date(lims_sample, lims)
@@ -69,7 +69,7 @@ def test_get_received_date_no_artifacts(lims_sample, lims):
 
 
 def test_get_received_date_one_artifact(lims_sample, lims):
-    ##GIVEN a lims with
+    # GIVEN a lims with
 
     process_type_name = 'CG002 - Reception Control'
     process_type = lims._add_process_type(name = process_type_name)
@@ -87,7 +87,7 @@ def test_get_received_date_one_artifact(lims_sample, lims):
 
 ############################# get_prepared_date ############################
 def test_get_prepared_date_no_artifacts(lims_sample, lims):
-    ##GIVEN a sample and lims without artifacts
+    # GIVEN a sample and lims without artifacts
 
     ##WHEN getting the prepared date
     prepared_date = get_prepared_date(lims_sample, lims)
@@ -96,7 +96,7 @@ def test_get_prepared_date_no_artifacts(lims_sample, lims):
     assert prepared_date is None
 
 def test_get_prepared_date_one_artifacts(lims_sample, lims):
-    ##GIVEN a sample and lims one artifacts
+    # GIVEN a sample and lims one artifacts
     date = '1818-01-01'
     process_type_name = 'CG002 - Aggregate QC (Library Validation)'
     process_type = lims._add_process_type(name = process_type_name)
@@ -111,7 +111,7 @@ def test_get_prepared_date_one_artifacts(lims_sample, lims):
 
 ############################# get_delivery_date ############################
 def test_get_delivery_date_no_artifacts(lims_sample, lims):
-    ##GIVEN a sample and lims without artifacts
+    # GIVEN a sample and lims without artifacts
 
     ##WHEN getting the delivery date
     delivery_date = get_delivery_date(lims_sample, lims)
@@ -121,7 +121,7 @@ def test_get_delivery_date_no_artifacts(lims_sample, lims):
 
 
 def test_get_delivery_date_one_artifact(lims_sample, lims):
-    ##GIVEN a sample and lims one artifacts
+    # GIVEN a sample and lims one artifacts
     process_type_name = 'CG002 - Delivery'
     process_type = lims._add_process_type(name = process_type_name)
     udf = 'Date delivered'
@@ -138,7 +138,7 @@ def test_get_delivery_date_one_artifact(lims_sample, lims):
 ############################# get_number_of_days ############################
 
 def test_get_number_of_days_no_date():
-    ##GIVEN a date that is None
+    # GIVEN a date that is None
     first_date = None
     second_date = dt.today()
 
@@ -150,7 +150,7 @@ def test_get_number_of_days_no_date():
 
 
 def test_get_number_of_days():
-    ##GIVEN two date time dates differing by two days
+    # GIVEN two date time dates differing by two days
     first_date = dt.strptime('2018-05-31', '%Y-%m-%d')
     second_date = dt.strptime('2018-06-02', '%Y-%m-%d')
 
@@ -163,7 +163,7 @@ def test_get_number_of_days():
 ############################# get_output_artifact ############################
 
 def test_get_latest_output_artifact_no_art(lims):
-    ##GIVEN a lims with no artifacts
+    # GIVEN a lims with no artifacts
 
     lims_id = 'Dummy'
     process_type = 'CG002 - Aggregate QC (Library Validation)'
@@ -176,7 +176,7 @@ def test_get_latest_output_artifact_no_art(lims):
 
 
 def test_get_latest_output_artifact(lims, lims_sample):
-    ##GIVEN a lims with artifacts A1,A2,A3 and processes P1, P2,P3 with relationships:
+    # GIVEN a lims with artifacts A1,A2,A3 and processes P1, P2,P3 with relationships:
     # P1 --> A1
     # P2 --> A2
     # P3 --> A3
@@ -204,7 +204,7 @@ def test_get_latest_output_artifact(lims, lims_sample):
 ############################# get_latest_input_artifact ############################
 
 def test_get_latest_input_artifact(lims):
-    ##GIVEN a lims with artifacts A1,A2,A3,A4,A5 and processes P1, P2,P3 with relationships:
+    # GIVEN a lims with artifacts A1,A2,A3,A4,A5 and processes P1, P2,P3 with relationships:
     # P1 --> A1
     # P2 --> A2
     # [A4, A5] --> P3 --> A3
@@ -242,7 +242,7 @@ def test_get_latest_input_artifact(lims):
 
 ############################# get_concentration_and_nr_defrosts ############################
 def test_get_concentration_and_nr_defrosts(lims, lims_sample):
-    ##GIVEN a lims with artifacts: A1, A2 and processes: P1, P2, P3, P4
+    # GIVEN a lims with artifacts: A1, A2 and processes: P1, P2, P3, P4
     # whith relationship: P1 --> A1 --> P4 --> A2
     # where A1 holds the concentration and P1, P2 and P3 holds the same lotnumber: '12345'
     # and where P2 and P3 were run before P1 (older date_run values)
@@ -280,7 +280,7 @@ def test_get_concentration_and_nr_defrosts(lims, lims_sample):
 ############################# get_final_conc_and_amount_dna ############################
 
 def test_get_final_conc_and_amount_dna(lims, lims_sample):
-    ##GIVEN a lims with artifacts: A1, A2, A3, and processes: P1 and P2
+    # GIVEN a lims with artifacts: A1, A2, A3, and processes: P1 and P2
     # whith relationship: A1 --> P1 --> A2 --> P2 --> A3
     # where A1 holds the amount udf and A2 holds the concentration
 
@@ -313,7 +313,7 @@ def test_get_final_conc_and_amount_dna(lims, lims_sample):
 ############################# get_microbial_library_concentration ############################
 
 def test_get_microbial_library_concentration(lims):
-    ##GIVEN a lims with artifacts A1,A2,A3,A4,A5 and processes P1, P2,P3 with relationships:
+    # GIVEN a lims with artifacts A1,A2,A3,A4,A5 and processes P1, P2,P3 with relationships:
     # P1 --> A1
     # P2 --> A2
     # [A4, A5] --> P3 --> A3
@@ -356,7 +356,7 @@ def test_get_microbial_library_concentration(lims):
 
 ############################# get_library_size_pre_hyb ############################
 def test_get_library_size_pre_hyb(lims, lims_sample):
-    ##GIVEN a l
+    # GIVEN a l
     application_tag = 'EXOjhkjhjk'
     lims_id = 'dummy'
     size_udf = 'Size (bp)'
@@ -383,7 +383,7 @@ def test_get_library_size_pre_hyb(lims, lims_sample):
 
 ############################# get_library_size_post_hyb ############################
 def test_get_library_size_post_hyb(lims, lims_sample):
-    ##GIVEN a l
+    # GIVEN a l
     application_tag = 'EXOjhkjhjk'
     lims_id = 'dummy'
     size_udf = 'Size (bp)'

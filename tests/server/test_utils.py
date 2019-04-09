@@ -13,7 +13,7 @@ def test_find_concentration_amount(database):
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     year = 2018
 
-    ## GIVEN a database  with a sample document:
+    # GIVEN a database  with a sample document:
     sample = {"_id":"ACC2692A1",
     "amount":322.5,
     "amount-concentration":11.5,
@@ -35,7 +35,7 @@ def test_find_concentration_defrosts(database):
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     year = 2018
 
-    ## GIVEN a database  with a sample document:
+    # GIVEN a database  with a sample document:
     sample = {"_id":"ACC2559A1",
     "nr_defrosts":2,
     "nr_defrosts-concentration":5.71,
@@ -65,7 +65,7 @@ def test_value_per_month(database):
     group_key = 'source'
 
 
-    ## GIVEN a database  with two sample documents:
+    # GIVEN a database  with two sample documents:
     sample = {"_id":"test1",
     "source":"blood",
     "library_size_post_hyb":333,

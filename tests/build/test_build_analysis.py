@@ -12,7 +12,7 @@ import pytest
 
 def test_build_analysis():
 
-    ## GIVEN a analysis dictionary valid_analysis_dict and analysis_type
+    # GIVEN a analysis dictionary valid_analysis_dict and analysis_type
     ## 1. read json file json_read
     ## 2. build an analysis mongo sample using build_analysis
 
@@ -37,7 +37,7 @@ def test_build_analysis():
 
 def test_build_analysis_invalid_key():
 
-    ## GIVEN a analysis dictionary invalid valid_analysis_dict and analysis_type
+    # GIVEN a analysis dictionary invalid valid_analysis_dict and analysis_type
     ## 1. read json file json_read
     ## 2. build an analysis mongo sample using build_analysis
 

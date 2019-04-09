@@ -3,7 +3,7 @@ from datetime import datetime as dt
 
 
 def test_build_run(lims):
-    ##GIVEN a run date, a instrument id and a lims_run with two lanes:
+    # GIVEN a run date, a instrument id and a lims_run with two lanes:
     L1 = lims._add_artifact()
     L2 = lims._add_artifact()
     lims_run = lims._add_process()
@@ -31,7 +31,7 @@ def test_build_run(lims):
 
 
 def test_build_run_no_data(lims):
-    ##GIVEN a run date, a instrument id and a lims_run with no lanes:
+    # GIVEN a run date, a instrument id and a lims_run with no lanes:
     lims_run = lims._add_process()
     lims_run.udf = {'Run ID':'190301_A00621_0010_AHHNTLDSXX'}
     date = '190301'
@@ -51,7 +51,7 @@ def test_build_run_no_data(lims):
 
 
 def test_build_run_no_instrument(lims):
-    ##GIVEN a run date, a instrument id and a lims_run with no lanes:
+    # GIVEN a run date, a instrument id and a lims_run with no lanes:
     lims_run = lims._add_process()
     lims_run.udf = {}
     date = '190301'

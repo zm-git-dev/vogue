@@ -3,7 +3,7 @@ from vogue.adapter.plugin import VougeAdapter
 
 
 def test_build_sample(lims_sample, lims, database):
-    ## GIVEN a lims sample with a valid application tag
+    # GIVEN a lims sample with a valid application tag
     #  and a database with application tags
     database.application_tag.update_one({'_id' : 'WGSPCFC030'}, {'$set' : {"category" : "wgs"}},
                                          upsert=True)
@@ -21,7 +21,7 @@ def test_build_sample(lims_sample, lims, database):
 
 
 def test_build_sample_no_apptag(lims_sample, lims, database):
-    ## GIVEN a lims sample with missing application tag
+    # GIVEN a lims sample with missing application tag
     #  and a database with application tags
     database.application_tag.update_one({'_id' : 'WGSPCFC030'}, {'$set' : {"category" : "wgs"}},
                                          upsert=True)
@@ -37,7 +37,7 @@ def test_build_sample_no_apptag(lims_sample, lims, database):
 
 
 def test_build_sample_wrong_apptag(lims_sample, lims, database):
-    ## GIVEN a lims sample with missing application tag
+    # GIVEN a lims sample with missing application tag
     #  and a database with application tags
     database.application_tag.update_one({'_id' : 'WGSPCFC030'}, {'$set' : {"category" : "wgs"}},
                                          upsert=True)
@@ -54,7 +54,7 @@ def test_build_sample_wrong_apptag(lims_sample, lims, database):
 
 
 def test_build_sample_family(family_sample, lims, database):
-    ## GIVEN a lims sample with a valid application tag
+    # GIVEN a lims sample with a valid application tag
     #  and a database with application tags and a family
     database.application_tag.update_one({'_id' : 'WGSPCFC030'},
                                          {'$set' : {"category" : "wgs"}},

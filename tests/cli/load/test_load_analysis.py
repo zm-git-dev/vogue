@@ -12,7 +12,7 @@ def test_analysis(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
 
-    ## GIVEN a correct formatted input file VALID_JSON
+    # GIVEN a correct formatted input file VALID_JSON
     sample_id = 'some_id'
 
     ## WHEN adding a new analysis
@@ -29,7 +29,7 @@ def test_analysis_no_file(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
 
-    ## GIVEN a invalid path to a json file
+    # GIVEN a invalid path to a json file
     sample_id = 'some_id'
     json_path = '/invalid_path_to_json/wrong.json'
 
@@ -46,7 +46,7 @@ def test_analysis_invalid_file(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
 
-    ## GIVEN a invalid path to a json file
+    # GIVEN a invalid path to a json file
     sample_id = 'some_id'
 
     ## WHEN adding a new analysis
