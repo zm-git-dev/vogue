@@ -23,12 +23,12 @@
 <script>
     Highcharts.chart('amount', {
         title: {
-            text: "{{amount.title}}"
+            text: "{{plot_amount_conc.title}}"
         },
         xAxis: {
-            title: { text: {{ amount.axis.x | tojson }}}},
+            title: { text: {{ plot_amount_conc.axis.x | tojson }}}},
         yAxis: {
-            title: { text: {{ amount.axis.y | tojson }}}},
+            title: { text: {{ plot_amount_conc.axis.y | tojson }}}},
         legend: {
             enabled: false
         },
@@ -70,10 +70,10 @@
 
     Highcharts.chart('amount_concentration_time', {
         chart: { type: 'spline' },
-        title: { text: '{{plot_attributes.title}}'},
+        title: { text: '{{plot_conc_time.title}}'},
         subtitle: { text: '' },
-        xAxis: { categories: {{ plot_attributes.labels| tojson }}},
-        yAxis: { title: { text: {{ plot_attributes.axis.y | tojson }}}},
+        xAxis: { categories: {{ plot_conc_time.labels| tojson }}},
+        yAxis: { title: { text: {{ plot_conc_time.axis.y | tojson }}}},
         legend: { enabled: false },
         tooltip: { crosshairs: true, shared: true },
         plotOptions: {
