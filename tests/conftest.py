@@ -208,3 +208,19 @@ def pymongo_client(request):
 def adapter(request, pymongo_client):	
     """Get a client to the mongo database"""	
     return VougeAdapter(pymongo_client, DATABASE)
+
+##########################################
+###### fixture files for input json ######
+##########################################
+
+@pytest.fixture
+def get_valid_json():
+    """Get file path to valid json"""
+    json_path='tests/fixtures/valid_multiqc.json'
+    return json_path
+
+@pytest.fixture
+def get_invalid_json():
+    """Get file path to invalid json"""
+    json_path='tests/fixtures/not_a_multiqc_report.json'
+    return json_path

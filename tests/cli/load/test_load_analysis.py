@@ -2,13 +2,10 @@ from vogue.server import create_app
 from vogue.commands.base import cli
 from vogue.adapter.plugin import VougeAdapter
 
-VALID_JSON = 'tests/fixtures/valid_multiqc.json'
-INVALID_JSON = 'tests/fixtures/not_a_multiqc_report.json'
-
 app = create_app(test=True)
 
 
-def test_analysis(database):
+def test_analysis(database, get_valid_json):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
 
@@ -19,7 +16,7 @@ def test_analysis(database):
     runner = app.test_cli_runner()
     result = runner.invoke(
         cli,
-        ['load', 'analysis', '-s', sample_id, '-a', VALID_JSON, '-t', 'QC'])
+        ['load', 'analysis', '-s', sample_id, '-a', get_valid_json, '-t', 'QC'])
 
     # THEN assert the new apptag should be added to the colleciton
     assert isinstance(app.adapter.analysis(sample_id), dict)
@@ -42,7 +39,7 @@ def test_analysis_no_file(database):
     assert result.exit_code == 1
 
 
-def test_analysis_invalid_file(database):
+def test_analysis_invalid_file(database, get_invalid_json):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
 
@@ -53,7 +50,7 @@ def test_analysis_invalid_file(database):
     runner = app.test_cli_runner()
     result = runner.invoke(
         cli,
-        ['load', 'analysis', '-s', sample_id, '-a', INVALID_JSON, '-t', 'QC'])
+        ['load', 'analysis', '-s', sample_id, '-a', get_invalid_json, '-t', 'QC'])
 
     # THEN assert  Can not load json.
     assert result.exit_code == 1
