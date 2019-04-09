@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'navigation.html' %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            {% include 'header_section.html' %}
+            <div class="row">
+                <div class="col-lg-12">
+                    <div id="q30"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+
+
+<script>
+    var series = []
+    {% for group in results['data'] %}
+        var data = []
+        {% for date, q30, run_id in results.data[group].data %}
+            // in this context january is 0, february 1,..., december 11 thereby date.month-1
+            data.push({'x': Date.UTC({{date.year}},{{date.month-1}},{{date.day}}), 'y': {{q30}},'name': {{run_id|tojson}}} )
+        {% endfor %}
+        series.push({
+            findNearestPointBy: 'xy',
+            name: "{{group}}",
+            data: data,
+            marker: { symbol: 'circle' } 
+            })
+    {% endfor %}
+
+    Highcharts.chart('q30', {
+        chart: {type: 'spline'},
+        title: {text: '{{results.title}}'},
+        xAxis: {type: 'datetime',
+                dateTimeLabelFormats: { 
+                    month: '%e. %b',
+                    year: '%b'}},
+        yAxis: {title: {text: {{ results.axis.y | tojson }} },
+                min: 0},
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+        tooltip: {
+        formatter: function () {
+            return 'Run ID: <b>' + this.point.name +'</b> <br> Q30: <b>'+ this.y + '</b>';
+        }
+    },
+        plotOptions: {
+            spline: {
+                marker: {
+                    enabled: true,
+                    radius: 2,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            }
+        },
+        series: series 
+});
+
+</script>
+{% endblock %}
+
