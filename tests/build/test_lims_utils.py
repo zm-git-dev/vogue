@@ -122,7 +122,7 @@ def test_get_delivery_date_no_artifacts(lims_sample, lims):
 
 def test_get_delivery_date_one_artifact(lims_sample, lims):
     ##GIVEN a sample and lims one artifacts
-    process_type_name = 'CG002 - Delivery'
+    process_type_name = 'Delivery v1'
     process_type = lims._add_process_type(name = process_type_name)
     udf = 'Date delivered'
     process = lims._add_process(date_str = '1818-01-01', process_type = process_type)
