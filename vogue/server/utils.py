@@ -201,3 +201,38 @@ def find_concentration_defrosts(adapter, year : int)-> dict:
         defrosts['data'][group]['nr_samples'].append([nr, result['count']])
             
     return defrosts
+
+
+def q30_instruments(adapter, year : int)-> dict:
+    """Prepares data for a plot Q30 values for diferent runs over time"""
+
+    instruments = {'axis' : {'y' : 'Average Q30'}, 
+                'data': {}, 'title' : 'Q30'}
+    pipe=[{
+        '$project': {
+            'year': {'$year': '$date'}, 
+            'instrument': 1, 
+            'date': 1, 
+            'avg': 1}
+        }, {
+        '$match': {'year': {'$eq': int(year)}}
+        }, {
+        '$group': {'_id': {'instrument': '$instrument'}, 
+                    'data': {'$push': {
+                    'Q30': '$avg.% Bases >=Q30', 
+                    'date': '$date', 
+                    'run_id': '$_id'}}}}]
+
+    aggregate_result = adapter.flowcells_aggregate(pipe)
+    for result in aggregate_result:
+        group = result['_id']['instrument'] 
+        data_tuples = [(d['date'], d['run_id'], d.get('Q30')) for d in result['data']]
+        data_sorted = sorted(data_tuples)
+        data = []
+        for date, run_id, Q30 in data_sorted:
+            if Q30:
+                data.append([date, Q30, run_id])
+        if data:
+            instruments['data'][group] = {'data':data}
+
+    return instruments
