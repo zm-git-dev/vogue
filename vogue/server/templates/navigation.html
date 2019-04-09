@@ -39,9 +39,7 @@
           Sequencing
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="{{ url_for('server.novaseq' , year=year_of_interest) }}">NovaSeq</a>
-          <a class="dropdown-item" href="{{ url_for('server.hiseqx' , year=year_of_interest) }}">Hiseq X</a>
-          <a class="dropdown-item" href="#">Hiseq 2500</a>
+          <a class="dropdown-item" href="{{ url_for('server.runs' , year=year_of_interest) }}">Instruments</a>
         </div>
       </li>
     </ul>
