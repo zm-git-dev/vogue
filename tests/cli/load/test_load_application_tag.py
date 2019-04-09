@@ -15,11 +15,11 @@ def test_application_tag(database):
     # GIVEN a correct foramted input string
     app_tags = '[{"tag":"MELPCFR030", "category":"wgs"}]'
     
-    ## WHEN adding a application tags
+    # WHEN adding a application tags
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'apptag', app_tags])
 
-    ## THEN assert the new apptag should be added to the colleciton
+    # THEN assert the new apptag should be added to the colleciton
     assert app.adapter.app_tag('MELPCFR030')['category'] == 'wgs'
 
 
@@ -29,9 +29,9 @@ def test_application_tag_wrong_input(database):
     # GIVEN a badly foramted input string
     app_tags = "[{'tag':'MELPCFR030', 'category':'wgs'}]}"
 
-    ## WHEN adding a application tags
+    # WHEN adding a application tags
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'apptag', app_tags])
 
-    ## THEN assert Badly formated json! Can not load json. Exiting. 
+    # THEN assert Badly formated json! Can not load json. Exiting. 
     assert result.exit_code == 1

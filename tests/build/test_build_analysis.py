@@ -21,16 +21,16 @@ def test_build_analysis():
     valid_analysis_names = ANALYSIS_SETS[analysis_type].keys()
     sample_id = 'test_sample'
 
-    ## WHEN building a mongo analysis document
+    # WHEN building a mongo analysis document
     mongo_sample_analysis = build_analysis(
         analysis_dict=valid_analysis_dict,
         analysis_type=analysis_type,
         valid_analysis=valid_analysis_names,
         sample_id=sample_id)
 
-    ## THEN assert the mongo_sample_analysis has key _id with value sample_id
+    # THEN assert the mongo_sample_analysis has key _id with value sample_id
     assert sample_id == mongo_sample_analysis.pop('_id')
-    ## THEN assert all keys in mongo_sample_analysis are valid
+    # THEN assert all keys in mongo_sample_analysis are valid
     assert set(mongo_sample_analysis.keys()).issubset(
         set(valid_analysis_names))
 
@@ -47,12 +47,12 @@ def test_build_analysis_invalid_key():
     sample_id = 'test_sample'
     valid_analysis_dict['invalid_key'] = 34
 
-    ## WHEN building a mongo analysis document
+    # WHEN building a mongo analysis document
     mongo_sample_analysis = build_analysis(
         analysis_dict=valid_analysis_dict,
         analysis_type=analysis_type,
         valid_analysis=valid_analysis_names,
         sample_id=sample_id)
 
-    ## THEN assert the mongo_sample_analysis doesnt have the invalid_key
+    # THEN assert the mongo_sample_analysis doesnt have the invalid_key
     assert 'invalid_key' not in mongo_sample_analysis.keys()

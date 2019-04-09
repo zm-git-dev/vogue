@@ -22,10 +22,10 @@ def test_find_concentration_amount(database):
 
     database.sample.insert_one(sample)
 
-    ## WHEN running find_concentration_amount
+    # WHEN running find_concentration_amount
     results = find_concentration_amount(app.adapter, year)
 
-    ## THEN assert the results should be equal to expected_result:
+    # THEN assert the results should be equal to expected_result:
     expected_result = [{'x': 200, 'y': 11.5, 'name': 'ACC2692A1'}]
     assert results['data'] == expected_result
 
@@ -45,10 +45,10 @@ def test_find_concentration_defrosts(database):
     database.sample.insert_one(sample)
 
 
-    ## WHEN running find_concentration_defrosts
+    # WHEN running find_concentration_defrosts
     results = find_concentration_defrosts(app.adapter, year)
 
-    ## THEN assert the results should be equal to expected_result:
+    # THEN assert the results should be equal to expected_result:
     expected_result = {'20124806': {'median': [[2, 5.71]], 
                                     'nr_samples': [[2, 1]], 
                                     'quartile': [[2, 5.71, 5.71]]}}
@@ -80,10 +80,10 @@ def test_value_per_month(database):
     database.sample.insert_one(sample)
 
 
-    ## WHEN running find_concentration_defrosts:
+    # WHEN running find_concentration_defrosts:
     results = value_per_month(app.adapter, year, y_vals, group_key)
 
-    ## THEN assert the results should be equal to expected_result:
+    # THEN assert the results should be equal to expected_result:
     expected_result = {
         'library_size_post_hyb': {
             'blood': {

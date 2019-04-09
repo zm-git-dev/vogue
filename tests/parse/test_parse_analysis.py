@@ -13,8 +13,8 @@ def test_validate_conf():
 
     analysis_conf = json_read(VALID_JSON)
 
-    ## WHEN extracting the valid keys from the json, using validate_conf
+    # WHEN extracting the valid keys from the json, using validate_conf
     valid_key_list = validate_conf(analysis_conf=analysis_conf)
 
-    ## THEN the output should be a list
+    # THEN the output should be a list
     assert isinstance(valid_key_list, list)

@@ -15,13 +15,13 @@ def test_analysis(database):
     # GIVEN a correct formatted input file VALID_JSON
     sample_id = 'some_id'
 
-    ## WHEN adding a new analysis
+    # WHEN adding a new analysis
     runner = app.test_cli_runner()
     result = runner.invoke(
         cli,
         ['load', 'analysis', '-s', sample_id, '-a', VALID_JSON, '-t', 'QC'])
 
-    ## THEN assert the new apptag should be added to the colleciton
+    # THEN assert the new apptag should be added to the colleciton
     assert isinstance(app.adapter.analysis(sample_id), dict)
 
 
@@ -33,12 +33,12 @@ def test_analysis_no_file(database):
     sample_id = 'some_id'
     json_path = '/invalid_path_to_json/wrong.json'
 
-    ## WHEN adding a new analysis
+    # WHEN adding a new analysis
     runner = app.test_cli_runner()
     result = runner.invoke(
         cli, ['load', 'analysis', '-s', sample_id, '-a', json_path, '-t', 'QC'])
 
-    ## THEN assert  Can not load json. Exiting.
+    # THEN assert  Can not load json. Exiting.
     assert result.exit_code == 1
 
 
@@ -49,11 +49,11 @@ def test_analysis_invalid_file(database):
     # GIVEN a invalid path to a json file
     sample_id = 'some_id'
 
-    ## WHEN adding a new analysis
+    # WHEN adding a new analysis
     runner = app.test_cli_runner()
     result = runner.invoke(
         cli,
         ['load', 'analysis', '-s', sample_id, '-a', INVALID_JSON, '-t', 'QC'])
 
-    ## THEN assert  Can not load json.
+    # THEN assert  Can not load json.
     assert result.exit_code == 1
