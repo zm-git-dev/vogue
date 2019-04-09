@@ -3,7 +3,7 @@ from datetime import datetime as dt
 
 
 def test_build_run(lims):
-    ##GIVEN a run date, a instrument id and a lims_run with two lanes:
+    # GIVEN a run date, a instrument id and a lims_run with two lanes:
     L1 = lims._add_artifact()
     L2 = lims._add_artifact()
     lims_run = lims._add_process()
@@ -16,10 +16,10 @@ def test_build_run(lims):
     date = '190301'
     instrument = 'A00621'
 
-    ##WHEN building the mongo_run:
+    # WHEN building the mongo_run:
     mongo_run = build_run(lims_run, instrument, date)
 
-    ##THEN assert lanes and avg was added. avg Q30== 86
+    # THEN assert lanes and avg was added. avg Q30== 86
     assert mongo_run ==  {
         '_id': '190301_A00621_0010_AHHNTLDSXX', 
         'instrument': 'A00621', 
@@ -31,16 +31,16 @@ def test_build_run(lims):
 
 
 def test_build_run_no_data(lims):
-    ##GIVEN a run date, a instrument id and a lims_run with no lanes:
+    # GIVEN a run date, a instrument id and a lims_run with no lanes:
     lims_run = lims._add_process()
     lims_run.udf = {'Run ID':'190301_A00621_0010_AHHNTLDSXX'}
     date = '190301'
     instrument = 'A00621'
 
-    ##WHEN building the mongo_run:
+    # WHEN building the mongo_run:
     mongo_run = build_run(lims_run, instrument, date)
 
-    ##THEN assert no lanes or avg were added to the mongo_run
+    # THEN assert no lanes or avg were added to the mongo_run
     assert mongo_run == {
         '_id': '190301_A00621_0010_AHHNTLDSXX', 
         'instrument': 'A00621', 
@@ -51,15 +51,15 @@ def test_build_run_no_data(lims):
 
 
 def test_build_run_no_instrument(lims):
-    ##GIVEN a run date, a instrument id and a lims_run with no lanes:
+    # GIVEN a run date, a instrument id and a lims_run with no lanes:
     lims_run = lims._add_process()
     lims_run.udf = {}
     date = '190301'
     instrument = None
 
-    ##WHEN building the mongo_run:
+    # WHEN building the mongo_run:
     mongo_run = build_run(lims_run, instrument, date)
 
-    ##THEN assert 
+    # THEN assert 
     assert mongo_run == {'date': dt(2019, 3, 1, 0, 0), 'avg': {}, 'lanes': {}}
 

@@ -13,7 +13,7 @@ def test_find_concentration_amount(database):
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     year = 2018
 
-    ## GIVEN a database  with a sample document:
+    # GIVEN a database  with a sample document:
     sample = {"_id":"ACC2692A1",
     "amount":322.5,
     "amount-concentration":11.5,
@@ -22,10 +22,10 @@ def test_find_concentration_amount(database):
 
     database.sample.insert_one(sample)
 
-    ## WHEN running find_concentration_amount
+    # WHEN running find_concentration_amount
     results = find_concentration_amount(app.adapter, year)
 
-    ## THEN assert the results should be equal to expected_result:
+    # THEN assert the results should be equal to expected_result:
     expected_result = [{'x': 200, 'y': 11.5, 'name': 'ACC2692A1'}]
     assert results['data'] == expected_result
 
@@ -35,7 +35,7 @@ def test_find_concentration_defrosts(database):
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     year = 2018
 
-    ## GIVEN a database  with a sample document:
+    # GIVEN a database  with a sample document:
     sample = {"_id":"ACC2559A1",
     "nr_defrosts":2,
     "nr_defrosts-concentration":5.71,
@@ -45,10 +45,10 @@ def test_find_concentration_defrosts(database):
     database.sample.insert_one(sample)
 
 
-    ## WHEN running find_concentration_defrosts
+    # WHEN running find_concentration_defrosts
     results = find_concentration_defrosts(app.adapter, year)
 
-    ## THEN assert the results should be equal to expected_result:
+    # THEN assert the results should be equal to expected_result:
     expected_result = {'20124806': {'median': [[2, 5.71]], 
                                     'nr_samples': [[2, 1]], 
                                     'quartile': [[2, 5.71, 5.71]]}}
@@ -65,7 +65,7 @@ def test_value_per_month(database):
     group_key = 'source'
 
 
-    ## GIVEN a database  with two sample documents:
+    # GIVEN a database  with two sample documents:
     sample = {"_id":"test1",
     "source":"blood",
     "library_size_post_hyb":333,
@@ -80,10 +80,10 @@ def test_value_per_month(database):
     database.sample.insert_one(sample)
 
 
-    ## WHEN running find_concentration_defrosts:
+    # WHEN running find_concentration_defrosts:
     results = value_per_month(app.adapter, year, y_vals, group_key)
 
-    ## THEN assert the results should be equal to expected_result:
+    # THEN assert the results should be equal to expected_result:
     expected_result = {
         'library_size_post_hyb': {
             'blood': {
