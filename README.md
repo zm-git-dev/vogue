@@ -20,11 +20,11 @@ All views in vogue should be self explanatory. There should be no further docume
 ## Back End
 The trending database is a Mongo database consisting of following collections:
 
-- sample - holds lims specific data on sample level. keys are lims sample ids
-- sample_analysis - holds data from diferent pipeliens on sample level. keys are lims sample ids
-- case_analysis - holds data from diferent pipeliens on case level. keys are ???
-- flowcell - holds lims specific data on run level. keys are flowcell ids
-- application_tag - holds application tag specific data. Keys are application tags.
+- **sample** - holds lims specific data on sample level. keys are lims sample ids
+- **sample_analysis** - holds data from diferent pipeliens on sample level. keys are lims sample ids
+- **case_analysis** - holds data from diferent pipeliens on case level. keys are ???
+- **flowcell** - holds lims specific data on run level. keys are flowcell ids
+- **application_tag** - holds application tag specific data. Keys are application tags.
 
 The load of each collection is described below.
 
