@@ -14,6 +14,20 @@ cd vogue
 pip install -e .
 ```
 
+## Front End
+All views in vogue should be self explanatory. There should be no further documentation needed to be able to be interpret the content of the web page.
+
+## Back End
+The trending database is a Mongo database. It contains the following collections:
+
+- sample - holds lims specific data on sample level. keys are lims sample ids
+- sample_analysis - holds data from diferent pipeliens on sample level. keys are lims sample ids
+- case_analysis - holds data from diferent pipeliens on case level. keys are ???
+- flowcell - holds lims specific data on run level. keys are flowcell ids
+- application_tag - holds application tag specific data. Keys are application tags.
+
+The load of each collection is described below.
+
 ## Command Line Interface
 The cli has two base commands - load and run. The load is for loading various data into the trending database, and the run is for running the web application.
 
@@ -88,4 +102,4 @@ Options:
   
 ### run
 
-## server
+
