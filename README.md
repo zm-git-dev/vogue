@@ -28,7 +28,7 @@ The trending database is a Mongo database. It contains the following collections
 
 The load of each collection is described below.
 
-## Command Line Interface
+## CLI
 The cli has two base commands - load and run. The load is for loading various data into the trending database, and the run is for running the web application.
 
 ### load sample
