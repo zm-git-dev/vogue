@@ -18,7 +18,7 @@ pip install -e .
 All views in vogue should be self explanatory. There should be no further documentation needed to be able to be interpret the content of the web page.
 
 ## Back End
-The trending database is a Mongo database. It contains the following collections:
+The trending database is a Mongo database consisting of following collections:
 
 - sample - holds lims specific data on sample level. keys are lims sample ids
 - sample_analysis - holds data from diferent pipeliens on sample level. keys are lims sample ids
