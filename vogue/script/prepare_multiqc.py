@@ -178,10 +178,15 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample):
         ]))
 
     if decompose:
+        LOG.info("Decompose mode enabled.")
         LOG.info("Found following modules in json: %s", multiqc_dict.keys())
         LOG.info("Only the following modules will be extracted: %s",
                  analysis_common_keys)
         LOG.info("Found following samples in valid modules: %s", samples_found)
+        if not sample:
+            LOG.error(
+                "Decompose mode needs list of samples. Choose one from above.")
+            raise click.Abort()
         if sample:
             LOG.info("Preparing output only for sample(s) %s", sample)
             multiqc_dict = extract_analysis(multiqc_dict=multiqc_dict,
