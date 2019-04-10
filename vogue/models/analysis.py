@@ -4,7 +4,7 @@ ANALYSIS_DESC = {
 
 ANALYSIS_SETS = {
     'QC': {
-        'multiqc_picard_dup':
+        'multiqc_picard_dups':
         'multiqc json/yaml report key for picard mark duplicate.',
         'multiqc_picard_HsMetrics':
         'multiqc json/yaml report key for picard collecthsmetrics.',
@@ -14,4 +14,3 @@ ANALYSIS_SETS = {
         'multiqc json/yaml report key for picard insert size metrics'
     }
 }
-

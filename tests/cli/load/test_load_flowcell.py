@@ -6,7 +6,7 @@ from vogue.constants.constants import RUN_TYPES, INSTRUMENTS
 app = create_app(test= True)
 
 def test_flowcell(database, lims):
-    ## GIVEN a app context with a mock lims with a process of correct type and udf 
+    # GIVEN a app context with a mock lims with a process of correct type and udf 
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     run_id = '190301_A00621_0010_AHHNTLDSXX'
@@ -15,38 +15,38 @@ def test_flowcell(database, lims):
     lims_run.udf = {'Run ID':run_id}
     app.lims = lims
 
-    ## WHEN adding a flowcell to the flowcell collection
+    # WHEN adding a flowcell to the flowcell collection
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'flowcell', '-r', run_id])
 
-    ## THEN a flowcell was created
+    # THEN a flowcell was created
     assert app.adapter.flowcell(run_id)['instrument'] == INSTRUMENTS['A00621']
 
 def test_flowcell_no_lims(database):
-    ## GIVEN a app context with no lims connection 
+    # GIVEN a app context with no lims connection 
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     app.lims = None
 
-    ## WHEN adding a flowcell tags
+    # WHEN adding a flowcell tags
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'flowcell', '-r', '190301_A00621_0010_AHHNTLDSXX'])
 
-    ## THEN abort
+    # THEN abort
     assert result.exit_code == 1
 
 
 def test_flowcell_wrong_id(database, lims):
-    ## GIVEN a app context with a lims connection 
+    # GIVEN a app context with a lims connection 
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     app.lims = lims
 
-    ## WHEN adding a flowcell with a Run ID that does not exist in lims
+    # WHEN adding a flowcell with a Run ID that does not exist in lims
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'flowcell', '-r', '190301_A00621_0010_AHHNTLDSXX'])
 
-    ## THEN abort
+    # THEN abort
     assert result.exit_code == 1
 
 
