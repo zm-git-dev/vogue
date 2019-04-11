@@ -10,9 +10,9 @@
 """
 import json
 import logging
+import os
 import click
 import coloredlogs
-import os
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
@@ -148,7 +148,8 @@ def write_json_per_sample(multiqc_dict, json_out_suffix, out_dir):
         Sample name to search within multiqc. This can be specified multiple times.
         This should be a exact match.
         """)
-def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample, directory):
+def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample,
+                    directory):
     """
     Reads an input json from mutliqc and decomposes into individual samples
     and divides by analysis type. Essentially it is reading: raw_data from
@@ -158,7 +159,7 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample, dir
 
     LOG.info("Running version %s", __version__)
     LOG.debug("Debug logging enabled.")
-    
+
     if decompose:
         LOG.debug("Output decompose is enabled.")
 
@@ -202,10 +203,11 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample, dir
             if not check_sample in samples_found:
                 LOG.warning("%s was not found in multiqc report", check_sample)
         if not valid_samples:
-            LOG.error("None of the samples were found in multiqc report.") 
+            LOG.error("None of the samples were found in multiqc report.")
             raise click.Abort()
         LOG.info("Decompose mode enabled.")
-        LOG.info("Only the following samples will be processed: %s", valid_samples)
+        LOG.info("Only the following samples will be processed: %s",
+                 valid_samples)
         LOG.info("Only the following modules will be extracted: %s",
                  analysis_common_keys)
         multiqc_dict = extract_analysis(multiqc_dict=multiqc_dict,
