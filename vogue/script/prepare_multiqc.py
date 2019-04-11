@@ -79,7 +79,7 @@ def extract_analysis(multiqc_dict, json_keys="all", samples=tuple()):
                     # If this particular sample is within this key (multiqc module)
                     if sample in multiqc_dict[key].keys():
                         LOG.debug("Found %s in %s analysis", sample, key)
-                        # Store valid key content (multiqc module) in sample key of output dict 
+                        # Store valid key content (multiqc module) in sample key of output dict
                         analysis[sample][key] = multiqc_dict[key][sample]
         else:
             for common_key in json_keys:
@@ -201,6 +201,7 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample,
         samples_found.extend(list(multiqc_dict[key].keys()))
     samples_found = list(set(samples_found))
 
+    # Find valid samples in input
     if sample:
         valid_samples = list()
         for check_sample in sample:
@@ -209,7 +210,6 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample,
 
     LOG.info("Found following samples in valid modules: %s", samples_found)
 
-    # Valid samples in input
     if decompose:
         for check_sample in sample:
             if not check_sample in samples_found:
