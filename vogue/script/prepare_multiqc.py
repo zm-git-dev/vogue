@@ -12,6 +12,7 @@ import json
 import logging
 import click
 import coloredlogs
+import os
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
@@ -83,19 +84,19 @@ def extract_analysis(multiqc_dict, json_keys="all", samples=tuple()):
     return analysis
 
 
-def write_json(multiqc_dict, json_out):
+def write_json(multiqc_dict, json_out, out_dir):
     """
     Input: a multiqc dictionary
     Output: output json filename
     """
     try:
-        with open(json_out, "w") as file_out:
+        with open(os.path.join(out_dir, json_out), "w") as file_out:
             json.dump(multiqc_dict, file_out, indent=4)
     except OSError:
         raise click.Abort("Write failed")
 
 
-def write_json_per_sample(multiqc_dict, json_out_suffix):
+def write_json_per_sample(multiqc_dict, json_out_suffix, out_dir):
     """
     Input: a multiqc dictionary with samples as first key
     Output: multiple output files with json_out_suffix.
@@ -103,6 +104,7 @@ def write_json_per_sample(multiqc_dict, json_out_suffix):
     try:
         for sample in multiqc_dict.keys():
             fname = sample + "." + json_out_suffix
+            fname = os.path.join(out_dir, fname)
             LOG.debug("Writing output file for %s: %s", sample, fname)
             with open(fname, "w") as file_out:
                 json.dump(multiqc_dict[sample], file_out, indent=4)
@@ -112,7 +114,7 @@ def write_json_per_sample(multiqc_dict, json_out_suffix):
 
 @click.command()
 @click.option('--log-level',
-              default='INFO',
+              default='DEBUG',
               type=click.Choice(LOG_LEVELS),
               help="Set the level of log output.",
               show_default=True)
@@ -130,6 +132,11 @@ def write_json_per_sample(multiqc_dict, json_out_suffix):
         %filename%.json will be considered as suffix.
         e.g. %samples%.%filename%.json.
         """)
+@click.option('-d',
+              '--directory',
+              default=os.getcwd(),
+              show_default=True,
+              help='Working directory for output file(s).')
 @click.option('--decompose/--no-decompose',
               default=True,
               show_default=True,
@@ -141,7 +148,7 @@ def write_json_per_sample(multiqc_dict, json_out_suffix):
         Sample name to search within multiqc. This can be specified multiple times.
         This should be a exact match.
         """)
-def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample):
+def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample, directory):
     """
     Reads an input json from mutliqc and decomposes into individual samples
     and divides by analysis type. Essentially it is reading: raw_data from
@@ -151,11 +158,19 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample):
 
     LOG.info("Running version %s", __version__)
     LOG.debug("Debug logging enabled.")
+    
+    if decompose:
+        LOG.debug("Output decompose is enabled.")
+
+    if decompose and not sample:
+        LOG.error(
+            "Decompose mode needs list of samples. Choose one from above.")
+        raise click.Abort()
+
     LOG.info("Reading input multiqc json files: %s", multiqc_json)
 
     multiqc_dict = read_multiqc(multiqc_json)
 
-    LOG.debug("Output decompose is enabled.")
     LOG.debug("Validating input json.")
 
     if validate_multiqc(multiqc_dict):
@@ -170,33 +185,37 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample):
     analysis_common_keys = [
         e for e in multiqc_dict.keys() if e in list(ANALYSIS_SETS.keys())
     ]
+    LOG.info("Found following modules in json: %s", analysis_common_keys)
 
+    # Match samples with multiqc report samples
     samples_found = list(
         set([
             s for key in analysis_common_keys
             for s in multiqc_dict[key].keys()
         ]))
+    LOG.info("Found following samples in valid modules: %s", samples_found)
 
+    # Valid samples in input
     if decompose:
+        valid_samples = [s for s in sample if s in samples_found]
+        for check_sample in sample:
+            if not check_sample in samples_found:
+                LOG.warning("%s was not found in multiqc report", check_sample)
+        if not valid_samples:
+            LOG.error("None of the samples were found in multiqc report.") 
+            raise click.Abort()
         LOG.info("Decompose mode enabled.")
-        LOG.info("Found following modules in json: %s", multiqc_dict.keys())
+        LOG.info("Only the following samples will be processed: %s", valid_samples)
         LOG.info("Only the following modules will be extracted: %s",
                  analysis_common_keys)
-        LOG.info("Found following samples in valid modules: %s", samples_found)
-        if not sample:
-            LOG.error(
-                "Decompose mode needs list of samples. Choose one from above.")
-            raise click.Abort()
-        if sample:
-            LOG.info("Preparing output only for sample(s) %s", sample)
-            multiqc_dict = extract_analysis(multiqc_dict=multiqc_dict,
-                                            json_keys=analysis_common_keys,
-                                            samples=sample)
-        write_json_per_sample(multiqc_dict, output_json)
+        multiqc_dict = extract_analysis(multiqc_dict=multiqc_dict,
+                                        json_keys=analysis_common_keys,
+                                        samples=valid_samples)
+        write_json_per_sample(multiqc_dict, output_json, directory)
 
     else:
         LOG.info("Writing output file: %s", output_json)
-        write_json(multiqc_dict, output_json)
+        write_json(multiqc_dict, output_json, directory)
 
 
 if __name__ == '__main__':
