@@ -68,13 +68,18 @@ def extract_analysis(multiqc_dict, json_keys="all", samples=tuple()):
     if json_keys == "all":
         analysis = multiqc_dict["report_saved_raw_data"]
     else:
+        # If any sample is provided:
         if samples:
+            # Looping through provided sampels:
             for sample in samples:
                 # Since this is for decompose, samples will be first keys.
                 analysis[sample] = dict()
+                # Loop through valid keys found
                 for key in json_keys:
+                    # If this particular sample is within this key (multiqc module)
                     if sample in multiqc_dict[key].keys():
                         LOG.debug("Found %s in %s analysis", sample, key)
+                        # Store valid key content (multiqc module) in sample key of output dict 
                         analysis[sample][key] = multiqc_dict[key][sample]
         else:
             for common_key in json_keys:
@@ -183,22 +188,29 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample,
         raise click.Abort()
 
     # Match multiqc_dict keys with the analysis_type of ANALYSIS_SETS
-    analysis_common_keys = [
-        e for e in multiqc_dict.keys() if e in list(ANALYSIS_SETS.keys())
-    ]
+    analysis_common_keys = list()
+    for key in multiqc_dict.keys():
+        if key in list(ANALYSIS_SETS.keys()):
+            analysis_common_keys.append(key)
+
     LOG.info("Found following modules in json: %s", analysis_common_keys)
 
-    # Match samples with multiqc report samples
-    samples_found = list(
-        set([
-            s for key in analysis_common_keys
-            for s in multiqc_dict[key].keys()
-        ]))
+    # Find samples within valid multiqc report samples
+    samples_found = list()
+    for key in analysis_common_keys:
+        samples_found.extend(list(multiqc_dict[key].keys()))
+    samples_found = list(set(samples_found))
+
+    if sample:
+        valid_samples = list()
+        for check_sample in sample:
+            if check_sample in samples_found:
+                valid_samples.append(check_sample)
+
     LOG.info("Found following samples in valid modules: %s", samples_found)
 
     # Valid samples in input
     if decompose:
-        valid_samples = [s for s in sample if s in samples_found]
         for check_sample in sample:
             if not check_sample in samples_found:
                 LOG.warning("%s was not found in multiqc report", check_sample)
