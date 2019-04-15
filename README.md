@@ -30,7 +30,7 @@ The load of each collection is described below.
 
 ## Data Flow
 <p align="center">
-		<img height="165" width="637" src="artwork/data_flow.png">
+		<img src="artwork/data_flow.png">
 </p>
 
 ## CLI
