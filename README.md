@@ -2,9 +2,6 @@
 
 Vogue is clinical genomics package for trending all kinds of data...
 
-## Prerequisites
-
-
 ## Installation
 
 
