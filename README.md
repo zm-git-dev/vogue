@@ -1,6 +1,6 @@
 # vogue (**version** = 0.2.0)
 
-Vogue is clinical genomics package for trending all kinds of data...
+Vogue is Clinical Genomics solution for capturing data from various places in the data flow and to trend the data over a longer period of time.
 
 ## Installation
 
@@ -12,18 +12,17 @@ pip install -e .
 ```
 
 ## Front End
-All views in vogue should be self explanatory. There should be no further documentation needed to be able to be interpret the content of the web page.
+All views in vogue should be self-explanatory. There should be no further documentation needed to be able to interpret the content of the web page.
 
 ## Back End
 The trending database is a Mongo database consisting of following collections:
 
-- **sample** - holds lims specific data on sample level. keys are lims sample ids
-- **sample_analysis** - holds data from diferent pipeliens on sample level. keys are lims sample ids
-- **case_analysis** - holds data from diferent pipeliens on case level. keys are ???
-- **flowcell** - holds lims specific data on run level. keys are flowcell ids
-- **application_tag** - holds application tag specific data. Keys are application tags.
+- **sample** - holds LIMS specific data on sample level. Anchoring identifier are LIMS sample ids.
+- **sample_analysis** - holds data from diferent pipeliens on sample level. Anchoring identifier are lims sample ids.
+- **flowcell** - holds lims specific data on run level. Anchoring identifier are flowcell ids.
+- **application_tag** - holds application tag specific data. Anchoring identifier are application tags.
 
-The load of each collection is described below.
+The load command of each collection is described below.
 
 ## Data Flow
 <p align="center">
@@ -31,37 +30,37 @@ The load of each collection is described below.
 </p>
 
 ## CLI
-The cli has two base commands - load and run. The load is for loading various data into the trending database, and the run is for running the web application.
+The CLI has two base commands - load and run. The load command is for loading various data into the trending database, and the run command is for running the web application.
 
-### load sample
+### Load sample
 ```
 Usage: vogue load sample [OPTIONS]
 
-  Read and load lims data for one ore all samples. When loading many
+  Read and load lims data for one or all samples. When loading many
   smaples, the different options -f, -n, -d are used to delimit the subset
   of samples to load.
 
 Options:
   -s, --sample-lims-id TEXT  Input sample lims id
-  -m, --many                 Loads all lims samples if no other options are
+  -m, --many                 Load all lims samples if no other options are
                              selected
   --dry                      Load from sample or not. (dry-run)
   -f, --load-from TEXT       load from this sample lims id. Use if load all
                              broke. Start where it ended
-  -n, --new                  Use this flagg if you only want to load samples
+  -n, --new                  Use this flag if you only want to load samples
                              that dont exist in the database
   -d, --date TEXT            Update only samples delivered after date
   --help                     Show this message and exit.
   ```
   
-  ### load analysis
+  ### Load analysis
   ```
   Usage: vogue load analysis [OPTIONS]
 
   Read and load analysis results. These are either QC or analysis output
   files.
 
-  The inputs are unique ID with an analysis config file (JSON/YAML) which
+  The input are unique IDs with an analysis config file (JSON/YAML) which
   includes analysis results matching the analysis model. Analysis types
   recognize the following keys in the input file: QC:multiqc_picard_dup,
   multiqc_picard_HsMetrics, multiqc_picard_AlignmentSummaryMetrics,
@@ -76,7 +75,7 @@ Options:
   --help                        Show this message and exit.
   ```
   
-  ### load flowcell
+  ### Load flowcell
   
   ```
   Usage: vogue load flowcell [OPTIONS]
@@ -84,13 +83,13 @@ Options:
   Read and load lims data for one or all runs
 
 Options:
-  -r, --run-id TEXT  Lims process id for the run. Eg: 24-100451
+  -r, --run-id TEXT  Flowcell id. Eg: 
   -a, --all-runs     Loads all lims flowcells ids
   --dry              Load from flowcell or not. (dry-run)
   --help             Show this message and exit.
   ```
   
-  ### load apptag
+  ### Load apptag
   
   ```
   Usage: vogue load apptag [OPTIONS] APPLICATION_TAGS
@@ -102,6 +101,6 @@ Options:
   --help  Show this message and exit.
   ```
   
-### run
+### Run
 
 
