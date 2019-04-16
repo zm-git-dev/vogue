@@ -84,7 +84,7 @@ Options:
 
 Options:
   -r, --run-id TEXT  Flowcell id. Eg: 190315_D00410_0873_BHWWKCBCX2
-  -a, --all-runs     Loads all lims flowcells ids
+  -a, --all-runs     Load all flowcells found in LIMS.
   --dry              Load from flowcell or not. (dry-run)
   --help             Show this message and exit.
   ```
