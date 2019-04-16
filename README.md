@@ -19,7 +19,7 @@ The trending database is a Mongo database consisting of following collections:
 
 - **sample** - holds LIMS specific data on sample level. Anchoring identifier are LIMS sample ids.
 - **sample_analysis** - holds data from diferent pipeliens on sample level. Anchoring identifier are lims sample ids.
-- **flowcell** - holds lims specific data on run level. Anchoring identifier are flowcell ids.
+- **flowcell** - holds LIMS specific data on run level. Anchoring identifier are flowcell ids.
 - **application_tag** - holds application tag specific data. Anchoring identifier are application tags.
 
 The load command of each collection is described below.
@@ -42,10 +42,10 @@ Usage: vogue load sample [OPTIONS]
 
 Options:
   -s, --sample-lims-id TEXT  Input sample lims id
-  -m, --many                 Load all lims samples if no other options are
+  -m, --many                 Load all LIMS samples if no other options are
                              selected
   --dry                      Load from sample or not. (dry-run)
-  -f, --load-from TEXT       load from this sample lims id. Use if load all
+  -f, --load-from TEXT       load from this sample LIMS id. Use if load all
                              broke. Start where it ended
   -n, --new                  Use this flag if you only want to load samples
                              that dont exist in the database
@@ -80,7 +80,7 @@ Options:
   ```
   Usage: vogue load flowcell [OPTIONS]
 
-  Read and load lims data for one or all runs
+  Read and load LIMS data for one or all runs
 
 Options:
   -r, --run-id TEXT  Flowcell id. Eg: 190315_D00410_0873_BHWWKCBCX2
