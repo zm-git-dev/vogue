@@ -28,7 +28,9 @@ def flowcell(run_id, all_runs, dry):
         load_all(current_app.adapter, lims=lims)
         return
 
-    runs = lims.get_processes(udf={'Run ID': run_id}, type=RUN_TYPES)
+    runs = []:
+    for run_type in RUN_TYPES:
+        runs = runs + lims.get_processes(udf={'Run ID': run_id}, type=run_type)
     if runs == []:
         LOG.warning("There is no run with this Run ID")
         raise click.Abort()
