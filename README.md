@@ -83,7 +83,7 @@ Options:
   Read and load lims data for one or all runs
 
 Options:
-  -r, --run-id TEXT  Flowcell id. Eg: 
+  -r, --run-id TEXT  Flowcell id. Eg: HF352BCX2
   -a, --all-runs     Loads all lims flowcells ids
   --dry              Load from flowcell or not. (dry-run)
   --help             Show this message and exit.
