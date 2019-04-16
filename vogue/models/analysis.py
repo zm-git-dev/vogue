@@ -1,5 +1,8 @@
 ANALYSIS_DESC = {
-    'QC': 'General quality control metrics for post- and pre-variant calling'
+    'QC':
+    'General quality control metrics for post- and pre-variant calling',
+    'microsalt':
+    'Results and quality control metrics output from microsalt workflow'
 }
 
 ANALYSIS_SETS = {
@@ -12,5 +15,17 @@ ANALYSIS_SETS = {
         'multiqc json/yaml report key for picard alignment summary metrics',
         'multiqc_picard_insertSize':
         'multiqc json/yaml report key for picard insert size metrics'
+    },
+    'microsalt': {
+        'blast_pubmlst':
+        'results for blasting for molecular typing and microbial genome diversity against pubmslt database',
+        'quast_assembly':
+        'results for quality assessment tool for genome assemblies (quast)',
+        'blast_resfinder_resistence':
+        'results blasting against the resistance database provided by resfinder db',
+        'picard_markduplicate':
+        'quality control and marking duplicate reads in bam/sam files',
+        'microsalt_samtools_stats':
+        'quality control to collect statistics from bam files'
     }
 }
