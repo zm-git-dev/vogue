@@ -2,6 +2,7 @@ import logging
 import click
 import yaml
 import json
+import collections
 
 from flask.cli import with_appcontext, current_app
 
@@ -19,8 +20,6 @@ LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
 
 
-
-
 @click.command("analysis", short_help="Read files from analysis workflows")
 @click.option('-s', '--sample-id', required=True, help='Input sample id')
 @click.option(
@@ -36,6 +35,20 @@ LOG = logging.getLogger(__name__)
     multiple=True,
     default=['all'],
     help='Type of analysis results to load.')
+@click.option(
+    '-c',
+    '--analysis-case',
+    required=True,
+    help='The case that this sample belongs to. It can be specified multiple times.')
+@click.option(
+    '-w',
+    '--analysis-workflow',
+    required=True,
+    help='Analysis workflow used.')
+@click.option(
+    '--workflow-version',
+    required=True,
+    help='Analysis workflow used.')
 @click.option('--dry', is_flag=True, help='Load from sample or not. (dry-run)')
 @doc(f"""
     Read and load analysis results. These are either QC or analysis output files.
@@ -44,7 +57,7 @@ LOG = logging.getLogger(__name__)
     analysis model. Analysis types recognize the following keys in the input file: {" ".join(concat_dict_keys(analysis_model.ANALYSIS_SETS,key_name=""))}
         """)
 @with_appcontext
-def analysis(sample_id, dry, analysis_config, analysis_type):
+def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case, analysis_workflow, workflow_version):
 
     LOG.info("Reading and validating config file.")
     try:
@@ -54,6 +67,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type):
 
     LOG.info("Trying JSON format")
     analysis_dict = json_read(analysis_config)
+
     if not isinstance(analysis_dict, dict):
         LOG.info("Trying YAML format")
         analysis_dict = yaml_read(analysis_config)
@@ -67,19 +81,12 @@ def analysis(sample_id, dry, analysis_config, analysis_type):
         LOG.error("Input config file is not valid.")
         click.Abort()
 
-    ready_analysis = dict()
-    if 'all' in analysis_type:
-        for my_analysis in analysis_model.ANALYSIS_DESC.keys():
-            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis,
-                                               valid_analysis, sample_id)
-            if tmp_analysis_dict:
-                ready_analysis = {**ready_analysis, **tmp_analysis_dict}
-    else:
-        for my_analysis in analysis_type:
-            tmp_analysis_dict = build_analysis(analysis_dict, my_analysis,
-                                               valid_analysis, sample_id)
-            if tmp_analysis_dict:
-                ready_analysis = {**ready_analysis, **tmp_analysis_dict}
+    analysis_dict['case'] = analysis_case
+    analysis_dict['workflow'] = analysis_workflow
+    analysis_dict['workflow_version'] = workflow_version
+
+    ready_analysis = build_analysis(analysis_dict=analysis_dict, analysis_type=analysis_type,
+            valid_analysis=valid_analysis, sample_id=sample_id)
 
     if ready_analysis:
         LOG.info(
