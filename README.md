@@ -37,25 +37,25 @@ The CLI has two base commands - load and run. The load command is for loading va
 Usage: vogue load sample [OPTIONS]
 
   Read and load lims data for one or all samples. When loading many
-  smaples, the different options -f, -n, -d are used to delimit the subset
+  samples, the different options -f, -n, -d are used to delimit the subset
   of samples to load.
 
 Options:
   -s, --sample-lims-id TEXT  Input sample lims id
   -m, --many                 Load all LIMS samples if no other options are
                              selected
-  --dry                      Load from sample or not. (dry-run)
+  --dry-run                  Load from sample or not. (dry-run)
   -f, --load-from TEXT       load from this sample LIMS id. Use if load all
                              broke. Start where it ended
   -n, --new                  Use this flag if you only want to load samples
-                             that dont exist in the database
+                             that do not exist in the database
   -d, --date TEXT            Update only samples delivered after date
   --help                     Show this message and exit.
   ```
   
-  ### Load analysis
-  ```
-  Usage: vogue load analysis [OPTIONS]
+### Load analysis
+```
+Usage: vogue load analysis [OPTIONS]
 
   Read and load analysis results. These are either QC or analysis output
   files.
@@ -64,7 +64,7 @@ Options:
   includes analysis results matching the analysis model. Analysis types
   recognize the following keys in the input file: QC:multiqc_picard_dup,
   multiqc_picard_HsMetrics, multiqc_picard_AlignmentSummaryMetrics,
-  multiqc_picard_insertSize
+  multiqc_picard_insertSize.
 
 Options:
   -s, --sample-id TEXT          Input sample id  [required]
@@ -75,10 +75,10 @@ Options:
   --help                        Show this message and exit.
   ```
   
-  ### Load flowcell
+### Load flowcell
   
-  ```
-  Usage: vogue load flowcell [OPTIONS]
+```
+Usage: vogue load flowcell [OPTIONS]
 
   Read and load LIMS data for one or all runs
 
@@ -89,10 +89,10 @@ Options:
   --help             Show this message and exit.
   ```
   
-  ### Load apptag
+### Load apptag
   
-  ```
-  Usage: vogue load apptag [OPTIONS] APPLICATION_TAGS
+```
+Usage: vogue load apptag [OPTIONS] APPLICATION_TAGS
 
   Reads json string with application tags. Eg:'[{"tag":"MELPCFR030",
   "category":"wgs",...},...]'
