@@ -73,13 +73,19 @@ def build_analysis(analysis_dict: dict, analysis_type: str,
     analysis_workflow = analysis_dict['workflow']
     workflow_version = analysis_dict['workflow_version']
 
+    workflow_data = list()
+    workflow_data.append({analysis_workflow: {'analysis': sample_analysis,'workflow_version': workflow_version}})
+    
+    cases_data = list()
+    cases_data.append({analysis_case: workflow_data})
+
     analysis = recursive_default_dict()
-    analysis['cases'][analysis_case]['workflows'][analysis_workflow][
-        'workflow_version'] = workflow_version
-    analysis['cases'][analysis_case]['workflows'][analysis_workflow][
-        'analysis'] = sample_analysis
+    analysis['cases'] = cases_data
+    #analysis['cases'][analysis_case]['workflows'] = list()
+    #analysis['cases'][analysis_case]['workflows'].append({analysis_workflow: {'analysis': sample_analysis,'workflow_version': workflow_version}})
     analysis = convert_defaultdict_to_regular_dict(analysis)
 
+    
     mongo_sample = copy.deepcopy(analysis)
     mongo_sample['_id'] = sample_id
 
