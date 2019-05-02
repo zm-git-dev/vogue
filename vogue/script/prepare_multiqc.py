@@ -146,6 +146,10 @@ def write_json_per_sample(multiqc_dict, json_out_suffix, out_dir):
               default=True,
               show_default=True,
               help='Decompose output for each sample.')
+@click.option('--regex-match/--no-regex-match',
+              default=False,
+              show_default=True,
+              help='Regex match sample name within multiqc.')
 @click.option('-s',
               '--sample',
               multiple=True,
@@ -154,7 +158,7 @@ def write_json_per_sample(multiqc_dict, json_out_suffix, out_dir):
         This should be a exact match.
         """)
 def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample,
-                    directory):
+                    directory, regex_match):
     """
     Reads an input json from mutliqc and decomposes into individual samples
     and divides by analysis type. Essentially it is reading: raw_data from
@@ -196,23 +200,36 @@ def prepare_multiqc(multiqc_json, log_level, output_json, decompose, sample,
     LOG.info("Found following modules in json: %s", analysis_common_keys)
 
     # Find samples within valid multiqc report samples
-    samples_found = list()
+    samples_in_multiqc = list()
     for key in analysis_common_keys:
-        samples_found.extend(list(multiqc_dict[key].keys()))
-    samples_found = list(set(samples_found))
+        samples_in_multiqc.extend(list(multiqc_dict[key].keys()))
+    samples_in_multiqc = list(set(samples_in_multiqc))
+    LOG.info("Found following samples in valid modules: %s",
+             samples_in_multiqc)
 
     # Find valid samples in input
     if sample:
         valid_samples = list()
-        for check_sample in sample:
-            if check_sample in samples_found:
-                valid_samples.append(check_sample)
-
-    LOG.info("Found following samples in valid modules: %s", samples_found)
+        if regex_match:
+            LOG.warning("Regex sample match is enabled.")
+            for check_sample in sample:
+                for sample_found in samples_in_multiqc:
+                    if sample_found.startswith(check_sample):
+                        LOG.debug(
+                            "Matched sample %s with %s in multiqc report",
+                            check_sample, sample_found)
+                        valid_samples.append(sample_found)
+        else:
+            LOG.info("Using exact match for sample names.")
+            for check_sample in sample:
+                if check_sample in samples_in_multiqc:
+                    valid_samples.append(check_sample)
+        LOG.info("Found the following valid samples in valid modules: %s",
+                 valid_samples)
 
     if decompose:
         for check_sample in sample:
-            if not check_sample in samples_found:
+            if check_sample not in samples_in_multiqc and not regex_match:
                 LOG.warning("%s was not found in multiqc report", check_sample)
         if not valid_samples:
             LOG.error("None of the samples were found in multiqc report.")
