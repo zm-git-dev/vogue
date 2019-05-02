@@ -9,7 +9,7 @@ from flask.cli import with_appcontext, current_app
 from vogue.tools.cli_utils import json_read
 from vogue.tools.cli_utils import yaml_read
 from vogue.tools.cli_utils import check_file
-from vogue.tools.cli_utils import concat_dict_keys 
+from vogue.tools.cli_utils import concat_dict_keys
 from vogue.build.analysis import build_analysis
 from vogue.tools.cli_utils import add_doc as doc
 from vogue.load.analysis import load_analysis
@@ -22,12 +22,11 @@ LOG = logging.getLogger(__name__)
 
 @click.command("analysis", short_help="Read files from analysis workflows")
 @click.option('-s', '--sample-id', required=True, help='Input sample id')
-@click.option(
-    '-a',
-    '--analysis-config',
-    type=click.Path(),
-    required=True,
-    help='Input config file. Accepted format: JSON, YAML')
+@click.option('-a',
+              '--analysis-config',
+              type=click.Path(),
+              required=True,
+              help='Input config file. Accepted format: JSON, YAML')
 @click.option(
     '-t',
     '--analysis-type',
@@ -39,16 +38,16 @@ LOG = logging.getLogger(__name__)
     '-c',
     '--analysis-case',
     required=True,
-    help='The case that this sample belongs to. It can be specified multiple times.')
-@click.option(
-    '-w',
-    '--analysis-workflow',
-    required=True,
-    help='Analysis workflow used.')
-@click.option(
-    '--workflow-version',
-    required=True,
-    help='Analysis workflow used.')
+    help=
+    'The case that this sample belongs to. It can be specified multiple times.'
+)
+@click.option('-w',
+              '--analysis-workflow',
+              required=True,
+              help='Analysis workflow used.')
+@click.option('--workflow-version',
+              required=True,
+              help='Analysis workflow used.')
 @click.option('--dry', is_flag=True, help='Load from sample or not. (dry-run)')
 @doc(f"""
     Read and load analysis results. These are either QC or analysis output files.
@@ -57,7 +56,8 @@ LOG = logging.getLogger(__name__)
     analysis model. Analysis types recognize the following keys in the input file: {" ".join(concat_dict_keys(analysis_model.ANALYSIS_SETS,key_name=""))}
         """)
 @with_appcontext
-def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case, analysis_workflow, workflow_version):
+def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
+             analysis_workflow, workflow_version):
 
     LOG.info("Reading and validating config file.")
     try:
@@ -85,8 +85,10 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case, anal
     analysis_dict['workflow'] = analysis_workflow
     analysis_dict['workflow_version'] = workflow_version
 
-    ready_analysis = build_analysis(analysis_dict=analysis_dict, analysis_type=analysis_type,
-            valid_analysis=valid_analysis, sample_id=sample_id)
+    ready_analysis = build_analysis(analysis_dict=analysis_dict,
+                                    analysis_type=analysis_type,
+                                    valid_analysis=valid_analysis,
+                                    sample_id=sample_id)
 
     if ready_analysis:
         LOG.info(
@@ -97,4 +99,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case, anal
             f'No enteries were found for the given analysis type: {analysis_type}'
         )
 
-    load_analysis(adapter=current_app.adapter, lims_id = sample_id, dry_run=dry, analysis=ready_analysis)
+    load_analysis(adapter=current_app.adapter,
+                  lims_id=sample_id,
+                  dry_run=dry,
+                  analysis=ready_analysis)
