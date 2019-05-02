@@ -86,18 +86,18 @@ class VougeAdapter(MongoAdapter):
     def add_or_update_analysis(self, analysis_result: dict):
         """Functionality to add or update analysis sample"""
         lims_id = analysis_result['_id']
-        update_result = self.db.analysis_sample.update_one({'_id' : lims_id}, {'$set': analysis_result}, upsert=True)
+        # pop _id key to make pushing easier
+        analysis_result.pop('_id')
+        update_result = self.db.analysis_sample.find_one({'_id': lims_id})
 
-        if not update_result.raw_result['updatedExisting']:
+        if update_result is None:
             self.db.analysis_sample.update_one({'_id' : lims_id}, 
-                    {'$set': {'added': dt.today()}})
+                    {'$set': {**analysis_result, **{'added': dt.today()}}},  upsert=True)
             LOG.info("Added analysis sample %s.", lims_id)
-        elif update_result.modified_count:
-            self.db.analysis_sample.update_one({'_id' : lims_id}, 
-                    {'$set': {'updated': dt.today()}})
-            LOG.info("Updated analysis for sample %s.", lims_id)
         else:
-            LOG.info("No analysis updates for sample %s.", lims_id)
+            self.db.analysis_sample.update_one({'_id' : lims_id}, 
+                    {'$push': analysis_result, '$set': {'updated': dt.today()}}, upsert=True)
+            LOG.info("Updated analysis for sample %s.", lims_id)
 
     def analysis(self, analysis_id: str):
         """Functionality to get analyses results"""
