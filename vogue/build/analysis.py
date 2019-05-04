@@ -140,10 +140,6 @@ def build_analysis(analysis_dict: dict, analysis_type: str,
     analysis_workflow = analysis_dict['workflow']
     workflow_version = analysis_dict['workflow_version']
 
-    analysis['cases'][analysis_case][analysis_workflow] = list()
-    analysis['cases'][analysis_case]['workflows'] = list()
-    analysis['cases']['case_names'] = list()
-
     if current_analysis is None:
         # if there is no current analysis, return the built analysis
         mongo_sample = copy.deepcopy(analysis)
