@@ -7,6 +7,7 @@ import vogue.models.analysis as analysis_model
 
 LOG = logging.getLogger(__name__)
 
+
 def recursive_default_dict():
     '''
     Recursivly create defaultdict.
@@ -49,7 +50,8 @@ def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
     return analysis
 
 
-def build_single_sample(analysis_dict: dict, analysis_type: str, valid_analysis: list):
+def build_single_sample(analysis_dict: dict, analysis_type: str,
+                        valid_analysis: list):
     '''
     Builds an analysis dict from input information provided by user.
     '''
@@ -69,6 +71,7 @@ def build_single_sample(analysis_dict: dict, analysis_type: str, valid_analysis:
                                                  valid_analysis=valid_analysis)
     return sample_analysis
 
+
 def build_mongo_sample(analysis_dict: dict, sample_analysis: dict):
     '''
     Builds a mongo sample from processed analysis dictionary
@@ -82,8 +85,14 @@ def build_mongo_sample(analysis_dict: dict, sample_analysis: dict):
     analysis['cases'][analysis_case][analysis_workflow] = list()
     analysis['cases'][analysis_case]['workflows'] = list()
     analysis['cases']['case_names'] = list()
-    
-    workflow_data = {**sample_analysis, **{'workflow_version': workflow_version, 'added': dt.today()}}
+
+    workflow_data = {
+        **sample_analysis,
+        **{
+            'workflow_version': workflow_version,
+            'added': dt.today()
+        }
+    }
     analysis['cases'][analysis_case][analysis_workflow].append(workflow_data)
     analysis['cases'][analysis_case]['workflows'].append(analysis_workflow)
     analysis['cases']['case_names'].append(analysis_case)
@@ -92,7 +101,9 @@ def build_mongo_sample(analysis_dict: dict, sample_analysis: dict):
 
     return analysis
 
-def update_mongo_sample(mongo_sample: dict, analysis_dict: dict, new_analysis: dict):
+
+def update_mongo_sample(mongo_sample: dict, analysis_dict: dict,
+                        new_analysis: dict):
     '''
     Updates an existing mongo sample dictionary with new analysis dictionary
     Rational on updating an analysis document 
@@ -108,21 +119,31 @@ def update_mongo_sample(mongo_sample: dict, analysis_dict: dict, new_analysis: d
     analysis_workflow = analysis_dict['workflow']
     workflow_version = analysis_dict['workflow_version']
 
-    if analysis_case in mongo_sample['cases']['case_names'] and analysis_workflow in mongo_sample['cases'][analysis_case]['workflows']:
+    if analysis_case in mongo_sample['cases'][
+            'case_names'] and analysis_workflow in mongo_sample['cases'][
+                analysis_case]['workflows']:
         # 1.a. case exists and workflow exists
-        mongo_sample['cases'][analysis_case][analysis_workflow].extend(new_analysis['cases'][analysis_case][analysis_workflow])
-    elif analysis_case in mongo_sample['cases']['case_names'] and analysis_workflow not in mongo_sample['cases'][analysis_case]['workflows']:
+        mongo_sample['cases'][analysis_case][analysis_workflow].extend(
+            new_analysis['cases'][analysis_case][analysis_workflow])
+    elif analysis_case in mongo_sample['cases'][
+            'case_names'] and analysis_workflow not in mongo_sample['cases'][
+                analysis_case]['workflows']:
         # 1.b case exists but workflow doesn't
-        mongo_sample['cases'][analysis_case]['workflows'].append(analysis_workflow)
-        mongo_sample['cases'][analysis_case][analysis_workflow] = new_analysis['cases'][analysis_case][analysis_workflow]
+        mongo_sample['cases'][analysis_case]['workflows'].append(
+            analysis_workflow)
+        mongo_sample['cases'][analysis_case][analysis_workflow] = new_analysis[
+            'cases'][analysis_case][analysis_workflow]
     else:
         # 2. case doesn't exists, and naturally there won't be any workflows
         mongo_sample['cases'][analysis_case] = recursive_default_dict()
-        mongo_sample['cases'][analysis_case]['workflows'] = new_analysis['cases'][analysis_case]['workflows'] 
-        mongo_sample['cases'][analysis_case][analysis_workflow] = new_analysis['cases'][analysis_case][analysis_workflow]
+        mongo_sample['cases'][analysis_case]['workflows'] = new_analysis[
+            'cases'][analysis_case]['workflows']
+        mongo_sample['cases'][analysis_case][analysis_workflow] = new_analysis[
+            'cases'][analysis_case][analysis_workflow]
         mongo_sample = convert_defaultdict_to_regular_dict(mongo_sample)
 
     return mongo_sample
+
 
 def build_analysis(analysis_dict: dict, analysis_type: str,
                    valid_analysis: list, sample_id: str,
@@ -131,10 +152,12 @@ def build_analysis(analysis_dict: dict, analysis_type: str,
     Builds analysis dictionary based on input analysis_dict and prepares a mongo_sample.
     '''
 
-    sample_analysis = build_single_sample(analysis_dict=analysis_dict, analysis_type=analysis_type,
-            valid_analysis=valid_analysis)
+    sample_analysis = build_single_sample(analysis_dict=analysis_dict,
+                                          analysis_type=analysis_type,
+                                          valid_analysis=valid_analysis)
 
-    analysis = build_mongo_sample(analysis_dict=analysis_dict, sample_analysis=sample_analysis)
+    analysis = build_mongo_sample(analysis_dict=analysis_dict,
+                                  sample_analysis=sample_analysis)
 
     analysis_case = analysis_dict['case']
     analysis_workflow = analysis_dict['workflow']
@@ -152,8 +175,9 @@ def build_analysis(analysis_dict: dict, analysis_type: str,
         mongo_sample.pop('added')
         if 'updated' in mongo_sample.keys():
             mongo_sample.pop('updated')
-    
-        mongo_sample = update_mongo_sample(mongo_sample=mongo_sample, analysis_dict=analysis_dict,
-                new_analysis=analysis)
+
+        mongo_sample = update_mongo_sample(mongo_sample=mongo_sample,
+                                           analysis_dict=analysis_dict,
+                                           new_analysis=analysis)
 
     return mongo_sample

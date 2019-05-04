@@ -1,8 +1,5 @@
 import logging
 import click
-import yaml
-import json
-import collections
 
 from flask.cli import with_appcontext, current_app
 
@@ -60,7 +57,7 @@ LOG = logging.getLogger(__name__)
 def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
              analysis_workflow, workflow_version):
 
-    analysis_dict=dict()
+    analysis_dict = dict()
     # Loop over list of input config files for single sample and merge them into
     # one single dictionary
     for input_config in analysis_config:
@@ -68,7 +65,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
         LOG.info("Reading and validating config file: %s", input_config)
         try:
             check_file(input_config)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             click.Abort()
 
         LOG.info("Trying JSON format")
@@ -78,7 +75,8 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
             LOG.info("Trying YAML format")
             tmp_analysis_dict = yaml_read(input_config)
             if not isinstance(tmp_analysis_dict, dict):
-                LOG.error("Cannot read input analysis config file. Type unknown.")
+                LOG.error(
+                    "Cannot read input analysis config file. Type unknown.")
                 click.Abort()
 
         analysis_dict = {**analysis_dict, **tmp_analysis_dict}
@@ -104,13 +102,12 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
 
     if ready_analysis:
         LOG.info(
-            f'Values for {list(ready_analysis.keys())} loaded for sample {sample_id}'
+            'Values for %s  loaded for sample %s', list(ready_analysis.keys()), sample_id
         )
     else:
         LOG.warning(
-            f'No enteries were found for the given analysis type: {analysis_type}'
+            'No enteries were found for the given analysis type: %s', analysis_type
         )
-
 
     load_analysis(adapter=current_app.adapter,
                   lims_id=sample_id,
