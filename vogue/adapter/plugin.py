@@ -88,7 +88,7 @@ class VougeAdapter(MongoAdapter):
         lims_id = analysis_result['_id']
         # pop _id key to make pushing easier
         analysis_result.pop('_id')
-        update_result = self.db.analysis_sample.find_one({'_id': lims_id})
+        update_result = self.db.sample_analysis.find_one({'_id': lims_id})
 
         if update_result is None:
             self.db.sample_analysis.update_one({'_id' : lims_id}, 
