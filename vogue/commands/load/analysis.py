@@ -25,6 +25,7 @@ LOG = logging.getLogger(__name__)
 @click.option('-a',
               '--analysis-config',
               type=click.Path(),
+              multiple=True,
               required=True,
               help='Input config file. Accepted format: JSON, YAML')
 @click.option(
@@ -59,36 +60,47 @@ LOG = logging.getLogger(__name__)
 def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
              analysis_workflow, workflow_version):
 
-    LOG.info("Reading and validating config file.")
-    try:
-        check_file(analysis_config)
-    except FileNotFoundError as e:
-        click.Abort()
+    analysis_dict=dict()
+    # Loop over list of input config files for single sample and merge them into
+    # one single dictionary
+    for input_config in analysis_config:
 
-    LOG.info("Trying JSON format")
-    analysis_dict = json_read(analysis_config)
-
-    if not isinstance(analysis_dict, dict):
-        LOG.info("Trying YAML format")
-        analysis_dict = yaml_read(analysis_config)
-        if not isinstance(analysis_dict, dict):
-            LOG.error("Cannot read input analysis config file. Type unknown.")
+        LOG.info("Reading and validating config file: %s", input_config)
+        try:
+            check_file(input_config)
+        except FileNotFoundError as e:
             click.Abort()
 
-    LOG.info("Validating config file")
+        LOG.info("Trying JSON format")
+        tmp_analysis_dict = json_read(input_config)
+
+        if not isinstance(analysis_dict, dict):
+            LOG.info("Trying YAML format")
+            tmp_analysis_dict = yaml_read(input_config)
+            if not isinstance(tmp_analysis_dict, dict):
+                LOG.error("Cannot read input analysis config file. Type unknown.")
+                click.Abort()
+
+        analysis_dict = {**analysis_dict, **tmp_analysis_dict}
+
+    LOG.info("Validating parsed config file(s).")
     valid_analysis = validate_conf(analysis_dict)
     if valid_analysis is None:
-        LOG.error("Input config file is not valid.")
+        LOG.error("Invalid or badly formatted file(s).")
         click.Abort()
 
     analysis_dict['case'] = analysis_case
     analysis_dict['workflow'] = analysis_workflow
     analysis_dict['workflow_version'] = workflow_version
 
+    # Get current sample if any
+    current_analysis = current_app.adapter.analysis(sample_id)
+
     ready_analysis = build_analysis(analysis_dict=analysis_dict,
                                     analysis_type=analysis_type,
                                     valid_analysis=valid_analysis,
-                                    sample_id=sample_id)
+                                    sample_id=sample_id,
+                                    current_analysis=current_analysis)
 
     if ready_analysis:
         LOG.info(
@@ -98,6 +110,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
         LOG.warning(
             f'No enteries were found for the given analysis type: {analysis_type}'
         )
+
 
     load_analysis(adapter=current_app.adapter,
                   lims_id=sample_id,
