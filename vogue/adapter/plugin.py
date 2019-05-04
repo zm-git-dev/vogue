@@ -91,7 +91,7 @@ class VougeAdapter(MongoAdapter):
         update_result = self.db.analysis_sample.find_one({'_id': lims_id})
 
         if update_result is None:
-            self.db.analysis_sample.update_one({'_id' : lims_id}, 
+            self.db.sample_analysis.update_one({'_id' : lims_id}, 
                     {'$set': {**analysis_result, **{'added': dt.today()}}}, upsert=True)
             LOG.info("Added analysis sample %s.", lims_id)
         else:
