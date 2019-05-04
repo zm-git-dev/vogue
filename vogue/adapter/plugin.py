@@ -15,7 +15,7 @@ class VougeAdapter(MongoAdapter):
         self.db = self.client[db_name]
         self.db_name = db_name
         self.sample_collection = self.db.sample
-        self.analysis_collection_sample = self.db.analysis_sample
+        self.sample_analysis_collection = self.db.sample_analysis
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
         
