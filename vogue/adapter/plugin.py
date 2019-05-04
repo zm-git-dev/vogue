@@ -92,11 +92,11 @@ class VougeAdapter(MongoAdapter):
 
         if update_result is None:
             self.db.analysis_sample.update_one({'_id' : lims_id}, 
-                    {'$set': {**analysis_result, **{'added': dt.today()}}},  upsert=True)
+                    {'$set': {**analysis_result, **{'added': dt.today()}}}, upsert=True)
             LOG.info("Added analysis sample %s.", lims_id)
         else:
             self.db.analysis_sample.update_one({'_id' : lims_id}, 
-                    {'$push': analysis_result, '$set': {'updated': dt.today()}}, upsert=True)
+                    {'$set': {**analysis_result, **{'updated': dt.today()}}}, upsert=True)
             LOG.info("Updated analysis for sample %s.", lims_id)
 
     def analysis(self, analysis_id: str):
