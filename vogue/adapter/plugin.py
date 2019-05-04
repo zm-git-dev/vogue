@@ -101,7 +101,7 @@ class VougeAdapter(MongoAdapter):
 
     def analysis(self, analysis_id: str):
         """Functionality to get analyses results"""
-        return self.analysis_collection_sample.find_one({'_id':analysis_id})
+        return self.sample_analysis_collection.find_one({'_id':analysis_id})
         
     def find_samples(self, query:dict)-> list:
         """Function to find samples in samples collection based on query"""
