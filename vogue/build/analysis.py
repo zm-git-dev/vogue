@@ -140,6 +140,7 @@ def update_mongo_sample(mongo_sample: dict, analysis_dict: dict,
             'cases'][analysis_case]['workflows']
         mongo_sample['cases'][analysis_case][analysis_workflow] = new_analysis[
             'cases'][analysis_case][analysis_workflow]
+        mongo_sample['case_names'].append(analysis_case)
         mongo_sample = convert_defaultdict_to_regular_dict(mongo_sample)
 
     return mongo_sample
