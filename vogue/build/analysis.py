@@ -84,7 +84,7 @@ def build_mongo_sample(analysis_dict: dict, sample_analysis: dict):
 
     analysis['cases'][analysis_case][analysis_workflow] = list()
     analysis['cases'][analysis_case]['workflows'] = list()
-    analysis['cases']['case_names'] = list()
+    analysis['case_names'] = list()
 
     workflow_data = {
         **sample_analysis,
@@ -95,7 +95,7 @@ def build_mongo_sample(analysis_dict: dict, sample_analysis: dict):
     }
     analysis['cases'][analysis_case][analysis_workflow].append(workflow_data)
     analysis['cases'][analysis_case]['workflows'].append(analysis_workflow)
-    analysis['cases']['case_names'].append(analysis_case)
+    analysis['case_names'].append(analysis_case)
 
     analysis = convert_defaultdict_to_regular_dict(analysis)
 
@@ -119,13 +119,13 @@ def update_mongo_sample(mongo_sample: dict, analysis_dict: dict,
     analysis_workflow = analysis_dict['workflow']
     workflow_version = analysis_dict['workflow_version']
 
-    if analysis_case in mongo_sample['cases'][
+    if analysis_case in mongo_sample[
             'case_names'] and analysis_workflow in mongo_sample['cases'][
                 analysis_case]['workflows']:
         # 1.a. case exists and workflow exists
         mongo_sample['cases'][analysis_case][analysis_workflow].extend(
             new_analysis['cases'][analysis_case][analysis_workflow])
-    elif analysis_case in mongo_sample['cases'][
+    elif analysis_case in mongo_sample[
             'case_names'] and analysis_workflow not in mongo_sample['cases'][
                 analysis_case]['workflows']:
         # 1.b case exists but workflow doesn't
