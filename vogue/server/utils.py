@@ -201,7 +201,6 @@ def find_concentration_defrosts(adapter, year : int)-> dict:
             
     return defrosts
 
-
 def q30_instruments(adapter, year : int)-> dict:
     """Prepares data for a plot Q30 values for diferent runs over time"""
 
@@ -235,3 +234,30 @@ def q30_instruments(adapter, year : int)-> dict:
             instruments['data'][group] = {'data':data}
 
     return instruments
+
+def insert_size(adapter, year : int)-> dict:
+    """Prepares data for the MIP insert sizs plot."""
+
+    pipe=[{
+        '$lookup': {
+            'from': 'sample_analysis', 
+            'localField': '_id', 
+            'foreignField': '_id', 
+            'as': 'analysis'}
+        }, {
+        '$match': {
+            'analysis': {
+                '$ne': []
+            }}
+        }, {
+        '$project': {
+            'library_size_pre_hyb': 1, 
+            'cases': '$analysis.cases'
+        }}]
+    
+    
+    aggregate_result = adapter.samples_aggregate(pipe)
+    for result in aggregate_result:
+        print(result)
+        
+

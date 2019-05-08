@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+
 from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
 from vogue.constants.constants import YEARS, THIS_YEAR
-from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, value_per_month, plot_attributes, q30_instruments)
+from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, value_per_month, plot_attributes, q30_instruments, insert_size)
 
 app = current_app
 blueprint = Blueprint('server', __name__)
@@ -154,6 +156,33 @@ def runs(year):
         header = 'Sequencing Instruments',
         page_id = 'runs',
         results = aggregate_result,
+        year_of_interest=year,
+        years = YEARS)
+
+@blueprint.route('/sequencing/mip/<year>')
+def mip(year):
+    results = insert_size(app.adapter, year)
+
+    return render_template('mip.html',
+        header = 'MIP',
+        page_id = 'mip',
+        year_of_interest=year,
+        years = YEARS)
+
+@blueprint.route('/sequencing/balsamic/<year>')
+def balsamic(year):
+
+    return render_template('balsamic.html',
+        header = 'Balsamic',
+        page_id = 'balsamic',
+        year_of_interest=year,
+        years = YEARS)
+
+@blueprint.route('/sequencing/microsalt/<year>')
+def microsalt(year):
+
+    return render_template('microsalt.html',
+        header = 'uSalt',
         year_of_interest=year,
         years = YEARS)
 
