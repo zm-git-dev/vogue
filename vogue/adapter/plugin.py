@@ -15,7 +15,7 @@ class VougeAdapter(MongoAdapter):
         self.db = self.client[db_name]
         self.db_name = db_name
         self.sample_collection = self.db.sample
-        self.analysis_collection = self.db.analysis
+        self.sample_analysis_collection = self.db.sample_analysis
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
         
@@ -86,22 +86,22 @@ class VougeAdapter(MongoAdapter):
     def add_or_update_analysis(self, analysis_result: dict):
         """Functionality to add or update analysis sample"""
         lims_id = analysis_result['_id']
-        update_result = self.db.analysis.update_one({'_id' : lims_id}, {'$set': analysis_result}, upsert=True)
+        # pop _id key to make pushing easier
+        analysis_result.pop('_id')
+        update_result = self.db.sample_analysis.find_one({'_id': lims_id})
 
-        if not update_result.raw_result['updatedExisting']:
-            self.db.analysis.update_one({'_id' : lims_id}, 
-                {'$set': {'added': dt.today()}})
+        if update_result is None:
+            self.db.sample_analysis.update_one({'_id' : lims_id}, 
+                    {'$set': {**analysis_result, **{'added': dt.today()}}}, upsert=True)
             LOG.info("Added analysis sample %s.", lims_id)
-        elif update_result.modified_count:
-            self.db.analysis.update_one({'_id' : lims_id}, 
-                {'$set': {'updated': dt.today()}})
-            LOG.info("Updated analysis for sample %s.", lims_id)
         else:
-            LOG.info("No analysis updates for sample %s.", lims_id)
+            self.db.sample_analysis.update_one({'_id' : lims_id}, 
+                    {'$set': {**analysis_result, **{'updated': dt.today()}}}, upsert=True)
+            LOG.info("Updated analysis for sample %s.", lims_id)
 
     def analysis(self, analysis_id: str):
         """Functionality to get analyses results"""
-        return self.analysis_collection.find_one({'_id':analysis_id})
+        return self.sample_analysis_collection.find_one({'_id':analysis_id})
         
     def find_samples(self, query:dict)-> list:
         """Function to find samples in samples collection based on query"""
