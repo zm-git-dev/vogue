@@ -28,6 +28,8 @@ def index():
         return redirect(url_for('server.target_enrichment', year=year))
     if request.form.get('page') == 'runs':
         return redirect(url_for('server.runs', year=year))
+    if request.form.get('page') == 'mip':
+        return redirect(url_for('server.mip', year=year))
 
     return render_template(
         'index.html',
