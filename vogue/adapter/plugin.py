@@ -134,7 +134,6 @@ class VougeAdapter(MongoAdapter):
     def add_or_update_analysis_case(self, analysis_result: dict):
         """Functionality to add or update analysis sample"""
         case_id = analysis_result['_id']
-        print(case_id)
         # pop _id key to make pushing easier
         analysis_result.pop('_id')
         update_result = self.db.case_analysis.find_one({'_id': case_id})
