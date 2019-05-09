@@ -51,10 +51,9 @@ LOG = logging.getLogger(__name__)
 @click.option('--workflow-version',
               required=True,
               help='Analysis workflow used.')
-@click.option(
-    '--multiqc',
-    is_flag=True,
-    help='Specify this flag if input json is unprocess multiqc output.')
+@click.option('--is-case',
+              is_flag=True,
+              help='Specify this flag if input json is case level.')
 @click.option('--dry', is_flag=True, help='Load from sample or not. (dry-run)')
 @doc(f"""
     Read and load analysis results. These are either QC or analysis output files.
@@ -64,23 +63,23 @@ LOG = logging.getLogger(__name__)
         """)
 @with_appcontext
 def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
-             analysis_workflow, workflow_version, multiqc):
+             analysis_workflow, workflow_version, is_case):
 
-    # multiqc does not work with multiple input analysis configs
-    if multiqc and len(analysis_config) > 1:
-        LOG.error("multiqc flag cannot be used with multiple input files")
+    # is_case does not work with multiple input analysis configs
+    if is_case and len(analysis_config) > 1:
+        LOG.error("is_case flag cannot be used with multiple input files")
         raise click.Abort()
 
-    if not multiqc and len(sample_id) > 1:
+    if not is_case and len(sample_id) > 1:
         LOG.error("for standard input, only use single sample ids.")
         raise click.Abort()
 
-    if not multiqc:
+    if not is_case:
         sample_id = copy.deepcopy(sample_id[0])
 
     analysis_dict = dict()
 
-    #if multiqc flag is enabled, build dictionary without merging.
+    #if is_case flag is enabled, build dictionary without merging.
     # Loop over list of input config files for single sample and merge them into
     # one single dictionary
     for input_config in analysis_config:
@@ -106,7 +105,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
 
     analysis_dict = dict_replace_dot(analysis_dict)
 
-    if not multiqc:
+    if not is_case:
         LOG.info("Validating parsed config file(s).")
         valid_analysis = validate_conf(analysis_dict)
         if valid_analysis is None:
@@ -114,7 +113,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
             raise click.Abort()
     else:
         old_keys = list(analysis_dict.keys())
-        analysis_dict['multiqc'] = copy.deepcopy(analysis_dict)
+        analysis_dict['is_case'] = copy.deepcopy(analysis_dict)
         valid_analysis = dict()
         for key in old_keys:
             analysis_dict.pop(key)
@@ -125,7 +124,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
     analysis_dict['sample'] = sample_id
 
     # Get current sample if any
-    if not multiqc:
+    if not is_case:
         current_analysis = current_app.adapter.sample_analysis(sample_id)
     else:
         current_analysis = current_app.adapter.case_analysis(analysis_case)
@@ -134,12 +133,12 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
                                     analysis_type=analysis_type,
                                     valid_analysis=valid_analysis,
                                     current_analysis=current_analysis,
-                                    build_case=multiqc)
+                                    build_case=is_case)
 
-    if ready_analysis and not multiqc:
+    if ready_analysis and not is_case:
         LOG.info('Values for %s  loaded for sample %s',
                  list(ready_analysis.keys()), sample_id)
-    elif not ready_analysis and not multiqc:
+    elif not ready_analysis and not is_case:
         LOG.warning('No enteries were found for the given analysis type: %s',
                     analysis_type)
     else:
@@ -147,6 +146,6 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
 
     load_analysis(adapter=current_app.adapter,
                   lims_id=sample_id,
-                  is_case=multiqc,
+                  is_case=is_case,
                   dry_run=dry,
                   analysis=ready_analysis)
