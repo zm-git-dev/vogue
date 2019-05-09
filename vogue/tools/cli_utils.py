@@ -8,11 +8,13 @@ import copy
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
 
+
 def convert_dot(string):
     '''
     replaces dot with underscore
     '''
-    return string.replace(".","_")
+    return string.replace(".", "_")
+
 
 def add_doc(docstring):
     """
@@ -25,19 +27,22 @@ def add_doc(docstring):
 
     return document
 
+
 def dict_replace_dot(obj):
     '''
     recursively replace all dots in json.load keys.
     '''
-    if isinstance(obj,dict):
+    if isinstance(obj, dict):
         for key in obj.keys():
             obj[convert_dot(key)] = obj.pop(key)
-            if isinstance(obj[convert_dot(key)],dict) or isinstance(obj[convert_dot(key)],list):
+            if isinstance(obj[convert_dot(key)], dict) or isinstance(
+                    obj[convert_dot(key)], list):
                 obj[convert_dot(key)] = dict_replace_dot(obj[convert_dot(key)])
-    elif isinstance(obj,list):
+    elif isinstance(obj, list):
         for item in obj:
             item = dict_replace_dot(item)
     return obj
+
 
 def json_read(fname):
     """
@@ -50,7 +55,8 @@ def json_read(fname):
             return analysis_conf
     except:
         LOG.warning('Input config is not JSON')
-        return False 
+        return False
+
 
 def yaml_read(fname):
     """
@@ -65,6 +71,7 @@ def yaml_read(fname):
         LOG.warning('Input config is not YAML')
         return False
 
+
 def check_file(fname):
     """
     Check file exists and readable.
@@ -75,6 +82,7 @@ def check_file(fname):
     if not path.exists() or not path.is_file():
         LOG.error("File not found or input is not a file.")
         raise FileNotFoundError
+
 
 def concat_dict_keys(my_dict: dict, key_name="", out_key_list=list()):
     '''

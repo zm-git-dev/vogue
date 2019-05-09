@@ -187,8 +187,9 @@ def build_mongo_case(analysis_dict: dict, case_analysis: dict):
 
     return analysis
 
+
 def update_mongo_doc_case(mongo_doc: dict, analysis_dict: dict,
-         new_analysis: dict):
+                          new_analysis: dict):
     '''
     '''
 
@@ -207,10 +208,12 @@ def update_mongo_doc_case(mongo_doc: dict, analysis_dict: dict,
 
     for sample in analysis_samples:
         if sample not in mongo_doc['samples']:
-            LOG.info("A new sample %s is added to the case %s",sample, analysis_case)
+            LOG.info("A new sample %s is added to the case %s", sample,
+                     analysis_case)
             mongo_doc['samples'].append(sample)
 
     return mongo_doc
+
 
 def build_analysis(analysis_dict: dict, analysis_type: str,
                    valid_analysis: list, current_analysis: dict,

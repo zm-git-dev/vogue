@@ -103,7 +103,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
                 raise click.Abort()
 
         analysis_dict = {**analysis_dict, **tmp_analysis_dict}
-    
+
     analysis_dict = dict_replace_dot(analysis_dict)
 
     if not multiqc:
@@ -115,7 +115,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
     else:
         old_keys = list(analysis_dict.keys())
         analysis_dict['multiqc'] = copy.deepcopy(analysis_dict)
-        valid_analysis=dict()
+        valid_analysis = dict()
         for key in old_keys:
             analysis_dict.pop(key)
 
