@@ -7,11 +7,43 @@
             {% include 'header_section.html' %}
             <div class="row">
                 <div class="col-lg-12">
+                    <div id="insert_size"></div>
                 </div>
             </div>
         </main>
     </div>
 </div>
 
+<script>
+    var data = []
+    {% if results.data is defined %}
+    var data = {{ results.data | tojson }}
+    {% endif %}
+
+    Highcharts.chart('insert_size', {
+        chart: { type: 'spline' },
+        title: { text: '{{results.title}}'},
+        subtitle: { text: '' },
+        xAxis: { categories: {{ results.labels| tojson }}},
+        yAxis: { title: { text: {{ results.axis.y | tojson }}}},
+        legend: { enabled: false },
+        tooltip: { crosshairs: true, shared: true },
+        plotOptions: {
+            series: { connectNulls: true },
+            spline: {
+                marker: {
+                    radius: 4,
+                    lineColor: '#666666',
+                    lineWidth: 1
+                }
+            }
+        },
+        series: [{
+            name: 'Average Concnetration',
+            data: data,
+            marker: { symbol: 'circle' }}] 
+});
+
+</script>
 
 {% endblock %}

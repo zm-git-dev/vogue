@@ -164,6 +164,7 @@ def mip(year):
     results = insert_size(app.adapter, year)
 
     return render_template('mip.html',
+        results = results,
         header = 'MIP',
         page_id = 'mip',
         year_of_interest=year,

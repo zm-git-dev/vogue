@@ -4,6 +4,7 @@ from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
 from vogue.constants.constants import (MONTHS, TEST_SAMPLES)
+from statistics import mean
 
 
 def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
@@ -234,30 +235,73 @@ def q30_instruments(adapter, year : int)-> dict:
             instruments['data'][group] = {'data':data}
 
     return instruments
-
+        
 def insert_size(adapter, year : int)-> dict:
     """Prepares data for the MIP insert sizs plot."""
 
-    pipe=[{
+    pipe = [
+    {
         '$lookup': {
-            'from': 'sample_analysis', 
+            'from': 'sample', 
             'localField': '_id', 
             'foreignField': '_id', 
-            'as': 'analysis'}
-        }, {
-        '$match': {
-            'analysis': {
-                '$ne': []
-            }}
-        }, {
+            'as': 'sample_info'
+        }
+    }, {
+        '$unwind': {
+            'path': '$sample_info'
+        }
+    }, {
         '$project': {
-            'library_size_pre_hyb': 1, 
-            'cases': '$analysis.cases'
-        }}]
+            'cases': 1, 
+            'received_date': '$sample_info.received_date'
+        }
+    }, {
+        '$match': {
+            'received_date': {
+                '$exists': 'True'
+            }
+        }
+    }, {
+        '$project': {
+            'month': {
+                '$month': '$received_date'
+            }, 
+            'year': {
+                '$year': '$received_date'
+            }, 
+            'cases': 1
+        }
+    },{
+        '$match': {
+            'year': {
+                '$eq': int(year)
+            }
+        }
+    }
+]
     
-    
-    aggregate_result = adapter.samples_aggregate(pipe)
-    for result in aggregate_result:
-        print(result)
-        
+    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    insert_size = {k:[] for k in range(1,13)}
+    final_data = []
+    for sample in aggregate_result:
+        latest_size = None
+        latest_analysis = None
+        for case , data in sample.get('cases').items():
+            if not 'mip' in data:
+                continue
+            for analysis in data.get('mip'):
+                if not latest_analysis or latest_analysis < analysis.get('added'):
+                    latest_analysis = analysis.get('added')
+                    latest_size = analysis.get('multiqc_picard_insertSize').get('MEAN_INSERT_SIZE')
+        insert_size[sample['month']].append(latest_size)
+
+    for month in range(1,13):
+        if insert_size[month]:
+            final_data.append(mean(insert_size[month]))
+        else:
+            final_data.append(None)
+
+    return({'data':final_data,'labels':MONTHS, 'title': 'avergage insert size','axis':{'y':'average insert size'}})                    
+
 
