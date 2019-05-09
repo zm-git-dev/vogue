@@ -301,6 +301,10 @@ def insert_size(adapter, year : int)-> dict:
         else:
             final_data.append(None)
 
-    return({'data':final_data,'labels':MONTHS, 'title': 'avergage insert size','axis':{'y':'average insert size'}})                    
+    plot_data = {'data':final_data,
+                'labels':[m[1] for m in MONTHS], 
+                'title': 'avergage insert size',
+                'axis':{'y':'average insert size'}}
+    return(plot_data)                    
 
 
