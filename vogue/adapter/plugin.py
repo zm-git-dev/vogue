@@ -16,6 +16,7 @@ class VougeAdapter(MongoAdapter):
         self.db_name = db_name
         self.sample_collection = self.db.sample
         self.sample_analysis_collection = self.db.sample_analysis
+        self.case_analysis_collection = self.db.case_analysis
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
         
@@ -83,7 +84,7 @@ class VougeAdapter(MongoAdapter):
     def delete_sample(self):
         return None
 
-    def add_or_update_analysis(self, analysis_result: dict):
+    def add_or_update_analysis_sample(self, analysis_result: dict):
         """Functionality to add or update analysis sample"""
         lims_id = analysis_result['_id']
         # pop _id key to make pushing easier
@@ -99,9 +100,30 @@ class VougeAdapter(MongoAdapter):
                     {'$set': {**analysis_result, **{'updated': dt.today()}}}, upsert=True)
             LOG.info("Updated analysis for sample %s.", lims_id)
 
-    def analysis(self, analysis_id: str):
+    def add_or_update_analysis_case(self, analysis_result: dict):
+        """Functionality to add or update analysis sample"""
+        case_id = analysis_result['_id']
+        print(case_id)
+        # pop _id key to make pushing easier
+        analysis_result.pop('_id')
+        update_result = self.db.case_analysis.find_one({'_id': case_id})
+
+        if update_result is None:
+            self.db.case_analysis.update_one({'_id' : case_id}, 
+                    {'$set': {**analysis_result, **{'added': dt.today()}}}, upsert=True)
+            LOG.info("Added analysis sample %s.", case_id)
+        else:
+            self.db.case_analysis.update_one({'_id' : case_id}, 
+                    {'$set': {**analysis_result, **{'updated': dt.today()}}}, upsert=True)
+            LOG.info("Updated analysis for sample %s.", case_id)
+
+    def sample_analysis(self, analysis_id: str):
         """Functionality to get analyses results"""
         return self.sample_analysis_collection.find_one({'_id':analysis_id})
+
+    def case_analysis(self, analysis_id: str):
+        """Functionality to get analyses results"""
+        return self.case_analysis_collection.find_one({'_id':analysis_id})
         
     def find_samples(self, query:dict)-> list:
         """Function to find samples in samples collection based on query"""
