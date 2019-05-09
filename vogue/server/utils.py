@@ -254,21 +254,21 @@ def insert_size(adapter, year : int)-> dict:
     }, {
         '$project': {
             'cases': 1, 
-            'received_date': '$sample_info.received_date'
+            'delivery_date': '$sample_info.delivery_date'
         }
     }, {
         '$match': {
-            'received_date': {
+            'delivery_date': {
                 '$exists': 'True'
             }
         }
     }, {
         '$project': {
             'month': {
-                '$month': '$received_date'
+                '$month': '$delivery_date'
             }, 
             'year': {
-                '$year': '$received_date'
+                '$year': '$delivery_date'
             }, 
             'cases': 1
         }
@@ -280,7 +280,6 @@ def insert_size(adapter, year : int)-> dict:
         }
     }
 ]
-    
     aggregate_result = adapter.sample_analysis_aggregate(pipe)
     insert_size = {k:[] for k in range(1,13)}
     final_data = []
