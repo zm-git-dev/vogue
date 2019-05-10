@@ -254,21 +254,21 @@ def insert_size(adapter, year : int)-> dict:
     }, {
         '$project': {
             'cases': 1, 
-            'delivery_date': '$sample_info.delivery_date'
+            'received_date': '$sample_info.received_date'
         }
     }, {
         '$match': {
-            'delivery_date': {
+            'received_date': {
                 '$exists': 'True'
             }
         }
     }, {
         '$project': {
             'month': {
-                '$month': '$delivery_date'
+                '$month': '$received_date'
             }, 
             'year': {
-                '$year': '$delivery_date'
+                '$year': '$received_date'
             }, 
             'cases': 1
         }
