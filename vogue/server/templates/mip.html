@@ -21,13 +21,21 @@
     {% endif %}
 
     Highcharts.chart('insert_size', {
-        chart: { type: 'spline' },
+        chart: { type: 'scatter' },
         title: { text: '{{results.title}}'},
         subtitle: { text: '' },
-        xAxis: { categories: {{ results.labels| tojson }}},
+        xAxis: { title: { text: {{ results.axis.x | tojson }}},
+                categories: {{ results.labels| tojson }}},
         yAxis: { title: { text: {{ results.axis.y | tojson }}}},
         legend: { enabled: false },
-        tooltip: { crosshairs: true, shared: true },
+        tooltip: {
+        formatter: function () {
+            var output = ''
+            if (this.point.name ) {
+                output = output + 'Sample ID: <b>' + this.point.name +'</b> <br>'}
+            output = output + 'MEAN INSERT SIZE: <b>'+ this.y + '</b> <br> Sample Recieved in: <b>'+ this.x + '</b>'
+            return output ;}
+        },
         plotOptions: {
             series: { connectNulls: true },
             spline: {

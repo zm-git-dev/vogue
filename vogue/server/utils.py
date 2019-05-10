@@ -281,7 +281,6 @@ def insert_size(adapter, year : int)-> dict:
     }
 ]
     aggregate_result = adapter.sample_analysis_aggregate(pipe)
-    insert_size = {k:[] for k in range(1,13)}
     final_data = []
     for sample in aggregate_result:
         latest_size = None
@@ -293,18 +292,14 @@ def insert_size(adapter, year : int)-> dict:
                 if not latest_analysis or latest_analysis < analysis.get('added'):
                     latest_analysis = analysis.get('added')
                     latest_size = analysis.get('multiqc_picard_insertSize').get('MEAN_INSERT_SIZE')
-        insert_size[sample['month']].append(latest_size)
-
-    for month in range(1,13):
-        if insert_size[month]:
-            final_data.append(mean(insert_size[month]))
-        else:
-            final_data.append(None)
+        if latest_size:
+           final_data.append({'name':sample['_id'], 'x':sample['month'], 'y':latest_size}) 
+        
 
     plot_data = {'data':final_data,
                 'labels':[m[1] for m in MONTHS], 
-                'title': 'avergage insert size',
-                'axis':{'y':'average insert size'}}
+                'title': 'MIP picard insertSize',
+                'axis':{'y':'Mean insert size', 'x':'Sampele Recieved'}}
     return(plot_data)                    
 
 
