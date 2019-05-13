@@ -115,3 +115,32 @@ Options:
 ### Run
 
 
+```
+Usage: vogue run [OPTIONS]
+
+  Run a local development server.
+
+  This server is for development purposes only. It does not provide the
+  stability, security, or performance of production WSGI servers.
+
+  The reloader and debugger are enabled by default if FLASK_ENV=development
+  or FLASK_DEBUG=1.
+
+Options:
+  -h, --host TEXT                 The interface to bind to.
+  -p, --port INTEGER              The port to bind to.
+  --cert PATH                     Specify a certificate file to use HTTPS.
+  --key FILE                      The key file to use when specifying a
+                                  certificate.
+  --reload / --no-reload          Enable or disable the reloader. By default
+                                  the reloader is active if debug is enabled.
+  --debugger / --no-debugger      Enable or disable the debugger. By default
+                                  the debugger is active if debug is enabled.
+  --eager-loading / --lazy-loader
+                                  Enable or disable eager loading. By default
+                                  eager loading is enabled if the reloader is
+                                  disabled.
+  --with-threads / --without-threads
+                                  Enable or disable multithreading.
+  --help                          Show this message and exit.
+  ```
