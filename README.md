@@ -60,19 +60,30 @@ Usage: vogue load analysis [OPTIONS]
   Read and load analysis results. These are either QC or analysis output
   files.
 
-  The input are unique IDs with an analysis config file (JSON/YAML) which
+  The inputs are unique ID with an analysis config file (JSON/YAML) which
   includes analysis results matching the analysis model. Analysis types
-  recognize the following keys in the input file: QC:multiqc_picard_dup,
+  recognize the following keys in the input file: QC:multiqc_picard_dups,
   multiqc_picard_HsMetrics, multiqc_picard_AlignmentSummaryMetrics,
-  multiqc_picard_insertSize.
+  multiqc_picard_insertSize microsalt:blast_pubmlst, quast_assembly,
+  blast_resfinder_resistence, picard_markduplicate, microsalt_samtools_stats
 
 Options:
-  -s, --sample-id TEXT          Input sample id  [required]
-  -a, --analysis-config PATH    Input config file. Accepted format: JSON, YAML
-                                [required]
-  -t, --analysis-type [QC|all]  Type of analysis results to load.
-  --dry                         Load from sample or not. (dry-run)
-  --help                        Show this message and exit.
+  -s, --sample-id TEXT            Input sample id.  [required]
+  -a, --analysis-config PATH      Input config file. Accepted format: JSON,
+                                  YAML  [required]
+  -t, --analysis-type [QC|microsalt|all]
+                                  Type of analysis results to load.
+  -c, --analysis-case TEXT        The case that this sample belongs.
+                                  It can be
+                                  specified multiple times.  [required]
+  -w, --analysis-workflow TEXT    Analysis workflow used.  [required]
+  --workflow-version TEXT         Analysis workflow used.  [required]
+  --is-case                       Specify this flag if input json is case
+                                  level.
+  --case-analysis-type [multiqc]  Specify the type for the case analysis. i.e.
+                                  if it is multiqc output, then choose multiqc
+  --dry                           Load from sample or not. (dry-run)
+  --help                          Show this message and exit.                      Show this message and exit.
   ```
   
 ### Load flowcell
