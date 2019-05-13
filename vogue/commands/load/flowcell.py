@@ -10,9 +10,9 @@ from vogue.constants.constants import RUN_TYPES
 
 LOG = logging.getLogger(__name__)
 
-@click.command("flowcell", short_help = "load flowcell into db.")
-@click.option('-r', '--run-id', help = 'Lims process id for the run. Eg: 24-100451')
-@click.option('-a', '--all-runs', is_flag = True, help = 'Loads all lims flowcells ids')
+@click.command("flowcell", short_help = "Load flowcell into db.")
+@click.option('-r', '--run-id', help = 'Flowcell id. Eg: 190315_D00410_0873_BHWWKCBCX2')
+@click.option('-a', '--all-runs', is_flag = True, help = 'Loads all flowcells found in LIMS.')
 @click.option('--dry', is_flag = True, help = 'Load from flowcell or not. (dry-run)')
 
 @with_appcontext
