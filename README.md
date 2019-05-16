@@ -94,8 +94,8 @@ Usage: vogue load flowcell [OPTIONS]
   Read and load LIMS data for one or all runs
 
 Options:
-  -r, --run-id TEXT  Flowcell id. Eg: 190315_D00410_0873_BHWWKCBCX2
-  -a, --all-runs     Load all flowcells found in LIMS.
+  -r, --run-id TEXT  Lims process id for the run. Eg: 24-107873
+  -a, --all-runs     Loads all flowcells found in LIMS.
   --dry              Load from flowcell or not. (dry-run)
   --help             Show this message and exit.
   ```
