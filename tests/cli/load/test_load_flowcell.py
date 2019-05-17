@@ -9,10 +9,9 @@ def test_flowcell(database, lims):
     # GIVEN a app context with a mock lims with a process of correct type and udf 
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
-    run_id = '190301_A00621_0010_AHHNTLDSXX'
+    run_id = 'some_id'
     process_type = lims._add_process_type(name = RUN_TYPES[0])
-    lims_run = lims._add_process(process_type = process_type)
-    lims_run.udf = {'Run ID':run_id}
+    lims_run = lims._add_process(process_type = process_type, pid=run_id)
     app.lims = lims
 
     # WHEN adding a flowcell to the flowcell collection
@@ -30,7 +29,7 @@ def test_flowcell_no_lims(database):
 
     # WHEN adding a flowcell tags
     runner = app.test_cli_runner()
-    result = runner.invoke(cli, ['load', 'flowcell', '-r', '190301_A00621_0010_AHHNTLDSXX'])
+    result = runner.invoke(cli, ['load', 'flowcell', '-r', 'some_id'])
 
     # THEN abort
     assert result.exit_code == 1
@@ -44,7 +43,7 @@ def test_flowcell_wrong_id(database, lims):
 
     # WHEN adding a flowcell with a Run ID that does not exist in lims
     runner = app.test_cli_runner()
-    result = runner.invoke(cli, ['load', 'flowcell', '-r', '190301_A00621_0010_AHHNTLDSXX'])
+    result = runner.invoke(cli, ['load', 'flowcell', '-r', 'some_id'])
 
     # THEN abort
     assert result.exit_code == 1
