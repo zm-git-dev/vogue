@@ -30,7 +30,7 @@ def flowcell(run_id, all_runs, dry):
 
     runs = []:
     for run_type in RUN_TYPES:
-        runs = runs + lims.get_processes(udf={'Run ID': run_id}, type=run_type)
+        runs = runs.extend(lims.get_processes(udf={'Run ID': run_id}, type=run_type))
     if runs == []:
         LOG.warning("There is no run with this Run ID")
         raise click.Abort()
