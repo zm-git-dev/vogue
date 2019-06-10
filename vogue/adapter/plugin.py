@@ -21,6 +21,8 @@ class VougeAdapter(MongoAdapter):
 
         LOG.info("Use database %s.", db_name)
 
+
+
     def add_or_update_sample(self, sample_news: dict):
         """Adds/updates a sample in the database"""
 
@@ -181,6 +183,10 @@ class VougeAdapter(MongoAdapter):
     def flowcells_aggregate(self, pipe: list):
         """Function to make a aggregation on the flowcell colleciton"""
         return self.flowcell_collection.aggregate(pipe)
+
+    def sample_analysis_aggregate(self, pipe : list):
+        """Function to make a aggregation on the sample analysis colleciton"""
+        return self.sample_analysis_collection.aggregate(pipe)
 
     def get_category(self, app_tag):
         """Function get category based on application tag from the application tag collection"""

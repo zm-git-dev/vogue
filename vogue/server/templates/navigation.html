@@ -42,6 +42,17 @@
           <a class="dropdown-item" href="{{ url_for('server.runs' , year=year_of_interest) }}">Instruments</a>
         </div>
       </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          QC
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{ url_for('server.mip' , year=year_of_interest) }}">MIP</a>
+          <a class="dropdown-item" href="{{ url_for('server.balsamic' , year=year_of_interest) }}">Balsamic</a>
+          <a class="dropdown-item" href="{{ url_for('server.microsalt' , year=year_of_interest) }}">uSalt</a>
+        </div>
+      </li>
     </ul>
   </div>
 </nav>

@@ -4,6 +4,7 @@ from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
 from vogue.constants.constants import (MONTHS, TEST_SAMPLES)
+from statistics import mean
 
 
 def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
@@ -201,7 +202,6 @@ def find_concentration_defrosts(adapter, year : int)-> dict:
             
     return defrosts
 
-
 def q30_instruments(adapter, year : int)-> dict:
     """Prepares data for a plot Q30 values for diferent runs over time"""
 
@@ -235,3 +235,71 @@ def q30_instruments(adapter, year : int)-> dict:
             instruments['data'][group] = {'data':data}
 
     return instruments
+        
+def insert_size(adapter, year : int)-> dict:
+    """Prepares data for the MIP insert sizs plot."""
+
+    pipe = [
+    {
+        '$lookup': {
+            'from': 'sample', 
+            'localField': '_id', 
+            'foreignField': '_id', 
+            'as': 'sample_info'
+        }
+    }, {
+        '$unwind': {
+            'path': '$sample_info'
+        }
+    }, {
+        '$project': {
+            'cases': 1, 
+            'received_date': '$sample_info.received_date'
+        }
+    }, {
+        '$match': {
+            'received_date': {
+                '$exists': 'True'
+            }
+        }
+    }, {
+        '$project': {
+            'month': {
+                '$month': '$received_date'
+            }, 
+            'year': {
+                '$year': '$received_date'
+            }, 
+            'cases': 1
+        }
+    },{
+        '$match': {
+            'year': {
+                '$eq': int(year)
+            }
+        }
+    }
+]
+    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    final_data = []
+    for sample in aggregate_result:
+        latest_size = None
+        latest_analysis = None
+        for case , data in sample.get('cases').items():
+            if not 'mip' in data:
+                continue
+            for analysis in data.get('mip'):
+                if not latest_analysis or latest_analysis < analysis.get('added'):
+                    latest_analysis = analysis.get('added')
+                    latest_size = analysis.get('multiqc_picard_insertSize').get('MEAN_INSERT_SIZE')
+        if latest_size:
+           final_data.append({'name':sample['_id'], 'x':sample['month'], 'y':latest_size}) 
+        
+
+    plot_data = {'data':final_data,
+                'labels':[m[1] for m in MONTHS], 
+                'title': 'MIP picard insertSize',
+                'axis':{'y':'Mean insert size', 'x':'Sampele Recieved'}}
+    return(plot_data)                    
+
+
