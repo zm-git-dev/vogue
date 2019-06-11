@@ -15,6 +15,7 @@ class VougeAdapter(MongoAdapter):
         self.db_name = db_name
         self.sample_collection = self.db.sample
         self.sample_analysis_collection = self.db.sample_analysis
+        self.sample_analysis_collection2 = self.db.sample_analysis2
         self.case_analysis_collection = self.db.case_analysis
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
@@ -91,17 +92,36 @@ class VougeAdapter(MongoAdapter):
         else:
             LOG.info("No updates for application_tag %s.", tag)
 
-    def sample(self, lims_id):
-        return self.sample_collection.find_one({'_id': lims_id})
 
-    def flowcell(self, run_id):
-        return self.flowcell_collection.find_one({'_id': run_id})
+    def add_or_update_sample_analysis(self, analysis_result: dict):
+        """Functionality to add or update analysis sample"""
+        lims_id = analysis_result['_id']
+        # pop _id key to make pushing easier
+        analysis_result.pop('_id')
+        update_result = self.db.sample_analysis2.find_one({'_id': lims_id})
 
-    def app_tag(self, tag):
-        return self.app_tag_collection.find_one({'_id': tag})
-
-    def delete_sample(self):
-        return None
+        if update_result is None:
+            self.db.sample_analysis2.update_one(
+                {'_id': lims_id},
+                {'$set': {
+                    **analysis_result,
+                    **{
+                        'added': dt.today()
+                    }
+                }},
+                upsert=True)
+            LOG.info("Added analysis sample %s.", lims_id)
+        else:
+            self.db.sample_analysis2.update_one(
+                {'_id': lims_id},
+                {'$set': {
+                    **analysis_result,
+                    **{
+                        'updated': dt.today()
+                    }
+                }},
+                upsert=True)
+            LOG.info("Updated analysis for sample %s.", lims_id)
 
     def add_or_update_analysis_sample(self, analysis_result: dict):
         """Functionality to add or update analysis sample"""
@@ -163,6 +183,19 @@ class VougeAdapter(MongoAdapter):
                 upsert=True)
             LOG.info("Updated analysis for sample %s.", case_id)
 
+
+    def sample(self, lims_id):
+        return self.sample_collection.find_one({'_id': lims_id})
+
+    def flowcell(self, run_id):
+        return self.flowcell_collection.find_one({'_id': run_id})
+
+    def app_tag(self, tag):
+        return self.app_tag_collection.find_one({'_id': tag})
+
+    def delete_sample(self):
+        return None
+
     def sample_analysis(self, analysis_id: str):
         """Functionality to get analyses results"""
         return self.sample_analysis_collection.find_one({'_id': analysis_id})
@@ -193,3 +226,4 @@ class VougeAdapter(MongoAdapter):
         tag = self.app_tag_collection.find_one({'_id': app_tag},
                                                {"category": 1})
         return tag.get('category') if tag else None
+
