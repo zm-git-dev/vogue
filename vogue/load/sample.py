@@ -1,5 +1,5 @@
 import logging
-from vogue.build.lims import build_sample
+from vogue.build.sample import build_sample
 LOG = logging.getLogger(__name__)
 from vogue.constants.constants import TEST_SAMPLES
 
