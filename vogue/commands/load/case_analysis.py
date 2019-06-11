@@ -10,11 +10,11 @@ from vogue.tools.cli_utils import dict_replace_dot
 from vogue.tools.cli_utils import yaml_read
 from vogue.tools.cli_utils import check_file
 from vogue.tools.cli_utils import concat_dict_keys
-from vogue.build.analysis import build_analysis
+from vogue.build.case_analysis import build_analysis
 from vogue.tools.cli_utils import add_doc as doc
-from vogue.load.analysis import load_analysis
-from vogue.parse.analysis import validate_conf
-import vogue.models.analysis as analysis_model
+from vogue.load.case_analysis import load_analysis
+from vogue.parse.load.case_analysis import validate_conf
+import vogue.models.case_analysis as analysis_model
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)

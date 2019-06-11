@@ -3,7 +3,7 @@ import copy
 import collections
 
 from datetime import datetime as dt
-import vogue.models.analysis as analysis_model
+import vogue.models.case_analysis as analysis_model
 
 LOG = logging.getLogger(__name__)
 

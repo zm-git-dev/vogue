@@ -9,7 +9,7 @@ from vogue.adapter import VougeAdapter
 LOG = logging.getLogger(__name__)
 
 # commands
-from vogue.commands.load.analysis import analysis as analysis_command
+from vogue.commands.load.case_analysis import analysis as analysis_command
 from vogue.commands.load.application_tag import application_tags as status_db_command
 from vogue.commands.load.flowcell import flowcell as flowcell_command
 from vogue.commands.load.sample import sample as sample_command
