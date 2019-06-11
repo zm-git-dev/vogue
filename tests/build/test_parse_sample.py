@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from vogue.build.lims_utils import (get_sequenced_date, get_number_of_days, get_output_artifact, 
+from vogue.parse.build.sample import (get_sequenced_date, get_number_of_days, get_output_artifact, 
                                     get_latest_input_artifact, str_to_datetime, get_received_date,
                                     get_prepared_date, get_delivery_date, get_concentration_and_nr_defrosts,
                                     get_final_conc_and_amount_dna, get_microbial_library_concentration,
