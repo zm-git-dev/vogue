@@ -2,8 +2,12 @@
 from vogue.parse.build.sample_analysis import *
 
 
+def build_sample():
+    return {}
+
+
 def build_samples(adapter, case)-> dict:
-    """Parse lims sample"""
+    """Parse sample"""
     mongo_samples = []
     for sample_id in case.samples:
         mongo_sample = {'_id' : sample_id}
