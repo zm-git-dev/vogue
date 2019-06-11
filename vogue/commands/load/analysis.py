@@ -55,7 +55,7 @@ LOG = logging.getLogger(__name__)
               is_flag=True,
               help='Specify this flag if input json is case level.')
 @click.option('--case-analysis-type',
-              type=click.Choice(['multiqc']),
+              type=click.Choice(['multiqc', 'custom']),
               default='multiqc',
               help='Specify the type for the case analysis. i.e. if it is multiqc output, then choose multiqc')
 @click.option('--dry', is_flag=True, help='Load from sample or not. (dry-run)')
