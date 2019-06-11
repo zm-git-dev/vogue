@@ -54,6 +54,10 @@ LOG = logging.getLogger(__name__)
 @click.option('--is-case',
               is_flag=True,
               help='Specify this flag if input json is case level.')
+@click.option('--case-analysis-type',
+              type=click.Choice(['multiqc']),
+              default='multiqc',
+              help='Specify the type for the case analysis. i.e. if it is multiqc output, then choose multiqc')
 @click.option('--dry', is_flag=True, help='Load from sample or not. (dry-run)')
 @doc(f"""
     Read and load analysis results. These are either QC or analysis output files.
@@ -63,11 +67,15 @@ LOG = logging.getLogger(__name__)
         """)
 @with_appcontext
 def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
-             analysis_workflow, workflow_version, is_case):
+             analysis_workflow, workflow_version, is_case, case_analysis_type):
 
     # is_case does not work with multiple input analysis configs
     if is_case and len(analysis_config) > 1:
         LOG.error("is_case flag cannot be used with multiple input files")
+        raise click.Abort()
+
+    if is_case and not case_analysis_type:
+        LOG.error("is_case flag requires a case_analysis_type value")
         raise click.Abort()
 
     if not is_case and len(sample_id) > 1:
@@ -113,7 +121,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
             raise click.Abort()
     else:
         old_keys = list(analysis_dict.keys())
-        analysis_dict['is_case'] = copy.deepcopy(analysis_dict)
+        analysis_dict[case_analysis_type] = copy.deepcopy(analysis_dict)
         valid_analysis = dict()
         for key in old_keys:
             analysis_dict.pop(key)
