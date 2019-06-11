@@ -3,7 +3,7 @@ import copy
 
 LOG = logging.getLogger(__name__)
 
-import vogue.models.analysis as analysis_model
+import vogue.models.case_analysis as analysis_model
 
 def validate_conf(analysis_conf: dict):
     """

@@ -1,5 +1,5 @@
-from vogue.parse.analysis import validate_conf
-from vogue.models.analysis import ANALYSIS_SETS
+from vogue.parse.load.case_analysis import validate_conf
+from vogue.models.case_analysis import ANALYSIS_SETS
 from vogue.tools.cli_utils import json_read
 
 VALID_JSON = 'tests/fixtures/valid_multiqc.json'
