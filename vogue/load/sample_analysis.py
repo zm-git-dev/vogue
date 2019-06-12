@@ -1,16 +1,6 @@
-from vogue.build.sample_analysis import build_sample, build_samples
+from vogue.build.sample_analysis import build_samples
 import logging
 LOG = logging.getLogger(__name__)
-
-
-
-def load_one_sample(adapter, sample_id):
-    """Function to load one sample into the sample_analysis collection"""
-    # undantagsfunction. Usually one will use load_one_case whenwver a new case is added. 
-    # And sometimes load_all
-    
-    mongo_sample = build_sample(sample_id=sample_id)
-    adapter.add_or_update_sample_analysis(mongo_sample)
 
 
 def load_one_case(adapter, case_id = None, case = None):

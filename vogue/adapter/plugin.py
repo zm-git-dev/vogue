@@ -6,12 +6,16 @@ LOG = logging.getLogger(__name__)
 
 
 
-def check_dates(current_document, analysis_result):
+def check_dates(analysis_result, current_document):
     """Function to pop analysysis results from tne new analysis if the results are older than 
     the current results in the database"""
 
     if current_document.get('mip') and analysis_result.get('mip'):
-        if current_document['mip']['added'] > analysis_result['mip']['added']:
+        try:
+            if current_document['mip']['added'] > analysis_result['mip']['added']:
+                analysis_result.pop('mip')
+        except:
+            LOG.error("Invalid or missing mip analysis date. Skiping analysis")
             analysis_result.pop('mip')
 
     return analysis_result
@@ -108,35 +112,30 @@ class VougeAdapter(MongoAdapter):
 
 
     def add_or_update_sample_analysis(self, analysis_result: dict):
-        """Functionality to add or update analysis sample"""
+        """Functionality to add or update sample_analysis collection"""
         lims_id = analysis_result['_id']
-        # pop _id key to make pushing easier
-        analysis_result.pop('_id')
         current_document = self.db.sample_analysis2.find_one({'_id': lims_id})
+        analysis_result = check_dates(analysis_result, current_document)
 
-        if current_document is None:
-            self.db.sample_analysis2.update_one(
-                {'_id': lims_id},
-                {'$set': {
-                    **analysis_result,
-                    **{
-                        'added': dt.today()
-                    }
-                }},
-                upsert=True)
-            LOG.info("Added analysis sample %s.", lims_id)
+        update_result = self.db.sample_analysis2.update_one({'_id': lims_id},
+                                                  {'$set': analysis_result},
+                                                  upsert=True)
+
+        if not update_result.raw_result['updatedExisting']:
+            self.db.sample_analysis2.update_one({'_id': lims_id},
+                                      {'$set': {
+                                          'added': dt.today()
+                                      }})
+            LOG.info("Added sample %s.", lims_id)
+        elif update_result.modified_count:
+            self.db.sample_analysis2.update_one({'_id': lims_id},
+                                      {'$set': {
+                                          'updated': dt.today()
+                                      }})
+            LOG.info("Updated sample %s.", lims_id)
         else:
-            analysis_result = check_dates(current_document, analysis_result)
-            self.db.sample_analysis2.update_one(
-                {'_id': lims_id},
-                {'$set': {
-                    **analysis_result,
-                    **{
-                        'updated': dt.today()
-                    }
-                }},
-                upsert=True)
-            LOG.info("Updated analysis for sample %s.", lims_id)
+            LOG.info("No updates for sample %s.", lims_id)
+
 
     def add_or_update_analysis_sample(self, analysis_result: dict):
         """Functionality to add or update analysis sample"""
