@@ -6,12 +6,16 @@ def build_sample():
     return {}
 
 
-def build_samples(adapter, case)-> dict:
+def build_samples(case)-> dict:
     """Parse sample"""
+    
+    mip_analysis = Mip(case)
+
     mongo_samples = []
-    for sample_id in case.samples:
+
+    for sample_id in case.get('samples'):
         mongo_sample = {'_id' : sample_id}
-        mongo_sample['insert_size'] = get_insert_size(case, sample_id)
+        mongo_sample['mip'] = mip_analysis.build_mip_sample(sample_id)
 
         for key in list(mongo_sample.keys()):
             if mongo_sample[key] is None:

@@ -13,9 +13,10 @@ def load_one_sample(adapter, sample_id):
     adapter.add_or_update_sample_analysis(mongo_sample)
 
 
-def load_one_case(adapter, case_id):
+def load_one_case(adapter, case_id = None, case = None):
     """Function to load all samples in one case into the sample_analysis colleciotn"""
-    case = adapter.case_analysis(case_id)
+    if case_id:
+        case = adapter.case_analysis(case_id)
     mongo_samples = build_samples(case = case)
     for mongo_sample in mongo_samples:
         adapter.add_or_update_sample_analysis(mongo_sample)
@@ -23,7 +24,7 @@ def load_one_case(adapter, case_id):
 
 def load_all(adapter):
     """Function to load all samples found in the case_analysis collection"""
-    for case in adapter.case_analysis_collection:
+    for case in adapter.case_analysis_collection.find():
         load_one_case(adapter, case = case)
       
 

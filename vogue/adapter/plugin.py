@@ -5,6 +5,20 @@ from datetime import datetime as dt
 LOG = logging.getLogger(__name__)
 
 
+
+def check_dates(current_document, analysis_result):
+    """Function to pop analysysis results from tne new analysis if the results are older than 
+    the current results in the database"""
+
+    if current_document.get('mip') and analysis_result.get('mip'):
+        if current_document['mip']['added'] > analysis_result['mip']['added']:
+            analysis_result.pop('mip')
+
+    return analysis_result
+
+
+
+
 class VougeAdapter(MongoAdapter):
     def setup(self, db_name: str):
         """Setup connection to a database"""
@@ -98,9 +112,9 @@ class VougeAdapter(MongoAdapter):
         lims_id = analysis_result['_id']
         # pop _id key to make pushing easier
         analysis_result.pop('_id')
-        update_result = self.db.sample_analysis2.find_one({'_id': lims_id})
+        current_document = self.db.sample_analysis2.find_one({'_id': lims_id})
 
-        if update_result is None:
+        if current_document is None:
             self.db.sample_analysis2.update_one(
                 {'_id': lims_id},
                 {'$set': {
@@ -112,6 +126,7 @@ class VougeAdapter(MongoAdapter):
                 upsert=True)
             LOG.info("Added analysis sample %s.", lims_id)
         else:
+            analysis_result = check_dates(current_document, analysis_result)
             self.db.sample_analysis2.update_one(
                 {'_id': lims_id},
                 {'$set': {
