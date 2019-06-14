@@ -5,6 +5,24 @@ from datetime import datetime as dt
 LOG = logging.getLogger(__name__)
 
 
+
+def check_dates(analysis_result, current_document):
+    """Function to pop analysysis results from tne new analysis if the results are older than 
+    the current results in the database"""
+
+    if current_document.get('mip') and analysis_result.get('mip'):
+        try:
+            if current_document['mip']['added'] > analysis_result['mip']['added']:
+                analysis_result.pop('mip')
+        except:
+            LOG.error("Invalid or missing mip analysis date. Skiping analysis")
+            analysis_result.pop('mip')
+
+    return analysis_result
+
+
+
+
 class VougeAdapter(MongoAdapter):
     def setup(self, db_name: str):
         """Setup connection to a database"""
@@ -15,6 +33,7 @@ class VougeAdapter(MongoAdapter):
         self.db_name = db_name
         self.sample_collection = self.db.sample
         self.sample_analysis_collection = self.db.sample_analysis
+        self.sample_analysis_collection2 = self.db.sample_analysis2
         self.case_analysis_collection = self.db.case_analysis
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
@@ -91,17 +110,32 @@ class VougeAdapter(MongoAdapter):
         else:
             LOG.info("No updates for application_tag %s.", tag)
 
-    def sample(self, lims_id):
-        return self.sample_collection.find_one({'_id': lims_id})
 
-    def flowcell(self, run_id):
-        return self.flowcell_collection.find_one({'_id': run_id})
+    def add_or_update_sample_analysis(self, analysis_result: dict):
+        """Functionality to add or update sample_analysis collection"""
+        lims_id = analysis_result['_id']
+        current_document = self.db.sample_analysis2.find_one({'_id': lims_id})
+        analysis_result = check_dates(analysis_result, current_document)
 
-    def app_tag(self, tag):
-        return self.app_tag_collection.find_one({'_id': tag})
+        update_result = self.db.sample_analysis2.update_one({'_id': lims_id},
+                                                  {'$set': analysis_result},
+                                                  upsert=True)
 
-    def delete_sample(self):
-        return None
+        if not update_result.raw_result['updatedExisting']:
+            self.db.sample_analysis2.update_one({'_id': lims_id},
+                                      {'$set': {
+                                          'added': dt.today()
+                                      }})
+            LOG.info("Added sample %s.", lims_id)
+        elif update_result.modified_count:
+            self.db.sample_analysis2.update_one({'_id': lims_id},
+                                      {'$set': {
+                                          'updated': dt.today()
+                                      }})
+            LOG.info("Updated sample %s.", lims_id)
+        else:
+            LOG.info("No updates for sample %s.", lims_id)
+
 
     def add_or_update_analysis_sample(self, analysis_result: dict):
         """Functionality to add or update analysis sample"""
@@ -163,6 +197,19 @@ class VougeAdapter(MongoAdapter):
                 upsert=True)
             LOG.info("Updated analysis for sample %s.", case_id)
 
+
+    def sample(self, lims_id):
+        return self.sample_collection.find_one({'_id': lims_id})
+
+    def flowcell(self, run_id):
+        return self.flowcell_collection.find_one({'_id': run_id})
+
+    def app_tag(self, tag):
+        return self.app_tag_collection.find_one({'_id': tag})
+
+    def delete_sample(self):
+        return None
+
     def sample_analysis(self, analysis_id: str):
         """Functionality to get analyses results"""
         return self.sample_analysis_collection.find_one({'_id': analysis_id})
@@ -193,3 +240,4 @@ class VougeAdapter(MongoAdapter):
         tag = self.app_tag_collection.find_one({'_id': app_tag},
                                                {"category": 1})
         return tag.get('category') if tag else None
+
