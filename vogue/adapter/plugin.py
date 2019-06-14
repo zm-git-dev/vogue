@@ -10,7 +10,7 @@ def check_dates(analysis_result, current_document):
     """Function to pop analysysis results from tne new analysis if the results are older than 
     the current results in the database"""
 
-    if current_document.get('mip') and analysis_result.get('mip'):
+    if current_document and current_document.get('mip') and analysis_result.get('mip'):
         try:
             if current_document['mip']['added'] > analysis_result['mip']['added']:
                 analysis_result.pop('mip')
@@ -33,7 +33,6 @@ class VougeAdapter(MongoAdapter):
         self.db_name = db_name
         self.sample_collection = self.db.sample
         self.sample_analysis_collection = self.db.sample_analysis
-        self.sample_analysis_collection2 = self.db.sample_analysis2
         self.case_analysis_collection = self.db.case_analysis
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
@@ -114,21 +113,21 @@ class VougeAdapter(MongoAdapter):
     def add_or_update_sample_analysis(self, analysis_result: dict):
         """Functionality to add or update sample_analysis collection"""
         lims_id = analysis_result['_id']
-        current_document = self.db.sample_analysis2.find_one({'_id': lims_id})
+        current_document = self.db.sample_analysis.find_one({'_id': lims_id})
         analysis_result = check_dates(analysis_result, current_document)
 
-        update_result = self.db.sample_analysis2.update_one({'_id': lims_id},
+        update_result = self.db.sample_analysis.update_one({'_id': lims_id},
                                                   {'$set': analysis_result},
                                                   upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
-            self.db.sample_analysis2.update_one({'_id': lims_id},
+            self.db.sample_analysis.update_one({'_id': lims_id},
                                       {'$set': {
                                           'added': dt.today()
                                       }})
             LOG.info("Added sample %s.", lims_id)
         elif update_result.modified_count:
-            self.db.sample_analysis2.update_one({'_id': lims_id},
+            self.db.sample_analysis.update_one({'_id': lims_id},
                                       {'$set': {
                                           'updated': dt.today()
                                       }})
@@ -136,36 +135,6 @@ class VougeAdapter(MongoAdapter):
         else:
             LOG.info("No updates for sample %s.", lims_id)
 
-
-    def add_or_update_analysis_sample(self, analysis_result: dict):
-        """Functionality to add or update analysis sample"""
-        lims_id = analysis_result['_id']
-        # pop _id key to make pushing easier
-        analysis_result.pop('_id')
-        update_result = self.db.sample_analysis.find_one({'_id': lims_id})
-
-        if update_result is None:
-            self.db.sample_analysis.update_one(
-                {'_id': lims_id},
-                {'$set': {
-                    **analysis_result,
-                    **{
-                        'added': dt.today()
-                    }
-                }},
-                upsert=True)
-            LOG.info("Added analysis sample %s.", lims_id)
-        else:
-            self.db.sample_analysis.update_one(
-                {'_id': lims_id},
-                {'$set': {
-                    **analysis_result,
-                    **{
-                        'updated': dt.today()
-                    }
-                }},
-                upsert=True)
-            LOG.info("Updated analysis for sample %s.", lims_id)
 
     def add_or_update_analysis_case(self, analysis_result: dict):
         """Functionality to add or update analysis sample"""

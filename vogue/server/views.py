@@ -2,8 +2,10 @@
 
 from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
-from vogue.constants.constants import YEARS, THIS_YEAR
-from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, value_per_month, plot_attributes, q30_instruments, insert_size)
+from vogue.constants.constants import YEARS, THIS_YEAR, PICARD_INSERT_SIZE, PICARD_HS_METRIC
+from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, 
+                                value_per_month, plot_attributes, q30_instruments, 
+                                mip_picard_time_plot, mip_picard_plot)
 
 app = current_app
 blueprint = Blueprint('server', __name__)
@@ -28,8 +30,10 @@ def index():
         return redirect(url_for('server.target_enrichment', year=year))
     if request.form.get('page') == 'runs':
         return redirect(url_for('server.runs', year=year))
-    if request.form.get('page') == 'mip':
-        return redirect(url_for('server.mip', year=year))
+    if request.form.get('page') == 'mip_picard_time':
+        return redirect(url_for('server.mip_picard_time', year=year))
+    if request.form.get('page') == 'mip_picard':
+        return redirect(url_for('server.mip_picard', year=year))
 
     return render_template(
         'index.html',
@@ -161,18 +165,44 @@ def runs(year):
         year_of_interest=year,
         years = YEARS)
 
-@blueprint.route('/sequencing/mip/<year>')
-def mip(year):
-    results = insert_size(app.adapter, year)
-
-    return render_template('mip.html',
-        results = results,
+@blueprint.route('/QC/mip_picard_time/<year>', methods=['GET', 'POST'])
+def mip_picard_time(year):
+    mip_results = mip_picard_time_plot(app.adapter, year)
+    selcted_metric = request.form.get('picard_metric')
+    if not selcted_metric:
+        selcted_metric = 'MEAN_INSERT_SIZE'
+    return render_template('mip_picard_time.html',
+        selcted_metric = selcted_metric,
+        mip_results = mip_results,
+        PICARD_INSERT_SIZE = PICARD_INSERT_SIZE, 
+        PICARD_HS_METRIC = PICARD_HS_METRIC,
         header = 'MIP',
-        page_id = 'mip',
+        page_id = 'mip_picard_time',
         year_of_interest=year,
         years = YEARS)
 
-@blueprint.route('/sequencing/balsamic/<year>')
+@blueprint.route('/QC/mip_picard/<year>', methods=['GET', 'POST'])
+def mip_picard(year):
+   
+    mip_results = mip_picard_plot(app.adapter, year)
+    Y_axis = request.form.get('Y_axis')
+    X_axis = request.form.get('X_axis')
+    if not Y_axis:
+        Y_axis = 'MEAN_INSERT_SIZE'
+    if not X_axis:
+        X_axis = 'MEAN_INSERT_SIZE'
+    return render_template('mip_picard.html',
+        Y_axis = Y_axis,
+        X_axis = X_axis,
+        mip_results = mip_results,
+        PICARD_INSERT_SIZE = PICARD_INSERT_SIZE, 
+        PICARD_HS_METRIC = PICARD_HS_METRIC,
+        header = 'MIP',
+        page_id = 'mip_picard',
+        year_of_interest=year,
+        years = YEARS)
+
+@blueprint.route('/QC/balsamic/<year>')
 def balsamic(year):
 
     return render_template('balsamic.html',
@@ -181,7 +211,7 @@ def balsamic(year):
         year_of_interest=year,
         years = YEARS)
 
-@blueprint.route('/sequencing/microsalt/<year>')
+@blueprint.route('/QC/microsalt/<year>')
 def microsalt(year):
 
     return render_template('microsalt.html',
