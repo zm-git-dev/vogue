@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import (MONTHS, TEST_SAMPLES)
+from vogue.constants.constants import (MONTHS, TEST_SAMPLES, PICARD_INSERT_SIZE, PICARD_HS_METRIC)
 from statistics import mean
 
 
@@ -236,8 +236,8 @@ def q30_instruments(adapter, year : int)-> dict:
 
     return instruments
         
-def insert_size(adapter, year : int)-> dict:
-    """Prepares data for the MIP insert sizs plot."""
+def mip_picard_time_plot(adapter, year : int)-> dict:
+    """Prepares data for the MIP picard over time plot."""
 
     pipe = [
     {
@@ -253,7 +253,7 @@ def insert_size(adapter, year : int)-> dict:
         }
     }, {
         '$project': {
-            'cases': 1, 
+            'mip': 1, 
             'received_date': '$sample_info.received_date'
         }
     }, {
@@ -270,7 +270,7 @@ def insert_size(adapter, year : int)-> dict:
             'year': {
                 '$year': '$received_date'
             }, 
-            'cases': 1
+            'mip': 1
         }
     },{
         '$match': {
@@ -281,25 +281,45 @@ def insert_size(adapter, year : int)-> dict:
     }
 ]
     aggregate_result = adapter.sample_analysis_aggregate(pipe)
-    final_data = []
-    for sample in aggregate_result:
-        latest_size = None
-        latest_analysis = None
-        for case , data in sample.get('cases').items():
-            if not 'mip' in data:
-                continue
-            for analysis in data.get('mip'):
-                if not latest_analysis or latest_analysis < analysis.get('added'):
-                    latest_analysis = analysis.get('added')
-                    latest_size = analysis.get('multiqc_picard_insertSize').get('MEAN_INSERT_SIZE')
-        if latest_size:
-           final_data.append({'name':sample['_id'], 'x':sample['month'], 'y':latest_size}) 
-        
+    final_data = {k:[] for k in PICARD_INSERT_SIZE + PICARD_HS_METRIC }
 
+    for sample in aggregate_result:
+        sample_id = sample['_id']
+        mip_analysis=sample.get('mip')
+        if mip_analysis:
+            multiqc_picard_insertSize = mip_analysis.get('multiqc_picard_insertSize')
+            multiqc_picard_HsMetrics = mip_analysis.get('multiqc_picard_HsMetrics')
+            for key, val in multiqc_picard_insertSize.items():
+                if key in final_data.keys():
+                    final_data[key].append({'name':sample_id, 'x':sample['month'], 'y':val}) 
+            for key, val in multiqc_picard_HsMetrics.items():
+                if key in final_data.keys():
+                    final_data[key].append({'name':sample_id, 'x':sample['month'], 'y':val})
+                    
     plot_data = {'data':final_data,
-                'labels':[m[1] for m in MONTHS], 
-                'title': 'MIP picard insertSize',
-                'axis':{'y':'Mean insert size', 'x':'Sampele Recieved'}}
+                'labels':[m[1] for m in MONTHS]}
+
     return(plot_data)                    
 
 
+def mip_picard_plot(adapter, year : int)-> dict:
+    """Prepares data for the MIP picard plot."""
+
+    all_samples = adapter.sample_analysis_collection.find() 
+    final_data = []
+
+    for sample in all_samples:
+        sample_id = sample['_id']
+        mip_analysis=sample.get('mip')
+        if mip_analysis:
+            multiqc_picard_insertSize = mip_analysis.get('multiqc_picard_insertSize')
+            multiqc_picard_HsMetrics = mip_analysis.get('multiqc_picard_HsMetrics')
+            merged = multiqc_picard_insertSize.copy()  
+            merged.update(multiqc_picard_HsMetrics)
+            merged['_id'] = sample_id
+            final_data.append(merged)
+                    
+    plot_data = {'final_data' : final_data,
+                'labels':[m[1] for m in MONTHS]}
+         
+    return(plot_data)                    

@@ -43,15 +43,36 @@
         </div>
       </li>
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          QC
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="{{ url_for('server.mip' , year=year_of_interest) }}">MIP</a>
-          <a class="dropdown-item" href="{{ url_for('server.balsamic' , year=year_of_interest) }}">Balsamic</a>
-          <a class="dropdown-item" href="{{ url_for('server.microsalt' , year=year_of_interest) }}">uSalt</a>
-        </div>
+        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">QC</a>
+        <ul class="dropdown-menu">
+          <li class="dropdown-item dropdown-submenu">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">MIP</a>
+            <ul class="dropdown-menu">
+              <li class="dropdown-item">
+                <a href="{{ url_for('server.mip_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
+              </li>
+              <li class="dropdown-item">
+                <a href="{{ url_for('server.mip_picard' , year=year_of_interest) }}">Picard QC</a>
+              </li>
+            </ul>
+          </li>
+          <li class="dropdown-item dropdown-submenu">
+              <a href="#" data-toggle="dropdown" class="dropdown-toggle">Balsamic</a>
+              <ul class="dropdown-menu">
+                <li class="dropdown-item">
+                  <a href="{{ url_for('server.balsamic' , year=year_of_interest) }}">Nothing here yet</a>
+                </li>
+              </ul>
+            </li>
+            <li class="dropdown-item dropdown-submenu">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">uSalt</a>
+                <ul class="dropdown-menu">
+                  <li class="dropdown-item">
+                    <a href="{{ url_for('server.microsalt' , year=year_of_interest) }}">Nothing here yet</a>
+                  </li>
+                </ul>
+              </li>
+        </ul>
       </li>
     </ul>
   </div>
