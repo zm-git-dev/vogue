@@ -19,6 +19,34 @@ def reduce_keys(dict_long_keys):
     new_dict = {key.split('_')[0]: val for key, val in dict_long_keys.items()}
     return new_dict
 
+class uSalt():
+    """Class to prepare uSalt case_analysis results 
+    for uSalt results in the sample_analysis collection"""
+
+    def __init__(self, project):
+        self.project = project
+        self.uSalt_analysis = get_latest_analysis(project, 'microsalt')
+        self.added = None
+        self.report_saved_raw_data = {}
+        self.multiqc_picard_insertSize = {}
+        self.multiqc_picard_HsMetrics = {}
+        self._set_init()
+
+    def _set_init(self):
+        if self.uSalt_analysis:
+            self.added = self.uSalt_analysis.get('added')
+            self.results = self.uSalt_analysis['results']
+
+    def build_uSalt_sample(self, sample_id):
+        """Bulding the uSalt analysis for one sample. 
+        Returns {} if the date 'added' is empty."""
+        
+        if not self.added:
+            return {}
+
+        return {'results': self.results.get(sample_id),
+                'added' : self.added,
+                'project' : self.project['_id']}
 
 class Mip():
     """Class to prepare mip case_analysis results 

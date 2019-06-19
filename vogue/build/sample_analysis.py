@@ -7,12 +7,13 @@ def build_samples(case: dict)-> dict:
     from one case in the case_analysis collection"""
     
     mip_analysis = Mip(case)
+    microsalt_analysis = uSalt(case)
     mongo_samples = []
 
     for sample_id in case.get('samples'):
         mongo_sample = {'_id' : sample_id}
         mongo_sample['mip'] = mip_analysis.build_mip_sample(sample_id)
-
+        mongo_sample['microsalt'] = microsalt_analysis.build_uSalt_sample(sample_id)
         for key in list(mongo_sample.keys()):
             stuff_we_dont_want = [None, [], {}]
             if mongo_sample[key] in stuff_we_dont_want:
