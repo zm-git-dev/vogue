@@ -322,4 +322,69 @@ def mip_picard_plot(adapter, year : int)-> dict:
     plot_data = {'final_data' : final_data,
                 'labels':[m[1] for m in MONTHS]}
          
-    return(plot_data)                    
+    return(plot_data)       
+
+def microsalt_strain_st(adapter,  year : int)-> dict:
+
+    pipe= [{
+        '$match': {
+            'microsalt': {
+                '$exists': 'True'
+            }
+        }
+    }, {
+        '$lookup': {
+            'from': 'sample', 
+            'localField': '_id', 
+            'foreignField': '_id', 
+            'as': 'sample_info'
+        }
+    }, {
+        '$unwind': {
+            'path': '$sample_info'
+        }
+    }, {
+        '$project': {
+            'strain': '$sample_info.strain', 
+            'year': {
+                '$year': '$sample_info.received_date'
+            }, 
+            'sequence_type': '$microsalt.results.blast_pubmlst.sequence_type'
+        }
+    }, {
+        '$match': {
+            'year': {
+                '$eq': int(year)
+            }
+        }
+    }, {
+        '$group': {
+            '_id': {
+                'strain': '$strain', 
+                'sequence_type': '$sequence_type'
+            }, 
+            'number': {
+                '$sum': 1
+            }
+        }
+    }, {
+        '$group': {
+            '_id': '$_id.strain', 
+            'number': {
+                '$push': '$number'
+            }, 
+            'sequence_type': {
+                '$push': '$_id.sequence_type'
+            }
+        }
+    }
+]
+    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    plot_data = {}
+    for strain_results in aggregate_result:
+        strain = strain_results['_id']
+        st = strain_results['sequence_type']
+        counts = strain_results['number']
+        data = [[st[i], c] for i, c in enumerate(counts)]
+        plot_data[strain] = data
+    return plot_data

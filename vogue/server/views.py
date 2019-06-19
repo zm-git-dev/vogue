@@ -5,7 +5,7 @@ from flask import url_for, redirect, render_template, request, Blueprint, curren
 from vogue.constants.constants import YEARS, THIS_YEAR, PICARD_INSERT_SIZE, PICARD_HS_METRIC
 from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, 
                                 value_per_month, plot_attributes, q30_instruments, 
-                                mip_picard_time_plot, mip_picard_plot)
+                                mip_picard_time_plot, mip_picard_plot, microsalt_strain_st)
 
 app = current_app
 blueprint = Blueprint('server', __name__)
@@ -34,6 +34,8 @@ def index():
         return redirect(url_for('server.mip_picard_time', year=year))
     if request.form.get('page') == 'mip_picard':
         return redirect(url_for('server.mip_picard', year=year))
+    if request.form.get('page') == 'strain_st':
+        return redirect(url_for('server.microsalt', year=year))
 
     return render_template(
         'index.html',
@@ -185,12 +187,8 @@ def mip_picard_time(year):
 def mip_picard(year):
    
     mip_results = mip_picard_plot(app.adapter, year)
-    Y_axis = request.form.get('Y_axis')
-    X_axis = request.form.get('X_axis')
-    if not Y_axis:
-        Y_axis = 'MEAN_INSERT_SIZE'
-    if not X_axis:
-        X_axis = 'MEAN_INSERT_SIZE'
+    Y_axis = request.form.get('Y_axis', 'MEAN_INSERT_SIZE')
+    X_axis = request.form.get('X_axis', 'MEAN_INSERT_SIZE')
     return render_template('mip_picard.html',
         Y_axis = Y_axis,
         X_axis = X_axis,
@@ -211,11 +209,17 @@ def balsamic(year):
         year_of_interest=year,
         years = YEARS)
 
-@blueprint.route('/QC/microsalt/<year>')
-def microsalt(year):
 
+@blueprint.route('/QC/microsalt/<year>',  methods=['GET', 'POST'])
+def microsalt(year):
+    strain = request.form.get('strain', '')
+    results = microsalt_strain_st(app.adapter, year)
     return render_template('microsalt.html',
+        data = results.get(strain, {}),
+        strain = strain,
+        categories = results.keys(),
         header = 'uSalt',
+        page_id = 'strain_st',
         year_of_interest=year,
         years = YEARS)
 
