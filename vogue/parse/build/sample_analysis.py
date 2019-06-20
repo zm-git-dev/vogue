@@ -27,9 +27,6 @@ class uSalt():
         self.project = project
         self.uSalt_analysis = get_latest_analysis(project, 'microsalt')
         self.added = None
-        self.report_saved_raw_data = {}
-        self.multiqc_picard_insertSize = {}
-        self.multiqc_picard_HsMetrics = {}
         self._set_init()
 
     def _set_init(self):
@@ -56,7 +53,8 @@ class Mip():
         self.case = case
         self.mip_analysis = get_latest_analysis(case, 'mip')
         self.added = None
-        self.report_saved_raw_data = {}
+        self.
+        = {}
         self.multiqc_picard_insertSize = {}
         self.multiqc_picard_HsMetrics = {}
         self._set_init()
