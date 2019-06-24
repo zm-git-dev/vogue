@@ -53,8 +53,7 @@ class Mip():
         self.case = case
         self.mip_analysis = get_latest_analysis(case, 'mip')
         self.added = None
-        self.
-        = {}
+        self.report_saved_raw_data = {}
         self.multiqc_picard_insertSize = {}
         self.multiqc_picard_HsMetrics = {}
         self._set_init()
