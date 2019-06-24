@@ -50,8 +50,8 @@
 
     Highcharts.chart('qc_time', {
         chart: { type: 'boxplot' },
-        title: { text: 'QC over time' },
-        subtitle: { text: '{{selected_metric}}' },
+        subtitle: { text: 'QC metric over time. (Mean is mean over the whole year.)' },
+        title: { text: '{{selected_metric}}' },
         xAxis: {
             title: { text: 'Date recived' },
             categories: {{ categories| tojson }}},
