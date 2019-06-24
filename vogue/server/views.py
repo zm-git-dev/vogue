@@ -37,6 +37,8 @@ def index():
         return redirect(url_for('server.microsalt', year=year))
     if request.form.get('page') == 'microsalt_qc_time':
         return redirect(url_for('server.microsalt_qc_time', year=year))
+    if request.form.get('page') == 'microsalt_untyped':
+        return redirect(url_for('server.microsalt_untyped', year=year))
 
     return render_template(
         'index.html',
@@ -219,7 +221,7 @@ def microsalt(year):
         data = results.get(strain, {}),
         strain = strain,
         categories = results.keys(),
-        header = 'microsalt',
+        header = 'microsalt - ST and strain',
         page_id = 'strain_st',
         year_of_interest=year,
         years = YEARS)
@@ -234,12 +236,25 @@ def microsalt_qc_time(year):
         categories = results['labels'],
         mean = results['mean'],
         selected_metric = metric_path.split('.')[1],
-        header = 'microsalt qc time',
+        header = 'microsalt - qc time',
         page_id = 'microsalt_qc_time',
         year_of_interest=year,
         MICROSALT = MICROSALT,
         years = YEARS)
 
+
+
+@blueprint.route('/QC/microsalt/untyped/<year>',  methods=['GET', 'POST'])
+def microsalt_untyped(year):
+    results = untyped_microsalt(app.adapter, year )
+    return render_template('microsalt_untyped.html',
+        results = results['data'],
+        categories = results['labels'],
+        header = 'microsalt - untyped organisms',
+        page_id = 'microsalt_untyped',
+        year_of_interest=year,
+        MICROSALT = MICROSALT,
+        years = YEARS)
 
 @blueprint.route('/sequencing/hiseqx/<year>')
 def hiseqx(year):
