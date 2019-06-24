@@ -32,7 +32,7 @@ class uSalt():
     def _set_init(self):
         if self.uSalt_analysis:
             self.added = self.uSalt_analysis.get('added')
-            self.results = self.uSalt_analysis['results']
+            self.results = self.uSalt_analysis.get('results', {})
 
     def build_uSalt_sample(self, sample_id):
         """Bulding the uSalt analysis for one sample. 
