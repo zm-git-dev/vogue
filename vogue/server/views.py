@@ -2,10 +2,9 @@
 
 from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
-from vogue.constants.constants import YEARS, THIS_YEAR, PICARD_INSERT_SIZE, PICARD_HS_METRIC
-from vogue.server.utils import ( find_concentration_defrosts, find_concentration_amount, 
-                                value_per_month, plot_attributes, q30_instruments, 
-                                mip_picard_time_plot, mip_picard_plot, microsalt_strain_st)
+from vogue.constants.constants import YEARS, THIS_YEAR, PICARD_INSERT_SIZE, PICARD_HS_METRIC, MICROSALT
+from vogue.server.utils import *
+
 
 app = current_app
 blueprint = Blueprint('server', __name__)
@@ -36,6 +35,8 @@ def index():
         return redirect(url_for('server.mip_picard', year=year))
     if request.form.get('page') == 'strain_st':
         return redirect(url_for('server.microsalt', year=year))
+    if request.form.get('page') == 'microsalt_qc_time':
+        return redirect(url_for('server.microsalt_qc_time', year=year))
 
     return render_template(
         'index.html',
@@ -210,7 +211,7 @@ def balsamic(year):
         years = YEARS)
 
 
-@blueprint.route('/QC/microsalt/<year>',  methods=['GET', 'POST'])
+@blueprint.route('/QC/microsalt/strain_st/<year>',  methods=['GET', 'POST'])
 def microsalt(year):
     strain = request.form.get('strain', '')
     results = microsalt_strain_st(app.adapter, year)
@@ -218,9 +219,25 @@ def microsalt(year):
         data = results.get(strain, {}),
         strain = strain,
         categories = results.keys(),
-        header = 'uSalt',
+        header = 'microsalt',
         page_id = 'strain_st',
         year_of_interest=year,
+        years = YEARS)
+
+
+@blueprint.route('/QC/microsalt/qc_time/<year>',  methods=['GET', 'POST'])
+def microsalt_qc_time(year):
+    metric_path = request.form.get('qc_metric', 'picard_markduplicate.insert_size')
+    results = qc_time_microsalt(app.adapter, year , metric_path)
+    return render_template('microsalt_qc_time.html',
+        results = results['data'],
+        categories = results['labels'],
+        mean = results['mean'],
+        selected_metric = metric_path.split('.')[1],
+        header = 'microsalt qc time',
+        page_id = 'microsalt_qc_time',
+        year_of_interest=year,
+        MICROSALT = MICROSALT,
         years = YEARS)
 
 

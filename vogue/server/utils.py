@@ -324,8 +324,8 @@ def mip_picard_plot(adapter, year : int)-> dict:
          
     return(plot_data)       
 
-def microsalt_strain_st(adapter,  year : int)-> dict:
 
+def microsalt_strain_st(adapter,  year : int)-> dict:
     pipe= [{
         '$match': {
             'microsalt': {
@@ -387,4 +387,75 @@ def microsalt_strain_st(adapter,  year : int)-> dict:
         counts = strain_results['number']
         data = [[st[i], c] for i, c in enumerate(counts)]
         plot_data[strain] = data
+    return plot_data
+
+
+
+def qc_time_microsalt(adapter,  year : int, metric_path : str)-> dict:
+    """Build aggregation pipeline to get information for microsalt qc data over time.
+    """
+    metric = metric_path.split('.')[1]
+    pipe = [{
+        '$match': {
+            'microsalt': {
+                '$exists': 'True'
+            }
+        }
+    }, {
+        '$lookup': {
+            'from': 'sample', 
+            'localField': '_id', 
+            'foreignField': '_id', 
+            'as': 'sample_info'
+        }
+    }, {
+        '$unwind': {
+            'path': '$sample_info'
+        }
+    }, {
+        '$project': {
+            'month': {
+                '$month': '$sample_info.received_date'
+            }, 
+            'year': {
+                '$year': '$sample_info.received_date'
+            }, 
+            metric : '$microsalt.results.' + metric_path
+        }
+    }, {
+        '$match': {
+            'year': {
+                '$eq': int(year)
+            }
+        }
+    }, {
+        '$group': {
+            '_id': {'month': '$month'}, 
+            metric : {'$push': '$' + metric}
+        }
+    }]
+
+    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    intermediate = {result['_id']['month']: result[metric] for result in aggregate_result}
+    box_plots = []
+    labels = []
+    means = []
+    for m in MONTHS:
+        values = intermediate.get(m[0],[])
+        if values:
+            minimum = round(min(values),2)
+            low = round(np.percentile(values,25),2)
+            med = round(np.median(values),2)
+            high = round(np.percentile(values,75),2)
+            maximum = round(max(values),2)
+            means.append(np.mean(values))
+            box_plots.append([minimum, low, med, high, maximum])
+        else:
+            box_plots.append([])
+        labels.append(m[1])     
+
+    plot_data = {'data' : box_plots,
+                'labels':labels,
+                'mean' : round(np.mean(means),2)}
+
     return plot_data

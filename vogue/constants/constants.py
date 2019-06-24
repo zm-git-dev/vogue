@@ -30,3 +30,13 @@ INSTRUMENTS ={'D00410':'Sigourney',
                 'A00621':'Greta',
                 'FS10000534':'Katherine'}
 
+MICROSALT = {
+        'picard_markduplicate': 
+                ['insert_size', 'duplication_rate'], 
+        'microsalt_samtools_stats':
+                ['average_coverage', 'coverage_10x', 'coverage_30x', 'coverage_50x', 
+                'coverage_100x', 'total_reads','mapped_rate'], 
+        'quast_assembly':
+                ['necessary_contigs', 'gc_percentage', 'estimated_genome_length', 'n50']
+}
+
