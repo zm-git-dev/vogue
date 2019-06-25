@@ -65,10 +65,13 @@
               </ul>
             </li>
             <li class="dropdown-item dropdown-submenu">
-                <a href="#" data-toggle="dropdown" class="dropdown-toggle">uSalt</a>
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">microsalt</a>
                 <ul class="dropdown-menu">
                   <li class="dropdown-item">
                     <a href="{{ url_for('server.microsalt' , year=year_of_interest) }}">ST vs Strain</a>
+                  </li>
+                  <li class="dropdown-item">
+                    <a href="{{ url_for('server.microsalt_qc_time' , year=year_of_interest) }}">QC over time</a>
                   </li>
                 </ul>
               </li>
