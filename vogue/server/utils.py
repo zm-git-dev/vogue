@@ -240,46 +240,29 @@ def mip_picard_time_plot(adapter, year : int)-> dict:
     """Prepares data for the MIP picard over time plot."""
 
     pipe = [
-    {
+        {
         '$lookup': {
             'from': 'sample', 
             'localField': '_id', 
             'foreignField': '_id', 
-            'as': 'sample_info'
-        }
-    }, {
-        '$unwind': {
-            'path': '$sample_info'
-        }
-    }, {
+            'as': 'sample_info'}
+        }, {
+        '$unwind': {'path': '$sample_info'}
+        }, {
         '$project': {
             'mip': 1, 
-            'received_date': '$sample_info.received_date'
+            'received_date': '$sample_info.received_date'}
+        }, {
+        '$match': {'received_date': {'$exists': 'True'}
         }
-    }, {
-        '$match': {
-            'received_date': {
-                '$exists': 'True'
-            }
-        }
-    }, {
+        }, {
         '$project': {
-            'month': {
-                '$month': '$received_date'
-            }, 
-            'year': {
-                '$year': '$received_date'
-            }, 
-            'mip': 1
-        }
-    },{
-        '$match': {
-            'year': {
-                '$eq': int(year)
-            }
-        }
-    }
-]
+            'month': {'$month': '$received_date'}, 
+            'year': {'$year': '$received_date'}, 
+            'mip': 1}
+        },{
+        '$match': {'year': {'$eq': int(year)}}
+        }]
     aggregate_result = adapter.sample_analysis_aggregate(pipe)
     final_data = {k:[] for k in PICARD_INSERT_SIZE + PICARD_HS_METRIC }
 
@@ -326,59 +309,44 @@ def mip_picard_plot(adapter, year : int)-> dict:
 
 
 def microsalt_strain_st(adapter,  year : int)-> dict:
-    pipe= [{
-        '$match': {
-            'microsalt': {
-                '$exists': 'True'
-            }
-        }
-    }, {
+    pipe= [
+        {'$match': {
+            'microsalt': {'$exists': 'True'}}
+        }, {
         '$lookup': {
             'from': 'sample', 
             'localField': '_id', 
             'foreignField': '_id', 
-            'as': 'sample_info'
-        }
-    }, {
-        '$unwind': {
-            'path': '$sample_info'
-        }
-    }, {
+            'as': 'sample_info'}
+        }, {
+        '$unwind': {'path': '$sample_info'}
+        }, {
         '$project': {
             'strain': '$sample_info.strain', 
-            'year': {
-                '$year': '$sample_info.received_date'
-            }, 
-            'sequence_type': '$microsalt.results.blast_pubmlst.sequence_type'
-        }
-    }, {
-        '$match': {
-            'year': {
-                '$eq': int(year)
-            }
-        }
-    }, {
+            'year': {'$year': '$sample_info.received_date'}, 
+            'sequence_type': '$microsalt.results.blast_pubmlst.sequence_type'}
+        }, {
+        '$match': {'year': {'$eq': int(year)}}
+        }, {
         '$group': {
             '_id': {
                 'strain': '$strain', 
-                'sequence_type': '$sequence_type'
-            }, 
+                'sequence_type': '$sequence_type'}, 
+            'number': {'$sum': 1}}
+        }, {
+        '$match': {
             'number': {
-                '$sum': 1
-            }
-        }
-    }, {
+                '$exists': 'True'
+            }, 
+            '_id.sequence_type': {
+                '$exists': 'True'}}
+        }, {
         '$group': {
             '_id': '$_id.strain', 
-            'number': {
-                '$push': '$number'
-            }, 
-            'sequence_type': {
-                '$push': '$_id.sequence_type'
-            }
-        }
-    }
-]
+            'number': {'$push': '$number'}, 
+            'sequence_type': {'$push': '$_id.sequence_type'}}
+        }]
+
     aggregate_result = adapter.sample_analysis_aggregate(pipe)
     plot_data = {}
     for strain_results in aggregate_result:
@@ -395,45 +363,29 @@ def qc_time_microsalt(adapter,  year : int, metric_path : str)-> dict:
     """Build aggregation pipeline to get information for microsalt qc data over time.
     """
     metric = metric_path.split('.')[1]
-    pipe = [{
-        '$match': {
-            'microsalt': {
-                '$exists': 'True'
-            }
-        }
-    }, {
+    pipe = [
+        {
+        '$match': {'microsalt': {'$exists': 'True'}}
+        }, {
         '$lookup': {
             'from': 'sample', 
             'localField': '_id', 
             'foreignField': '_id', 
-            'as': 'sample_info'
-        }
-    }, {
-        '$unwind': {
-            'path': '$sample_info'
-        }
-    }, {
+            'as': 'sample_info'}
+        }, {
+        '$unwind': {'path': '$sample_info'}
+        }, {
         '$project': {
-            'month': {
-                '$month': '$sample_info.received_date'
-            }, 
-            'year': {
-                '$year': '$sample_info.received_date'
-            }, 
-            metric : '$microsalt.results.' + metric_path
-        }
-    }, {
-        '$match': {
-            'year': {
-                '$eq': int(year)
-            }
-        }
-    }, {
+            'month': {'$month': '$sample_info.received_date'}, 
+            'year': {'$year': '$sample_info.received_date'}, 
+            metric : '$microsalt.results.' + metric_path}
+        }, {
+        '$match': {'year': {'$eq': int(year)}}
+        }, {
         '$group': {
             '_id': {'month': '$month'}, 
-            metric : {'$push': '$' + metric}
-        }
-    }]
+            metric : {'$push': '$' + metric}}
+        }]
 
     aggregate_result = adapter.sample_analysis_aggregate(pipe)
     intermediate = {result['_id']['month']: result[metric] for result in aggregate_result}
@@ -459,3 +411,62 @@ def qc_time_microsalt(adapter,  year : int, metric_path : str)-> dict:
                 'mean' : round(np.mean(means),2)}
 
     return plot_data
+
+def untyped_microsalt(adapter,  year : int)-> dict:
+    """Build aggregation pipeline to get information for microsalt qc data over time.
+    """
+    pipe = [
+        {
+        '$match': {'microsalt': {'$exists': 'True'}}
+        }, {
+        '$lookup': {
+            'from': 'sample', 
+            'localField': '_id', 
+            'foreignField': '_id', 
+            'as': 'sample_info'}
+        }, {
+        '$unwind': {'path': '$sample_info'}
+        }, {
+        '$project': {
+            'month': {'$month': '$sample_info.received_date'}, 
+            'year': {'$year': '$sample_info.received_date'}, 
+            'ST': '$microsalt.results.blast_pubmlst.sequence_type'}
+        }, {
+        '$match': {'year': {'$eq': int(year)}}
+        }, {
+        '$group': {
+            '_id': {'month': '$month'}, 
+            'ST': {'$push': '$ST'}}
+        }]
+        
+    intermediate = {}
+    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    for result in aggregate_result:
+        untyped = 0
+        typed = 0
+        for st in result['ST']:
+            try:
+                st = int(st)
+                if  -9 < st < -1:
+                    untyped+=1
+                else:
+                    typed += 1
+            except:
+                pass
+        if typed + untyped:
+            fraction = untyped/(typed + untyped)
+        else:
+            fraction = None
+        intermediate[result['_id']['month']] = fraction
+
+    data = []
+    labels = []
+    for m in MONTHS:
+        value = intermediate.get(m[0],None)
+        data.append(value)
+        labels.append(m[1])     
+
+    plot_data = {'data' : data,
+                'labels':labels}
+    return plot_data
+
