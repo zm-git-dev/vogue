@@ -34,11 +34,13 @@ def index():
     if request.form.get('page') == 'mip_picard':
         return redirect(url_for('server.mip_picard', year=year))
     if request.form.get('page') == 'strain_st':
-        return redirect(url_for('server.microsalt', year=year))
+        return redirect(url_for('server.microsalt_strain_st', year=year))
     if request.form.get('page') == 'microsalt_qc_time':
         return redirect(url_for('server.microsalt_qc_time', year=year))
     if request.form.get('page') == 'microsalt_untyped':
         return redirect(url_for('server.microsalt_untyped', year=year))
+    if request.form.get('page') == 'microsalt_st_time':
+        return redirect(url_for('server.microsalt_st_time', year=year))
 
     return render_template(
         'index.html',
@@ -214,14 +216,14 @@ def balsamic(year):
 
 
 @blueprint.route('/QC/microsalt/strain_st/<year>',  methods=['GET', 'POST'])
-def microsalt(year):
+def microsalt_strain_st(year):
     strain = request.form.get('strain', '')
-    results = microsalt_strain_st(app.adapter, year)
-    return render_template('microsalt.html',
+    results = microsalt_get_strain_st(app.adapter, year)
+    return render_template('microsalt_strain_st.html',
         data = results.get(strain, {}),
         strain = strain,
         categories = results.keys(),
-        header = 'microsalt - ST and strain',
+        header = 'Microsalt',
         page_id = 'strain_st',
         year_of_interest=year,
         years = YEARS)
@@ -230,13 +232,13 @@ def microsalt(year):
 @blueprint.route('/QC/microsalt/qc_time/<year>',  methods=['GET', 'POST'])
 def microsalt_qc_time(year):
     metric_path = request.form.get('qc_metric', 'picard_markduplicate.insert_size')
-    results = qc_time_microsalt(app.adapter, year , metric_path)
+    results = microsalt_get_qc_time(app.adapter, year , metric_path)
     return render_template('microsalt_qc_time.html',
         results = results['data'],
         categories = results['labels'],
         mean = results['mean'],
         selected_metric = metric_path.split('.')[1],
-        header = 'microsalt - qc time',
+        header = 'Microsalt',
         page_id = 'microsalt_qc_time',
         year_of_interest=year,
         MICROSALT = MICROSALT,
@@ -246,12 +248,28 @@ def microsalt_qc_time(year):
 
 @blueprint.route('/QC/microsalt/untyped/<year>',  methods=['GET', 'POST'])
 def microsalt_untyped(year):
-    results = untyped_microsalt(app.adapter, year )
+    results = microsalt_get_untyped(app.adapter, year )
     return render_template('microsalt_untyped.html',
         results = results['data'],
         categories = results['labels'],
-        header = 'microsalt - untyped organisms',
+        header = 'Microsalt',
         page_id = 'microsalt_untyped',
+        year_of_interest=year,
+        MICROSALT = MICROSALT,
+        years = YEARS)
+
+
+@blueprint.route('/QC/microsalt/st_time/<year>',  methods=['GET', 'POST'])
+def microsalt_st_time(year):
+    strain = request.form.get('strain', 'E.coli')
+    results = microsalt_get_st_time(app.adapter, year )
+    return render_template('microsalt_st_time.html',
+        results = results['data'][strain],
+        strain = strain,
+        strains = results['data'].keys(),
+        categories = results['labels'],
+        header = 'Microsalt',
+        page_id = 'microsalt_st_time',
         year_of_interest=year,
         MICROSALT = MICROSALT,
         years = YEARS)

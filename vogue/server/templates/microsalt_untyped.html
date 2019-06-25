@@ -22,9 +22,9 @@
     
         Highcharts.chart('untyped', {
             chart: { type: 'spline' },
-            title: { text: 'Fraction Untyped'},
-            subtitle: { text: '' },
-            xAxis: { categories: {{ categories| tojson }}},
+            title: { text: 'Fraction of untyped organisms over time'},
+            xAxis: {  title: { text: 'Date recived' },
+                    categories: {{ categories| tojson }}},
             yAxis: { title: { text:'Fraction Untyped' }},
             legend: { enabled: false },
             tooltip: { crosshairs: true, shared: true },
