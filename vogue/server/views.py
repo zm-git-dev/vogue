@@ -237,6 +237,7 @@ def microsalt_qc_time(year):
         results = results['data'],
         categories = results['labels'],
         mean = results['mean'],
+        selected_group = metric_path.split('.')[0],
         selected_metric = metric_path.split('.')[1],
         header = 'Microsalt',
         page_id = 'microsalt_qc_time',
@@ -262,12 +263,14 @@ def microsalt_untyped(year):
 @blueprint.route('/QC/microsalt/st_time/<year>',  methods=['GET', 'POST'])
 def microsalt_st_time(year):
     strain = request.form.get('strain', 'E.coli')
-    results = microsalt_get_st_time(app.adapter, year )
+    results_all = microsalt_get_st_time(app.adapter, year )
+    strain_results = results_all['data'].get(strain, {})
     return render_template('microsalt_st_time.html',
-        results = results['data'][strain],
+        results = strain_results,
+        results_sorted_keys = sorted(strain_results.keys()),
         strain = strain,
-        strains = results['data'].keys(),
-        categories = results['labels'],
+        strains = results_all['data'].keys(),
+        categories = results_all['labels'],
         header = 'Microsalt',
         page_id = 'microsalt_st_time',
         year_of_interest=year,

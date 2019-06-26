@@ -353,8 +353,8 @@ def microsalt_get_strain_st(adapter,  year : int)-> dict:
         strain = strain_results['_id']
         st = strain_results['sequence_type']
         counts = strain_results['number']
-        data = [[st[i], c] for i, c in enumerate(counts)]
-        plot_data[strain] = data
+        data = [(st[i], c) for i, c in enumerate(counts)]
+        plot_data[strain] = sorted(data)
     return plot_data
 
 
@@ -540,6 +540,7 @@ def microsalt_get_st_time(adapter,  year : int)-> dict:
             st = result['_id']['sequence_type']
             strain = result['_id']['strain']  
             final_results[strain][st][month-1]=count
+    print(final_results['E.coli'])
 
     return {'data' : final_results, 'labels' : [m[1] for m in MONTHS]}
     
