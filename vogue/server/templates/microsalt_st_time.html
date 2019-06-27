@@ -34,7 +34,7 @@
 
 <script>
         var series = []
-        {% for group in results %}
+        {% for group in results_sorted_keys %}
         series.push({
             name: "{{group}}",
             data: {{ results[group] | tojson }},
@@ -48,6 +48,13 @@
             xAxis: { title: { text: 'Date recived' },
                     categories: {{ categories| tojson }}},
             yAxis: { title: { text: 'Number of samples' } },
+            legend: {
+                title: {
+                    text: 'Sequence Type<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+                    style: {fontStyle: 'italic'}},
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'},
             tooltip: {
             formatter: function () {
                 var output =  'Month: <b>' + this.x + '</b> <br>'

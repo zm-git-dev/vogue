@@ -13,16 +13,16 @@
                                 <label for="X_axis">Select X axis metric:</label>
                                 <select id="X_axis" name="X_axis" class="form-control form-control-sm"
                                     placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                    <optgroup label="PICARD_INSERT_SIZE">
+                                    <optgroup label="Picard insert size">
                                         {% for metric in PICARD_INSERT_SIZE %}
                                         <option value="{{ metric }}" {{ 'selected' if metric == X_axis }}>
-                                            {{ metric}}
+                                            {{ metric.lower().capitalize().replace('_', ' ')}}
                                         </option>
                                         {% endfor %}
-                                    <optgroup label="PICARD_HS_METRIC">
+                                    <optgroup label="Picard HS metric">
                                         {% for metric in PICARD_HS_METRIC %}
                                         <option value="{{ metric }}" {{ 'selected' if metric == X_axis }}>
-                                            {{ metric}}
+                                            {{ metric.lower().capitalize().replace('_', ' ')}}
                                         </option>
                                         {% endfor %}
                                 </select>
@@ -35,13 +35,13 @@
                                     <optgroup label="PICARD_INSERT_SIZE">
                                         {% for metric in PICARD_INSERT_SIZE %}
                                         <option value="{{ metric }}" {{ 'selected' if metric == Y_axis }}>
-                                            {{ metric}}
+                                            {{ metric.lower().capitalize().replace('_', ' ')}}
                                         </option>
                                         {% endfor %}
                                     <optgroup label="PICARD_HS_METRIC">
                                         {% for metric in PICARD_HS_METRIC %}
                                         <option value="{{ metric }}" {{ 'selected' if metric == Y_axis }}>
-                                            {{ metric}}
+                                            {{ metric.lower().capitalize().replace('_', ' ')}}
                                         </option>
                                         {% endfor %}
                                 </select>
@@ -69,8 +69,8 @@
     Highcharts.chart('picard_plot', {
         chart: { type: 'scatter' },
         title: { text: 'Picard QC' },
-        xAxis: { title: { text: "{{X_axis}}" } },
-        yAxis: { title: { text: "{{Y_axis}}" } },
+        xAxis: { title: { text: "{{X_axis.lower().capitalize().replace('_', ' ')}}" } },
+        yAxis: { title: { text: "{{Y_axis.lower().capitalize().replace('_', ' ')}}" } },
         legend: { enabled: false },
         tooltip: {
             formatter: function () {

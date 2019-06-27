@@ -12,16 +12,16 @@
                             <div class="col-lg-3">
                                 <select name="picard_metric" class="form-control form-control-sm"
                                     placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                    <optgroup label="PICARD_INSERT_SIZE">
+                                    <optgroup label="Picard insert size">
                                         {% for metric in PICARD_INSERT_SIZE %}
                                         <option value="{{ metric }}" {{ 'selected' if metric == selcted_metric }}>
-                                            {{ metric}}
+                                            {{ metric.lower().capitalize().replace('_', ' ')}}
                                         </option>
                                         {% endfor %}
-                                    <optgroup label="PICARD_HS_METRIC">
+                                    <optgroup label="Picard HS metric">
                                         {% for metric in PICARD_HS_METRIC %}
                                         <option value="{{ metric }}" {{ 'selected' if metric == selcted_metric }}>
-                                            {{ metric}}
+                                            {{ metric.lower().capitalize().replace('_', ' ')}}
                                         </option>
                                         {% endfor %}
                                 </select>
@@ -49,11 +49,11 @@
     Highcharts.chart('picard_plot', {
         chart: { type: 'scatter' },
         title: { text: 'Picard QC over time' },
-        subtitle: { text: "{{selcted_metric}}" },
+        subtitle: { text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" },
         xAxis: {
             title: { text: 'Date recived' },
             categories: {{ mip_results.labels | tojson }}},
-        yAxis: { title: { text: "{{selcted_metric}}" } },
+        yAxis: { title: { text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" } },
         legend: { enabled: false },
         tooltip: {
             formatter: function () {
@@ -61,7 +61,7 @@
                 if (this.point.name) {
                     output = output + 'Sample ID: <b>' + this.point.name + '</b> <br>'
                 }
-                output = output + "{{selcted_metric}}" + ': <b>' + this.y + '</b> <br> Sample Recieved in: <b>' + this.x + '</b>'
+                output = output + "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" + ': <b>' + this.y + '</b> <br> Sample Recieved in: <b>' + this.x + '</b>'
                 return output;
             }
         },

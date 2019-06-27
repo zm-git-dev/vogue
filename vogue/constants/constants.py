@@ -30,13 +30,22 @@ INSTRUMENTS ={'D00410':'Sigourney',
                 'A00621':'Greta',
                 'FS10000534':'Katherine'}
 
+
 MICROSALT = {
         'picard_markduplicate': 
-                ['insert_size', 'duplication_rate'], 
+                {'insert_size': 'Median distance between read 1 and read 2 of paired reads. Trimmed deduplicated reads mapped via bwa, reported in Picard. Result is extrapolated from curve fitting the data.', 
+                'duplication_rate':'Percentage of reads that were exact duplicates (thus giving no new information). Trimmed reads mapped via bwa, reported in picard'}, 
         'microsalt_samtools_stats':
-                ['average_coverage', 'coverage_10x', 'coverage_30x', 'coverage_50x', 
-                'coverage_100x', 'total_reads','mapped_rate'], 
+                {'average_coverage':'Summed coverage of each position, divided by reference genome length. Trimmed deduplicated reads mapped via bwa, reported in  Samtools', 
+                'coverage_10x':'Number of positions above 10x coverage, divided by genome length	Trimmed deduplicated reads mapped via bwa, reported in  Samtools', 
+                'coverage_30x':'Number of positions above 30x coverage, divided by genome length	Trimmed deduplicated reads mapped via bwa, reported in  Samtools', 
+                'coverage_50x':'Number of positions above 50x coverage, divided by genome length	Trimmed deduplicated reads mapped via bwa, reported in  Samtools', 
+                'coverage_100x':'Number of positions above 100x coverage, divided by genome length	Trimmed deduplicated reads mapped via bwa, reported in  Samtools', 
+                'total_reads':'Number of reads	Trimmed reads mapped via bwa, reported in samtools.',
+                'mapped_rate': 'Percentage of reads that mapped to the reference. Trimmed reads mapped via bwa, reported in samtools.'}, 
         'quast_assembly':
-                ['necessary_contigs', 'gc_percentage', 'estimated_genome_length', 'n50']
-}
-
+                {'necessary_contigs', 
+                'gc_percentage', 
+                'estimated_genome_length', 
+                'n50'}
+        }
