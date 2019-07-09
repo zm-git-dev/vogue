@@ -204,6 +204,13 @@ class VougeAdapter(MongoAdapter):
         """Function to make a aggregation on the sample analysis colleciton"""
         return self.sample_analysis_collection.aggregate(pipe)
 
+    def sample_collection_ids(self):
+        pipe = [{'$project': {'_id': 1}
+                }, {'$group': {'_id': None, 
+                    'ids': {'$addToSet': '$_id'}}}]
+        return self.sample_collection.aggregate(pipe)
+        
+
     def get_category(self, app_tag):
         """Function get category based on application tag from the application tag collection"""
         tag = self.app_tag_collection.find_one({'_id': app_tag},
