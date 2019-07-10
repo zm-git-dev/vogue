@@ -30,14 +30,20 @@ def run_data(run):
         """
     lane_data = {}
     avg_data = {}
-
-    for lane in run.all_outputs():
-        name=lane.name
-        if not 'Lane' in name.split():
-            lane = lane.input_artifact_list()[0]
-            if not lane.location:
+    if run.type.name=='AUTOMATED - NovaSeq Run':
+        lanes=run.all_outputs()
+    else:
+        lanes=run.all_inputs()
+    for lane in lanes:
+        if not lane.location:
+            continue
+        if run.type.name=='AUTOMATED - NovaSeq Run':
+            name=lane.name
+            if not 'Lane' in name.split():
                 continue
+        else:
             name = lane.location[1]
+
 
         lane_data[name] = {}
         for udf in LANE_UDFS:
@@ -56,8 +62,6 @@ def run_data(run):
     q30_r2 = '% Bases >=Q30 R2'
     if q30_r1 in avg_data.keys() and  q30_r2 in avg_data.keys():
         Q30 = np.mean([avg_data[q30_r1],avg_data[q30_r2]])
-        avg_data.pop(q30_r1)
-        avg_data.pop(q30_r2)
         avg_data['% Bases >=Q30'] = Q30
     avg_data = filter_none(avg_data)    
 
