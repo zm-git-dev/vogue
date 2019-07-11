@@ -36,6 +36,9 @@
         yAxis: {
             title: { text: {{ plot_attributes.axis.y | tojson }}}},
         legend: {
+            title: {
+                    text: 'Organism<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+                    style: {fontStyle: 'italic'}},
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle'
