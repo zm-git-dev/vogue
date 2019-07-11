@@ -164,7 +164,7 @@ def lucigen(year):
 
 @blueprint.route('/sequencing/runs/<year>', methods=['GET', 'POST'])
 def runs(year):
-    selcted_metric = request.form.get('metric')
+    selcted_metric = request.form.get('metric', '% Bases >=Q30')
     aggregate_result = instrument_info(app.adapter, year, selcted_metric)
 
     return render_template('runs.html',
