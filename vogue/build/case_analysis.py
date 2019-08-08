@@ -146,12 +146,12 @@ def update_mongo_doc_sample(mongo_doc: dict, analysis_dict: dict,
     return mongo_doc
 
 
-def build_single_case(analysis_dict: dict):
+def build_single_case(analysis_dict: dict, case_analysis_type: str):
     '''
     Prepare a case analysis dictionary
     '''
     case_analysis = recursive_default_dict()
-    case_analysis['multiqc'] = copy.deepcopy(analysis_dict['multiqc'])
+    case_analysis[case_analysis_type] = copy.deepcopy(analysis_dict[case_analysis_type])
     case_analysis = convert_defaultdict_to_regular_dict(case_analysis)
 
     return case_analysis
@@ -217,13 +217,13 @@ def update_mongo_doc_case(mongo_doc: dict, analysis_dict: dict,
 
 def build_analysis(analysis_dict: dict, analysis_type: str,
                    valid_analysis: list, current_analysis: dict,
-                   build_case: bool):
+                   case_analysis_type: str, build_case: bool):
     '''
     Builds analysis dictionary based on input analysis_dict and prepares a mongo_doc.
     '''
 
     if build_case:
-        case_analysis = build_single_case(analysis_dict=analysis_dict)
+        case_analysis = build_single_case(analysis_dict=analysis_dict, case_analysis_type=case_analysis_type)
         analysis = build_mongo_case(analysis_dict=analysis_dict,
                                     case_analysis=case_analysis)
     else:

@@ -141,6 +141,7 @@ def analysis(sample_id, dry, analysis_config, analysis_type, analysis_case,
                                     analysis_type=analysis_type,
                                     valid_analysis=valid_analysis,
                                     current_analysis=current_analysis,
+                                    case_analysis_type=case_analysis_type,
                                     build_case=is_case)
 
     if ready_analysis and not is_case:
