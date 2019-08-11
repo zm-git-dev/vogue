@@ -33,6 +33,8 @@ def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
     Extracts analysis dictionary based on input analysis_dict. This function will remove analysis json that are not part
     of the matching model. analysis_type is a single key matching ANALYSIS_SETS's first level keys.
     '''
+    
+    case_analysis_type = analysis_dict['case_analysis_type']
 
     # Match valid_analysis with the analysis_type of ANALYSIS_SETS
     analysis_common_keys = list()
@@ -44,12 +46,13 @@ def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
     # A new dictionary is constructed instead of dropping unrelevant keys. Or maybe one could deepcopy analysis_dict and
     # remove the irrelevant keys.
     analysis = dict()
-    # detect if multiqc analysis_dict is multiqc
-    if "report_saved_raw_data" in analysis_dict.keys():
-        analysis_dict = analysis_dict["report_saved_raw_data"]
 
     for common_key in analysis_common_keys:
-        analysis[common_key] = analysis_dict[common_key]
+        # detect if multiqc analysis_dict is multiqc
+        if case_analysis_type == "multiqc":
+            analysis[common_key] = analysis_dict["multiqc"]["report_saved_raw_data"][common_key] 
+        else:
+            analysis[common_key] = analysis_dict[common_key]
 
     return analysis
 
@@ -66,13 +69,16 @@ def build_processed_case(analysis_dict: dict,
     if not cleanup:
         case_analysis = analysis_dict
     elif cleanup and 'all' in analysis_type:
+        case_analysis = copy.deepcopy(analysis_dict)
+        case_analysis_type = analysis_dict['case_analysis_type']
+        case_analysis[case_analysis_type] = dict()
         for my_analysis in analysis_model.ANALYSIS_DESC.keys():
             tmp_analysis_dict = extract_valid_analysis(
                 analysis_dict=analysis_dict,
                 analysis_type=my_analysis,
                 valid_analysis=valid_analysis)
             if tmp_analysis_dict:
-                case_analysis = {**case_analysis, **tmp_analysis_dict}
+                case_analysis[case_analysis_type] = {**case_analysis[case_analysis_type], **tmp_analysis_dict}
     else:
         case_analysis = extract_valid_analysis(analysis_dict=analysis_dict,
                                                analysis_type=my_analysis,
@@ -197,7 +203,6 @@ def build_analysis(analysis_dict: dict,
                                              analysis_type=analysis_type,
                                              valid_analysis=valid_analysis,
                                              cleanup=cleanup)
-
     analysis = build_mongo_case(analysis_dict=analysis_dict,
                                 processed=process_case,
                                 case_analysis=case_analysis)
