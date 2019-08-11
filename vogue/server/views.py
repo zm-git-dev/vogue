@@ -2,7 +2,7 @@
 
 from flask import url_for, redirect, render_template, request, Blueprint, current_app
 
-from vogue.constants.constants import YEARS, THIS_YEAR, PICARD_INSERT_SIZE, PICARD_HS_METRIC, MICROSALT
+from vogue.constants.constants import *
 from vogue.server.utils import *
 
 
@@ -104,6 +104,7 @@ def common_samples(year):
 def microbial(year):
     y_vals = ['microbial_library_concentration']
     data = value_per_month(app.adapter, year, y_vals, "strain")
+
     return render_template('microbial.html',
         header = 'Microbial Samples',
         page_id = 'microbial',
@@ -161,16 +162,20 @@ def lucigen(year):
         years = YEARS)
 
 
-@blueprint.route('/sequencing/runs/<year>')
+@blueprint.route('/sequencing/runs/<year>', methods=['GET', 'POST'])
 def runs(year):
-    aggregate_result = q30_instruments(app.adapter, year)
+    selcted_metric = request.form.get('metric', '% Bases >=Q30')
+    aggregate_result = instrument_info(app.adapter, year, selcted_metric)
 
     return render_template('runs.html',
         header = 'Sequencing Instruments',
         page_id = 'runs',
+        metric = selcted_metric,
+        metrices = LANE_UDFS,
         results = aggregate_result,
         year_of_interest=year,
         years = YEARS)
+
 
 @blueprint.route('/QC/mip_picard_time/<year>', methods=['GET', 'POST'])
 def mip_picard_time(year):
@@ -178,6 +183,7 @@ def mip_picard_time(year):
     selcted_metric = request.form.get('picard_metric')
     if not selcted_metric:
         selcted_metric = 'MEAN_INSERT_SIZE'
+
     return render_template('mip_picard_time.html',
         selcted_metric = selcted_metric,
         mip_results = mip_results,
@@ -188,12 +194,13 @@ def mip_picard_time(year):
         year_of_interest=year,
         years = YEARS)
 
+
 @blueprint.route('/QC/mip_picard/<year>', methods=['GET', 'POST'])
-def mip_picard(year):
-   
+def mip_picard(year):    
     mip_results = mip_picard_plot(app.adapter, year)
     Y_axis = request.form.get('Y_axis', 'MEAN_INSERT_SIZE')
     X_axis = request.form.get('X_axis', 'MEAN_INSERT_SIZE')
+
     return render_template('mip_picard.html',
         Y_axis = Y_axis,
         X_axis = X_axis,
@@ -204,6 +211,7 @@ def mip_picard(year):
         page_id = 'mip_picard',
         year_of_interest=year,
         years = YEARS)
+
 
 @blueprint.route('/QC/balsamic/<year>')
 def balsamic(year):
@@ -219,6 +227,7 @@ def balsamic(year):
 def microsalt_strain_st(year):
     strain = request.form.get('strain', '')
     results = microsalt_get_strain_st(app.adapter, year)
+
     return render_template('microsalt_strain_st.html',
         data = results.get(strain, {}),
         strain = strain,
@@ -233,6 +242,7 @@ def microsalt_strain_st(year):
 def microsalt_qc_time(year):
     metric_path = request.form.get('qc_metric', 'picard_markduplicate.insert_size')
     results = microsalt_get_qc_time(app.adapter, year , metric_path)
+
     return render_template('microsalt_qc_time.html',
         results = results['data'],
         categories = results['labels'],
@@ -246,10 +256,10 @@ def microsalt_qc_time(year):
         years = YEARS)
 
 
-
 @blueprint.route('/QC/microsalt/untyped/<year>',  methods=['GET', 'POST'])
 def microsalt_untyped(year):
     results = microsalt_get_untyped(app.adapter, year )
+
     return render_template('microsalt_untyped.html',
         results = results['data'],
         categories = results['labels'],
@@ -265,6 +275,7 @@ def microsalt_st_time(year):
     strain = request.form.get('strain', 'E.coli')
     results_all = microsalt_get_st_time(app.adapter, year )
     strain_results = results_all['data'].get(strain, {})
+    
     return render_template('microsalt_st_time.html',
         results = strain_results,
         results_sorted_keys = sorted(strain_results.keys()),
@@ -277,11 +288,3 @@ def microsalt_st_time(year):
         MICROSALT = MICROSALT,
         years = YEARS)
 
-@blueprint.route('/sequencing/hiseqx/<year>')
-def hiseqx(year):
-
-    return render_template('hiseqx.html',
-        header = 'HiseqX',
-        page_id = 'hiseqx',
-        year_of_interest=year,
-        years = YEARS)

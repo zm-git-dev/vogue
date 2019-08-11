@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import (MONTHS, TEST_SAMPLES, PICARD_INSERT_SIZE, PICARD_HS_METRIC)
+from vogue.constants.constants import (MONTHS, TEST_SAMPLES, PICARD_INSERT_SIZE, PICARD_HS_METRIC, LANE_UDFS)
 from statistics import mean
 
 
@@ -202,11 +202,10 @@ def find_concentration_defrosts(adapter, year : int)-> dict:
             
     return defrosts
 
-def q30_instruments(adapter, year : int)-> dict:
+def instrument_info(adapter, year : int, metric : str)-> dict:
     """Prepares data for a plot Q30 values for diferent runs over time"""
-
     instruments = {'axis' : {'y' : 'Average Q30'}, 
-                'data': {}, 'title' : 'Q30'}
+                'data': {p:{} for p in LANE_UDFS}, 'title' : 'Q30'}
     pipe=[{
         '$project': {
             'year': {'$year': '$date'}, 
@@ -218,21 +217,23 @@ def q30_instruments(adapter, year : int)-> dict:
         }, {
         '$group': {'_id': {'instrument': '$instrument'}, 
                     'data': {'$push': {
-                    'Q30': '$avg.% Bases >=Q30', 
+                    metric: '$avg.'+metric, 
                     'date': '$date', 
                     'run_id': '$_id'}}}}]
 
     aggregate_result = adapter.flowcells_aggregate(pipe)
+    
     for result in aggregate_result:
         group = result['_id']['instrument'] 
-        data_tuples = [(d['date'], d['run_id'], d.get('Q30')) for d in result['data']]
-        data_sorted = sorted(data_tuples)
-        data = []
-        for date, run_id, Q30 in data_sorted:
-            if Q30:
-                data.append([date, Q30, run_id])
-        if data:
-            instruments['data'][group] = {'data':data}
+        for plot_name in LANE_UDFS:
+            data_tuples = [(d['date'], d['run_id'], d.get(plot_name)) for d in result['data']]
+            data_sorted = sorted(data_tuples)
+            data = []
+            for date, run_id, value in data_sorted:
+                if value:
+                    data.append([date, value, run_id])
+            if data:
+                instruments['data'][plot_name][group] = {'data':data}
 
     return instruments
         
@@ -540,7 +541,6 @@ def microsalt_get_st_time(adapter,  year : int)-> dict:
             st = result['_id']['sequence_type']
             strain = result['_id']['strain']  
             final_results[strain][st][month-1]=count
-    print(final_results['E.coli'])
 
     return {'data' : final_results, 'labels' : [m[1] for m in MONTHS]}
     

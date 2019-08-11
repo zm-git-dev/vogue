@@ -43,6 +43,9 @@
         yAxis: {
             title: { text: {{ plot_post_hyb.axis.y | tojson }}}},
         legend: {
+            title: {
+                    text: 'Source<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+                    style: {fontStyle: 'italic'}},
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle'
@@ -89,6 +92,9 @@
         yAxis: {
             title: { text: {{ plot_pre_hyb.axis.y | tojson }}}},
         legend: {
+            title: {
+                    text: 'Source<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+                    style: {fontStyle: 'italic'}},
             layout: 'vertical',
             align: 'right',
             verticalAlign: 'middle'

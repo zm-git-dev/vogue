@@ -1,6 +1,6 @@
 
 from vogue.server import create_app
-from vogue.server.utils import find_concentration_defrosts, find_concentration_amount, value_per_month, q30_instruments
+from vogue.server.utils import find_concentration_defrosts, find_concentration_amount, value_per_month, instrument_info
 from vogue.adapter.plugin import VougeAdapter
 from datetime import datetime
 
@@ -102,22 +102,23 @@ def test_q30_instruments(database):
     instrument = 'Marie'
 
     ## GIVEN a database  with two flowcell documents with instrument Marie:
+    metric = "% Bases >=Q30"
     run1 = {"_id":"170530_ST-E00214_0154_AHJCL5ALXX",
     "instrument": instrument,
     "date": datetime(year, 5, 30, 0, 0),
-    "avg": {"% Bases >=Q30" : 90 }}
+    "avg": {metric : 90 }}
     database.flowcell.insert_one(run1)
 
     run2 = {"_id":'171012_ST-E00214_0186_BHCGCKCCXY',
     "instrument":instrument ,
     "date":datetime(year, 10, 12, 0, 0),
-    "avg": {"% Bases >=Q30" : 80 } }
+    "avg": {metric : 80 } }
     database.flowcell.insert_one(run2)
 
     ## WHEN running find_concentration_amount
-    results = q30_instruments(app.adapter, year)
+    results = instrument_info(app.adapter, year, metric)
 
     ## THEN assert the results for Marie should be as expected:
     expected = [[datetime(2017, 5, 30, 0, 0), 90, '170530_ST-E00214_0154_AHJCL5ALXX'], 
                 [datetime(2017, 10, 12, 0, 0), 80, '171012_ST-E00214_0186_BHCGCKCCXY']]
-    assert results['data'][instrument]['data']== expected
+    assert results['data'][metric][instrument]['data']== expected
