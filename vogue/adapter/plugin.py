@@ -66,6 +66,29 @@ class VougeAdapter(MongoAdapter):
         else:
             LOG.info("No updates for sample %s.", lims_id)
 
+    def add_or_update_maf_analysis(self, sample_news: dict):
+        """Adds/updates a sample in the database"""
+
+        lims_id = sample_news['_id']
+        update_result = self.db.maf_analysis.update_one({'_id': lims_id},
+                                                  {'$set': sample_news},
+                                                  upsert=True)
+
+        if not update_result.raw_result['updatedExisting']:
+            self.db.maf_analysis.update_one({'_id': lims_id},
+                                      {'$set': {
+                                          'added': dt.today()
+                                      }})
+            LOG.info("Added sample %s.", lims_id)
+        elif update_result.modified_count:
+            self.db.maf_analysis.update_one({'_id': lims_id},
+                                      {'$set': {
+                                          'updated': dt.today()
+                                      }})
+            LOG.info("Updated sample %s.", lims_id)
+        else:
+            LOG.info("No updates for sample %s.", lims_id)
+
     def add_or_update_run(self, run_news: dict):
         """Adds/updates a flowcell in the database"""
 

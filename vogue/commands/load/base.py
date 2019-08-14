@@ -14,6 +14,7 @@ from vogue.commands.load.sample_analysis import sample_analysis as sample_analys
 from vogue.commands.load.application_tag import application_tags as status_db_command
 from vogue.commands.load.flowcell import flowcell as flowcell_command
 from vogue.commands.load.sample import sample as sample_command
+from vogue.commands.load.maf_analysis import maf_analysis as maf_analysis_command
 
 # Get version and doc decorator
 from vogue import __version__
@@ -33,4 +34,5 @@ load.add_command(status_db_command)
 load.add_command(sample_command)
 load.add_command(flowcell_command)
 load.add_command(sample_analysis_command)
+load.add_command(maf_analysis_command)
 
