@@ -1,9 +1,10 @@
 import logging
 import copy
 
+import vogue.models.case_analysis as analysis_model
+
 LOG = logging.getLogger(__name__)
 
-import vogue.models.case_analysis as analysis_model
 
 def validate_conf(analysis_dict: dict):
     """
@@ -13,9 +14,11 @@ def validate_conf(analysis_dict: dict):
     exist, disqualifies the file and returns False
     """
 
+    case_analysis_type =  analysis_dict['case_analysis_type']
+
     # detect if multiqc analysis_dict is multiqc
-    if "report_saved_raw_data" in analysis_dict.keys():
-        analysis_dict = analysis_dict["report_saved_raw_data"]
+    if case_analysis_type == "multiqc":
+        analysis_dict = analysis_dict["multiqc"]["report_saved_raw_data"]
 
     # Second level keys in ANALYSIS_SETS are bioinformatic tool name OR analysis name.
     # This line will extract all the second level keys.
