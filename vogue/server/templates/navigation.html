@@ -83,6 +83,15 @@
               </li>
         </ul>
       </li>
+      <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Genotypes
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="{{ url_for('server.genotype_time' , year=year_of_interest) }}">Genotypes over time</a>
+          </div>
+        </li>
     </ul>
   </div>
 </nav>
