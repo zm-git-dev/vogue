@@ -4,7 +4,7 @@ python:
     - '3.6'
 
 install:
-  - pip install --editable -r requirements-dev.txt -r requirements.txt .
+  - pip install -r requirements-dev.txt -r requirements.txt -e .
 
 script:
   - py.test --cov=vogue -rsxv tests/* 
