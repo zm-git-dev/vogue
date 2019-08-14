@@ -64,6 +64,7 @@ def compare(analysis_1, analysis_2):
 def build_sample(sample):
     analysis = Analysis.query.filter(Analysis.sample_id == sample.id).all()
     mongo_sample = {
+                '_id' : sample.id,
                 'status' : sample.status,
                 'date' : sample.created_at,
                 'sex' : sample.sex}
