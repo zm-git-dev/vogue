@@ -4,27 +4,10 @@ import collections
 
 from datetime import datetime as dt
 import vogue.models.case_analysis as analysis_model
+from vogue.tools.cli_utils import recursive_default_dict
+from vogue.tools.cli_utils import convert_defaultdict_to_regular_dict
 
 LOG = logging.getLogger(__name__)
-
-
-def recursive_default_dict():
-    '''
-    Recursivly create defaultdict.
-    '''
-    return collections.defaultdict(recursive_default_dict)
-
-
-def convert_defaultdict_to_regular_dict(inputdict: dict):
-    '''
-    Recursively convert defaultdict to dict.
-    '''
-    if isinstance(inputdict, collections.defaultdict):
-        inputdict = {
-            key: convert_defaultdict_to_regular_dict(value)
-            for key, value in inputdict.items()
-        }
-    return inputdict
 
 
 def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
@@ -33,8 +16,13 @@ def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
     Extracts analysis dictionary based on input analysis_dict. This function will remove analysis json that are not part
     of the matching model. analysis_type is a single key matching ANALYSIS_SETS's first level keys.
     '''
-    
-    case_analysis_type = analysis_dict['case_analysis_type']
+
+    case_analysis_type =  analysis_dict['case_analysis_type']
+    samples = analysis_dict['sample']
+
+    # detect if multiqc analysis_dict is multiqc
+    if case_analysis_type == "multiqc":
+        analysis_dict = analysis_dict["multiqc"]["report_saved_raw_data"]
 
     # Match valid_analysis with the analysis_type of ANALYSIS_SETS
     analysis_common_keys = list()
@@ -50,7 +38,8 @@ def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
     for common_key in analysis_common_keys:
         # detect if multiqc analysis_dict is multiqc
         if case_analysis_type == "multiqc":
-            analysis[common_key] = analysis_dict["multiqc"]["report_saved_raw_data"][common_key] 
+            analysis[common_key] = analysis_dict["multiqc"][
+                "report_saved_raw_data"][common_key]
         else:
             analysis[common_key] = analysis_dict[common_key]
 
@@ -65,24 +54,45 @@ def build_processed_case(analysis_dict: dict,
     Builds an analysis dict from input information provided by user.
     '''
 
-    case_analysis = dict()
+    case_analysis = copy.deepcopy(analysis_dict)
+    case_analysis_type = analysis_dict['case_analysis_type']
+    analysis_workflow = analysis_dict['workflow']
+    workflow_version = analysis_dict['workflow_version']
+    case_analysis[analysis_workflow] = dict()
+    case_analysis[analysis_workflow][case_analysis_type] = dict()
     if not cleanup:
-        case_analysis = analysis_dict
-    elif cleanup and 'all' in analysis_type:
-        case_analysis = copy.deepcopy(analysis_dict)
-        case_analysis_type = analysis_dict['case_analysis_type']
-        case_analysis[case_analysis_type] = dict()
+        case_analysis[analysis_workflow][case_analysis_type] = analysis_dict[
+            case_analysis_type]
+    else:
         for my_analysis in analysis_model.ANALYSIS_DESC.keys():
             tmp_analysis_dict = extract_valid_analysis(
                 analysis_dict=analysis_dict,
                 analysis_type=my_analysis,
                 valid_analysis=valid_analysis)
             if tmp_analysis_dict:
-                case_analysis[case_analysis_type] = {**case_analysis[case_analysis_type], **tmp_analysis_dict}
-    else:
-        case_analysis = extract_valid_analysis(analysis_dict=analysis_dict,
-                                               analysis_type=my_analysis,
-                                               valid_analysis=valid_analysis)
+                case_analysis[analysis_workflow][case_analysis_type] = {
+                    **case_analysis[analysis_workflow][case_analysis_type],
+                    **tmp_analysis_dict
+                }
+
+    case_analysis[analysis_workflow][case_analysis_type] = {
+        **case_analysis[analysis_workflow][case_analysis_type],
+        **{
+            'workflow_version': workflow_version,
+            'added': dt.today()
+        }
+    }
+
+    ## TODO: add the following to control over which valid analysis to load.
+    ## Example:
+    ##    elif cleanup and 'all' in analysis_type:
+    ##    else:
+    ##        case_analysis = extract_valid_analysis(analysis_dict=analysis_dict,
+    ##                                               analysis_type=my_analysis,
+    ##                                               valid_analysis=valid_analysis)
+
+    print(case_analysis.keys())
+
     return case_analysis
 
 
@@ -98,7 +108,8 @@ def build_unprocessed_case(analysis_dict: dict):
     return case_analysis
 
 
-def build_mongo_case(analysis_dict: dict, case_analysis: dict, processed=False):
+def build_mongo_case(analysis_dict: dict, case_analysis: dict,
+                     processed=False):
     '''
     Build a mongo case docuemtn dictionary
     '''
@@ -113,7 +124,8 @@ def build_mongo_case(analysis_dict: dict, case_analysis: dict, processed=False):
     if not processed:
         analysis[analysis_workflow][case_analysis_type] = list()
     else:
-        analysis[case_analysis_type] = list()
+        analysis[analysis_workflow][case_analysis_type] = dict()
+
     analysis['workflows'] = list()
     analysis['case_analysis_types'] = list()
     analysis['samples'] = list()
@@ -128,7 +140,10 @@ def build_mongo_case(analysis_dict: dict, case_analysis: dict, processed=False):
     if not processed:
         analysis[analysis_workflow][case_analysis_type].append(workflow_data)
     else:
-        analysis[case_analysis_type].append(workflow_data[case_analysis_type])
+        analysis[analysis_workflow][case_analysis_type] = workflow_data[
+            analysis_workflow][case_analysis_type]
+        #analysis[analysis_workflow] = {**analysis[analysis_workflow], **workflow_data[analysis_workflow][case_analysis_type]}
+
     analysis['case_analysis_types'].append(case_analysis_type)
     analysis['workflows'].append(analysis_workflow)
     analysis['samples'].extend(analysis_samples)
@@ -138,9 +153,13 @@ def build_mongo_case(analysis_dict: dict, case_analysis: dict, processed=False):
     return analysis
 
 
-def update_mongo_doc_case(mongo_doc: dict, analysis_dict: dict,
-                          new_analysis: dict, processed=False):
+def update_mongo_doc_case(mongo_doc: dict,
+                          analysis_dict: dict,
+                          new_analysis: dict,
+                          processed=False):
     '''
+    Add or update mongo document for case data
+    Adds or updates within processed or raw bioinfo collection
     '''
 
     analysis_samples = analysis_dict['sample']
@@ -150,25 +169,44 @@ def update_mongo_doc_case(mongo_doc: dict, analysis_dict: dict,
     workflow_version = analysis_dict['workflow_version']
 
     if not processed:
-        if analysis_workflow in mongo_doc['workflows'] and case_analysis_type in mongo_doc['case_analysis_types']:
+        if analysis_workflow in mongo_doc[
+                'workflows'] and case_analysis_type in mongo_doc[
+                    'case_analysis_types']:
             # 1.a. case exists and workflow exists
-            mongo_doc[analysis_workflow][case_analysis_type].extend(new_analysis[analysis_workflow][case_analysis_type])
-        elif analysis_workflow in mongo_doc['workflows'] and case_analysis_type not in mongo_doc['case_analysis_types']:
+            mongo_doc[analysis_workflow][case_analysis_type].extend(
+                new_analysis[analysis_workflow][case_analysis_type])
+        elif analysis_workflow in mongo_doc[
+                'workflows'] and case_analysis_type not in mongo_doc[
+                    'case_analysis_types']:
             # 1.b. case exists and workflow exists
-            mongo_doc[analysis_workflow][case_analysis_type] = copy.deepcopy(new_analysis[analysis_workflow][case_analysis_type])
+            mongo_doc[analysis_workflow][case_analysis_type] = copy.deepcopy(
+                new_analysis[analysis_workflow][case_analysis_type])
             mongo_doc['case_analysis_types'].append(case_analysis_type)
         else:
             # 1.c case exists but workflow doesn't
             mongo_doc['workflows'].append(analysis_workflow)
             mongo_doc[analysis_workflow] = new_analysis[analysis_workflow]
     else:
-        if case_analysis_type in mongo_doc['case_analysis_types']:
-             # 1.a. case exists and workflow exists
-             mongo_doc[case_analysis_type].extend(new_analysis[case_analysis_type])
+        if analysis_workflow in mongo_doc['workflows']:
+            mongo_doc[analysis_workflow] = {
+                **mongo_doc[analysis_workflow],
+                **new_analysis[analysis_workflow]
+            }
         else:
-            # 1.b. case exists and workflow exists            
-            mongo_doc[case_analysis_type] = copy.deepcopy(new_analysis[case_analysis_type])
+            mongo_doc[analysis_workflow][case_analysis_type] = new_analysis[
+                analysis_workflow][case_analysis_type]
+
+        if case_analysis_type not in mongo_doc['case_analysis_types']:
             mongo_doc['case_analysis_types'].append(case_analysis_type)
+
+
+#        if case_analysis_type in mongo_doc['case_analysis_types']:
+#             # 1.a. case exists and workflow exists
+#             mongo_doc[case_analysis_type].extend(new_analysis[case_analysis_type])
+#        else:
+#            # 1.b. case exists and workflow exists
+#            mongo_doc[case_analysis_type] = copy.deepcopy(new_analysis[case_analysis_type])
+#            mongo_doc['case_analysis_types'].append(case_analysis_type)
 
     for sample in analysis_samples:
         if sample not in mongo_doc['samples']:
@@ -203,6 +241,7 @@ def build_analysis(analysis_dict: dict,
                                              analysis_type=analysis_type,
                                              valid_analysis=valid_analysis,
                                              cleanup=cleanup)
+
     analysis = build_mongo_case(analysis_dict=analysis_dict,
                                 processed=process_case,
                                 case_analysis=case_analysis)
