@@ -4,6 +4,7 @@ import logging
 import os
 import pathlib
 import copy
+import collections
 
 LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
@@ -99,3 +100,21 @@ def concat_dict_keys(my_dict: dict, key_name="", out_key_list=list()):
             concat_dict_keys(my_dict[k], key_name=k, out_key_list=out_key_list)
 
     return out_key_list
+
+def recursive_default_dict():
+    '''
+    Recursivly create defaultdict.
+    '''
+    return collections.defaultdict(recursive_default_dict)
+
+
+def convert_defaultdict_to_regular_dict(inputdict: dict):
+    '''
+    Recursively convert defaultdict to dict.
+    '''
+    if isinstance(inputdict, collections.defaultdict):
+        inputdict = {
+            key: convert_defaultdict_to_regular_dict(value)
+            for key, value in inputdict.items()
+        }
+    return inputdict
