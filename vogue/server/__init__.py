@@ -11,6 +11,8 @@ from vogue.server.views import blueprint
 from genologics.lims import Lims
 from genologics.config import BASEURI,USERNAME,PASSWORD
 
+from flask_sqlalchemy import SQLAlchemy
+
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
 
@@ -23,11 +25,13 @@ def create_app(test = False):
         except:
             app.lims = None
 
+
         app.config.from_object(f"{__name__}.config")
         client = MongoClient(app.config['DB_URI'])
         db_name = app.config['DB_NAME']
         app.client = client
         app.db = client[db_name]
+        app.genotype_db = SQLAlchemy(app)
         app.adapter = VougeAdapter(client, db_name = db_name)
         app.register_blueprint(blueprint)
 

@@ -1,13 +1,8 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import (Column, Integer, String, DateTime, Text, Enum,ForeignKey, UniqueConstraint, Numeric, Date)
 from sqlalchemy.orm import relationship, backref
 
-
-SQLALCHEMY_DATABASE_URI='mysql+pymysql://remoteuser:lq33sym@localhost:3308/genotype'
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-db = SQLAlchemy(app)
+from vogue.server.auto import app
+db = app.genotype_db
 
 class Sample(db.Model):
     __tablename__ = 'sample'
@@ -39,3 +34,5 @@ class Analysis(db.Model):
     type = Column(String(255))
     sex = Column(String(255))
     created_at = Column(DateTime)
+
+
