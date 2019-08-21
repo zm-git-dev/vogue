@@ -249,6 +249,8 @@ def mip_picard_time_plot(adapter, year : int)-> dict:
             'as': 'sample_info'}
         }, {
         '$unwind': {'path': '$sample_info'}
+        },{
+        '$match': {'sample_info.received_date': {'$exists': 'True'}} 
         }, {
         '$project': {
             'mip': 1, 
@@ -264,7 +266,7 @@ def mip_picard_time_plot(adapter, year : int)-> dict:
         },{
         '$match': {'year': {'$eq': int(year)}}
         }]
-    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
     final_data = {k:[] for k in PICARD_INSERT_SIZE + PICARD_HS_METRIC }
 
     for sample in aggregate_result:
@@ -289,7 +291,7 @@ def mip_picard_time_plot(adapter, year : int)-> dict:
 def mip_picard_plot(adapter, year : int)-> dict:
     """Prepares data for the MIP picard plot."""
 
-    all_samples = adapter.sample_analysis_collection.find() 
+    all_samples = adapter.bioinfo_samples_collection.find() 
     final_data = []
 
     for sample in all_samples:
@@ -322,10 +324,12 @@ def microsalt_get_strain_st(adapter,  year : int)-> dict:
         }, {
         '$unwind': {'path': '$sample_info'}
         }, {
+        '$match': {'sample_info.received_date': {'$exists': 'True'}} 
+        },{
         '$project': {
             'strain': '$sample_info.strain', 
             'year': {'$year': '$sample_info.received_date'}, 
-            'sequence_type': '$microsalt.results.blast_pubmlst.sequence_type'}
+            'sequence_type': '$microsalt.blast_pubmlst.sequence_type'}
         }, {
         '$match': {'year': {'$eq': int(year)}}
         }, {
@@ -348,7 +352,7 @@ def microsalt_get_strain_st(adapter,  year : int)-> dict:
             'sequence_type': {'$push': '$_id.sequence_type'}}
         }]
 
-    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
     plot_data = {}
     for strain_results in aggregate_result:
         strain = strain_results['_id']
@@ -375,11 +379,13 @@ def microsalt_get_qc_time(adapter,  year : int, metric_path : str)-> dict:
             'as': 'sample_info'}
         }, {
         '$unwind': {'path': '$sample_info'}
-        }, {
+        },{
+        '$match': {'sample_info.received_date': {'$exists': 'True'}} 
+        },{
         '$project': {
             'month': {'$month': '$sample_info.received_date'}, 
             'year': {'$year': '$sample_info.received_date'}, 
-            metric : '$microsalt.results.' + metric_path}
+            metric : '$microsalt.' + metric_path}
         }, {
         '$match': {'year': {'$eq': int(year)}}
         }, {
@@ -388,7 +394,7 @@ def microsalt_get_qc_time(adapter,  year : int, metric_path : str)-> dict:
             metric : {'$push': '$' + metric}}
         }]
 
-    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
     intermediate = {result['_id']['month']: result[metric] for result in aggregate_result}
     box_plots = []
     labels = []
@@ -428,10 +434,12 @@ def microsalt_get_untyped(adapter,  year : int)-> dict:
         }, {
         '$unwind': {'path': '$sample_info'}
         }, {
+        '$match': {'sample_info.received_date': {'$exists': 'True'}} 
+        },{
         '$project': {
             'month': {'$month': '$sample_info.received_date'}, 
             'year': {'$year': '$sample_info.received_date'}, 
-            'ST': '$microsalt.results.blast_pubmlst.sequence_type'}
+            'ST': '$microsalt.blast_pubmlst.sequence_type'}
         }, {
         '$match': {'year': {'$eq': int(year)}}
         }, {
@@ -441,7 +449,7 @@ def microsalt_get_untyped(adapter,  year : int)-> dict:
         }]
 
     intermediate = {}
-    aggregate_result = adapter.sample_analysis_aggregate(pipe)
+    aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
     for result in aggregate_result:
         untyped = 0
         typed = 0
@@ -491,6 +499,8 @@ def microsalt_get_st_time(adapter,  year : int)-> dict:
             'path': '$sample_info'
         }
     }, {
+        '$match': {'sample_info.received_date': {'$exists': 'True'}} 
+    },{
         '$project': {
             'month': {
                 '$month': '$sample_info.received_date'
@@ -499,7 +509,7 @@ def microsalt_get_st_time(adapter,  year : int)-> dict:
             'year': {
                 '$year': '$sample_info.received_date'
             }, 
-            'sequence_type': '$microsalt.results.blast_pubmlst.sequence_type'
+            'sequence_type': '$microsalt.blast_pubmlst.sequence_type'
         }
     }, {
         '$match': {
@@ -526,7 +536,7 @@ def microsalt_get_st_time(adapter,  year : int)-> dict:
         }
     }]
     final_results = {}
-    aggregate_result = list(adapter.sample_analysis_aggregate(pipe))
+    aggregate_result = list(adapter.bioinfo_samples_aggregate(pipe))
     for result in aggregate_result:
         st = result['_id']['sequence_type']
         strain = result['_id']['strain']
