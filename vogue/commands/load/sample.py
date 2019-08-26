@@ -2,7 +2,7 @@ import logging
 import click
 from vogue.load.sample import load_one, load_all, load_recent, load_one_dry, load_all_dry
 from flask.cli import with_appcontext, current_app
-from datetime import datetime
+from datetime import date, timedelta
 
 
 from genologics.entities import Sample
@@ -17,7 +17,7 @@ LOG = logging.getLogger(__name__)
                 help = 'Loads all lims samples if no other options are selected')
 @click.option('-f', '--load-from', 
                 help = 'load from this sample lims id. Use if load all broke. Start where it ended')
-@click.option('-d', '--days', 
+@click.option('-d', '--days', type = int,
                 help = 'Update only samples updated in the latest number of days')
 @click.option('--dry', is_flag = True, 
                 help = 'Load from sample or not. (dry-run)')
@@ -39,14 +39,13 @@ def sample(sample_lims_id, all_samples, load_from, days, dry):
         except Exception as err:
             LOG.error(err)
             raise click.Abort()
-        load_recent(current_app.adapter,lims=lims, the_date)
-
-    if all_samples:
+        load_recent(current_app.adapter,lims, the_date)
+    elif all_samples:
         if dry:
             load_all_dry()
         else:
             load_all(current_app.adapter, lims=lims, start_sample=load_from)
-    else:
+    elif sample_lims_id:
         lims_sample = Sample(lims, id = sample_lims_id)
         if not lims_sample:
             LOG.critical("The sample does not exist in the database in the LIMS database.")

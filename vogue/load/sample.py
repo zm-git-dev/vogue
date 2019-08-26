@@ -24,19 +24,21 @@ def load_all(adapter, lims, start_sample = None):
         elif start_sample and start_sample == sample.id:
             start_sample = None
 
+
 def load_recent(adapter, lims, the_date):
     """Function to load all lims samples into the database"""
 
-    latest_processes = lims.get_processes(last_modified = the_date) 
+    latest_processes = lims.get_processes(last_modified = the_date)
     samples = []
+    LOG.info('Found %s processes modified since %s.', len(latest_processes), the_date)
+    LOG.info('Fetching recently updated samples...')
     for process in latest_processes:
         for analyte in process.all_inputs():
-            samples.append(analyte.samples)
-    
+            samples += analyte.samples
+    LOG.info('%s samples will be added or updated.', len(set(samples)))
     for sample in set(samples):
         LOG.info(sample.id)
-        load_one(adapter, lims_sample=sample, lims=lims)
-    
+        load_one(adapter, lims_sample=sample, lims=lims)    
 
 
 def load_one_dry(lims_sample, lims, adapter):
