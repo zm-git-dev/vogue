@@ -9,8 +9,7 @@ from vogue.adapter import VougeAdapter
 LOG = logging.getLogger(__name__)
 
 # commands
-from vogue.commands.load.case_analysis import analysis as analysis_command
-from vogue.commands.load.sample_analysis import sample_analysis as sample_analysis_command
+from vogue.commands.load.bioinfo import bioinfo as bioinfo_command 
 from vogue.commands.load.application_tag import application_tags as status_db_command
 from vogue.commands.load.flowcell import flowcell as flowcell_command
 from vogue.commands.load.sample import sample as sample_command
@@ -27,10 +26,8 @@ def load():
     pass
 
 
-
-load.add_command(analysis_command)
+load.add_command(bioinfo_command)
 load.add_command(status_db_command)
 load.add_command(sample_command)
 load.add_command(flowcell_command)
-load.add_command(sample_analysis_command)
 
