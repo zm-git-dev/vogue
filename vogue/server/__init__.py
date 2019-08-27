@@ -11,7 +11,6 @@ from vogue.server.views import blueprint
 from genologics.lims import Lims
 from genologics.config import BASEURI,USERNAME,PASSWORD
 
-
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
 
