@@ -7,7 +7,7 @@ LOG = logging.getLogger(__name__)
 
 @click.command("genotype", 
                 short_help = "Load genotype document into db.")
-@click.argument('-s', '--sample-doc', 
+@click.option('-s', '--sample-doc', 
                 help = 'Dictionary with genotype data.')
 
 @with_appcontext
