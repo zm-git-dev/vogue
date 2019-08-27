@@ -7,6 +7,3 @@ DB_NAME = os.environ['MONGO_DBNAME']
 
 DEBUG = os.environ['FLASK_DEBUG']
 SECRET_KEY = os.environ['VOGUE_SECRET_KEY']
-
-
-SQLALCHEMY_DATABASE_URI='mysql+pymysql://remoteuser:lq33sym@localhost:3308/genotype'
