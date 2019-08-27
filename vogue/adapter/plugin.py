@@ -32,7 +32,6 @@ class VougeAdapter(MongoAdapter):
         self.db = self.client[db_name]
         self.db_name = db_name
         self.sample_collection = self.db.sample
-        self.sample_analysis_collection = self.db.sample_analysis
         self.bioinfo_processed_collection = self.db.bioinfo_processed
         self.bioinfo_raw_collection = self.db.bioinfo_raw
         self.bioinfo_samples_collection = self.db.bioinfo_samples
@@ -161,7 +160,7 @@ class VougeAdapter(MongoAdapter):
             LOG.info("No updates for sample %s.", lims_id)
 
 
-    def add_or_update_analysis_bioinfo_raw(self, analysis_result: dict):
+    def add_or_update_bioinfo_raw(self, analysis_result: dict):
         """Functionality to add or update analysis for unprocessed aka raw bioinfo stat"""
         case_id = analysis_result['_id']
         # pop _id key to make pushing easier
@@ -191,7 +190,7 @@ class VougeAdapter(MongoAdapter):
                 upsert=True)
             LOG.info("Updated analysis for sample %s.", case_id)
 
-    def add_or_update_analysis_bioinfo_processed(self, analysis_result: dict):
+    def add_or_update_bioinfo_processed(self, analysis_result: dict):
         """Functionality to add or update analysis for processed bioinfo stat"""
         case_id = analysis_result['_id']
         # pop _id key to make pushing easier
@@ -221,6 +220,31 @@ class VougeAdapter(MongoAdapter):
                 upsert=True)
             LOG.info("Updated analysis for sample %s.", case_id)
 
+    def add_or_update_bioinfo_samples(self, analysis_result: dict):
+        """Functionality to add or update bioinfo analysis for sample level results"""
+        lims_id = analysis_result['_id']
+        current_document = self.db.bioinfo_samples.find_one({'_id': lims_id})
+        analysis_result = check_dates(analysis_result, current_document)
+
+        update_result = self.db.bioinfo_samples.update_one({'_id': lims_id},
+                                                  {'$set': analysis_result},
+                                                  upsert=True)
+
+        if not update_result.raw_result['updatedExisting']:
+            self.db.bioinfo_samples.update_one({'_id': lims_id},
+                                      {'$set': {
+                                          'added': dt.today()
+                                      }})
+            LOG.info("Added sample %s.", lims_id)
+        elif update_result.modified_count:
+            self.db.bioinfo_samples.update_one({'_id': lims_id},
+                                      {'$set': {
+                                          'updated': dt.today()
+                                      }})
+            LOG.info("Updated sample %s.", lims_id)
+        else:
+            LOG.info("No updates for sample %s.", lims_id)
+
     def sample(self, lims_id):
         return self.sample_collection.find_one({'_id': lims_id})
 
@@ -235,7 +259,7 @@ class VougeAdapter(MongoAdapter):
 
     def sample_analysis(self, analysis_id: str):
         """Functionality to get analyses results"""
-        return self.sample_analysis_collection.find_one({'_id': analysis_id})
+        return self.bioinfo_samples_collection.find_one({'_id': analysis_id})
 
     def bioinfo_raw(self, analysis_id: str):
         """Functionality to get analyses results"""
@@ -258,9 +282,9 @@ class VougeAdapter(MongoAdapter):
         """Function to make a aggregation on the flowcell colleciton"""
         return self.flowcell_collection.aggregate(pipe)
 
-    def sample_analysis_aggregate(self, pipe : list):
+    def bioinfo_samples_aggregate(self, pipe : list):
         """Function to make a aggregation on the sample analysis colleciton"""
-        return self.sample_analysis_collection.aggregate(pipe)
+        return self.bioinfo_samples_collection.aggregate(pipe)
 
     def get_category(self, app_tag):
         """Function get category based on application tag from the application tag collection"""

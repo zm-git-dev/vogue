@@ -1,4 +1,6 @@
 flask_debugtoolbar
-pytest>=3.6
 pytest-flask
+pytest>=3.7.1
 pytest-cov
+python-coveralls
+pylint
