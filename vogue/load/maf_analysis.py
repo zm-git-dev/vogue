@@ -20,8 +20,8 @@ def load_all(adapter):
 
 def load_many(adapter, days=120):
     current_time = datetime.datetime.utcnow()
-    three_days_ago = current_time - datetime.timedelta(days = days)
-    samples = Sample.query.filter(Sample.created_at > three_days_ago).all()
+    some_days_ago = current_time - datetime.timedelta(days = days)
+    samples = Sample.query.filter(Sample.created_at > some_days_ago).all()
     for sample in samples:
         mongo_sample = build_sample(sample)
         adapter.add_or_update_maf_analysis(mongo_sample)
