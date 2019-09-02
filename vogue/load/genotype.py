@@ -12,6 +12,8 @@ def load_sample(adapter, genotype_sample_string):
         mongo_sample = json.loads(genotype_sample_string)
     except ValueError as e:
         LOG.error(e)
+        return
+        
     if '_id' not in mongo_sample:
         LOG.error('Not a propper mongo document. Missing _id')
         return 
