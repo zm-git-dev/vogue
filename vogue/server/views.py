@@ -41,6 +41,8 @@ def index():
         return redirect(url_for('server.microsalt_untyped', year=year))
     if request.form.get('page') == 'microsalt_st_time':
         return redirect(url_for('server.microsalt_st_time', year=year))
+    if request.form.get('page') == 'genotype_time':
+        return redirect(url_for('server.genotype_time', year=year))
 
     return render_template(
         'index.html',
@@ -88,7 +90,6 @@ def common_samples(year):
     data_cat = value_per_month(app.adapter, year, y_vals, 'category')
     data_prio = value_per_month(app.adapter, year, y_vals, 'priority')
     y_axis_label = 'Nr of samples'
-
     return render_template('samples.html',
         header = 'Samples',
         page_id = 'samples',
@@ -273,7 +274,7 @@ def microsalt_untyped(year):
 @blueprint.route('/QC/microsalt/st_time/<year>',  methods=['GET', 'POST'])
 def microsalt_st_time(year):
     strain = request.form.get('strain', 'E.coli')
-    results_all = microsalt_get_st_time(app.adapter, year )
+    results_all = microsalt_get_st_time(app.adapter, year)
     strain_results = results_all['data'].get(strain, {})
     
     return render_template('microsalt_st_time.html',
@@ -286,5 +287,17 @@ def microsalt_st_time(year):
         page_id = 'microsalt_st_time',
         year_of_interest=year,
         MICROSALT = MICROSALT,
+        years = YEARS)
+
+@blueprint.route('/QC/genotype/time/<year>',  methods=['GET', 'POST'])
+def genotype_time(year):
+    
+    plot_data = genotype_status_time(app.adapter, year)
+    return render_template('genotype_time.html',
+        data = plot_data['data'],
+        labels = plot_data['labels'],
+        header = 'MAF',
+        page_id = 'genotype_time',
+        year_of_interest=year,
         years = YEARS)
 

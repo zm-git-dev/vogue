@@ -37,6 +37,7 @@ class VougeAdapter(MongoAdapter):
         self.bioinfo_samples_collection = self.db.bioinfo_samples
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
+        self.maf_analysis_collection = self.db.maf_analysis
 
         LOG.info("Use database %s.", db_name)
 
@@ -292,6 +293,10 @@ class VougeAdapter(MongoAdapter):
                     'ids': {'$addToSet': '$_id'}}}]
         return self.sample_collection.aggregate(pipe)
         
+
+    def maf_analysis_aggregate(self, pipe : list):
+        """Function to make a aggregation on the maf analysis colleciton"""
+        return self.maf_analysis_collection.aggregate(pipe)
 
     def get_category(self, app_tag):
         """Function get category based on application tag from the application tag collection"""
