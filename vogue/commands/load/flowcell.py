@@ -2,6 +2,7 @@ import logging
 import click
 from vogue.load.flowcell import load_one, load_all, load_recent
 from flask.cli import with_appcontext, current_app
+from datetime import date, timedelta
 
 
 from genologics.lims import Lims
