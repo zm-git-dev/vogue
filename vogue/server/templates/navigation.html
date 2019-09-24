@@ -43,10 +43,10 @@
         </div>
       </li>
       <li class="nav-item dropdown">
-        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">QC</a>
+        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Bioinfo</a>
         <ul class="dropdown-menu">
           <li class="dropdown-item dropdown-submenu">
-            <a href="#" data-toggle="dropdown" class="dropdown-toggle">MIP</a>
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Rare Disease</a>
             <ul class="dropdown-menu">
               <li class="dropdown-item">
                 <a href="{{ url_for('server.mip_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
@@ -57,7 +57,7 @@
             </ul>
           </li>
           <li class="dropdown-item dropdown-submenu">
-              <a href="#" data-toggle="dropdown" class="dropdown-toggle">Balsamic</a>
+              <a href="#" data-toggle="dropdown" class="dropdown-toggle">Cancer</a>
               <ul class="dropdown-menu">
                 <li class="dropdown-item">
                   <a href="{{ url_for('server.balsamic' , year=year_of_interest) }}">Nothing here yet</a>
@@ -65,7 +65,7 @@
               </ul>
             </li>
             <li class="dropdown-item dropdown-submenu">
-                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Microsalt</a>
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Microbial</a>
                 <ul class="dropdown-menu">
                   <li class="dropdown-item">
                     <a href="{{ url_for('server.microsalt_strain_st' , year=year_of_interest) }}">ST total</a>

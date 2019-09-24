@@ -178,7 +178,7 @@ def runs(year):
         years = YEARS)
 
 
-@blueprint.route('/QC/mip_picard_time/<year>', methods=['GET', 'POST'])
+@blueprint.route('/Bioinfo/Rare_Disease/picard_time/<year>', methods=['GET', 'POST'])
 def mip_picard_time(year):
     mip_results = mip_picard_time_plot(app.adapter, year)
     selcted_metric = request.form.get('picard_metric')
@@ -196,7 +196,7 @@ def mip_picard_time(year):
         years = YEARS)
 
 
-@blueprint.route('/QC/mip_picard/<year>', methods=['GET', 'POST'])
+@blueprint.route('/Bioinfo/Rare_Disease/picard/<year>', methods=['GET', 'POST'])
 def mip_picard(year):    
     mip_results = mip_picard_plot(app.adapter, year)
     Y_axis = request.form.get('Y_axis', 'MEAN_INSERT_SIZE')
@@ -214,7 +214,7 @@ def mip_picard(year):
         years = YEARS)
 
 
-@blueprint.route('/QC/balsamic/<year>')
+@blueprint.route('/Bioinfo/Cancer/<year>')
 def balsamic(year):
 
     return render_template('balsamic.html',
@@ -224,7 +224,7 @@ def balsamic(year):
         years = YEARS)
 
 
-@blueprint.route('/QC/microsalt/strain_st/<year>',  methods=['GET', 'POST'])
+@blueprint.route('/Bioinfo/Microbial/strain_st/<year>',  methods=['GET', 'POST'])
 def microsalt_strain_st(year):
     strain = request.form.get('strain', '')
     results = microsalt_get_strain_st(app.adapter, year)
@@ -239,7 +239,7 @@ def microsalt_strain_st(year):
         years = YEARS)
 
 
-@blueprint.route('/QC/microsalt/qc_time/<year>',  methods=['GET', 'POST'])
+@blueprint.route('/Bioinfo/Microbial/qc_time/<year>',  methods=['GET', 'POST'])
 def microsalt_qc_time(year):
     metric_path = request.form.get('qc_metric', 'picard_markduplicate.insert_size')
     results = microsalt_get_qc_time(app.adapter, year , metric_path)
@@ -257,7 +257,7 @@ def microsalt_qc_time(year):
         years = YEARS)
 
 
-@blueprint.route('/QC/microsalt/untyped/<year>',  methods=['GET', 'POST'])
+@blueprint.route('/Bioinfo/Microbial/untyped/<year>',  methods=['GET', 'POST'])
 def microsalt_untyped(year):
     results = microsalt_get_untyped(app.adapter, year )
 
@@ -271,7 +271,7 @@ def microsalt_untyped(year):
         years = YEARS)
 
 
-@blueprint.route('/QC/microsalt/st_time/<year>',  methods=['GET', 'POST'])
+@blueprint.route('/Bioinfo/Microbial/st_time/<year>',  methods=['GET', 'POST'])
 def microsalt_st_time(year):
     strain = request.form.get('strain', 'E.coli')
     results_all = microsalt_get_st_time(app.adapter, year)
@@ -289,7 +289,7 @@ def microsalt_st_time(year):
         MICROSALT = MICROSALT,
         years = YEARS)
 
-@blueprint.route('/QC/genotype/time/<year>',  methods=['GET', 'POST'])
+@blueprint.route('/Bioinfo/Genotype/time/<year>',  methods=['GET', 'POST'])
 def genotype_time(year):
     
     plot_data = genotype_status_time(app.adapter, year)
