@@ -117,9 +117,7 @@ class MockLims():
             if last_modified:
                 LOG.info(process.modified)
                 if last_modified > process.modified:
-                    LOG.info('jjj')
                     continue
-                LOG.info('akakaka')
             processes.append(process)
         LOG.info(str(processes))
         return processes
