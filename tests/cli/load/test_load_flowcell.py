@@ -76,4 +76,16 @@ def test_flowcell_days(database, lims):
     assert app.adapter.flowcell(run_id2) is None
 
 
- 
+def test_flowcell_days_wrong_type(database, lims):
+    # GIVEN a app context with a mock lims 
+    app.db = database
+    app.adapter = VougeAdapter(database.client, db_name = database.name)
+    app.lims = lims
+
+    # WHEN running load flowcell -d with wrong type of argument
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'flowcell', '-d', 'apa'])
+    
+    # THEN exit
+    assert result.exit_code == 2
+
