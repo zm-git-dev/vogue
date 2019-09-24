@@ -193,8 +193,8 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
 
             # Find the dates for all processes where the lotnr was used (all_defrosts),
             # and pick the once before or equal to this_date
-            for defrost in all_defrosts:  
-                if str_to_datetime(defrost.date_run) <= this_date:
+            for defrost in all_defrosts:
+                if defrost.date_run and str_to_datetime(defrost.date_run) <= this_date:
                     defrosts_before_this_process.append(defrost)
 
             nr_defrosts = len(defrosts_before_this_process)
