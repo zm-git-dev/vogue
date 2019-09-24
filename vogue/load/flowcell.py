@@ -27,6 +27,7 @@ def load_all(adapter, lims):
 
 def load_recent(adapter, lims, the_date):
     """Function to load all lims flowcell into the database"""
+    LOG.info('*****')
     for run in lims.get_processes(type=RUN_TYPES, last_modified = the_date):
         load_one(adapter, run)
       

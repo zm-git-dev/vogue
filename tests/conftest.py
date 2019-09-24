@@ -35,13 +35,14 @@ def database(request, pymongo_client):
 
 
 class MockProcess():
-    def __init__(self, date_str='2018-01-01', process_type=None, pid=None):
+    def __init__(self, date_str='2018-01-01', process_type=None, pid=None, modified=None):
         self.date_run = date_str
         self.type = process_type
         self.udf = {}
         self.input_artifact_list = []
         self.id = pid
         self.outputs = []
+        self.modified = modified
 
     def all_outputs(self):
         return self.outputs
@@ -97,7 +98,7 @@ class MockLims():
             arts.append(art)
         return arts
 
-    def get_processes(self, type=None, udf={}, inputartifactlimsid=None):
+    def get_processes(self, type=None, udf={}, inputartifactlimsid=None, last_modified=None):
         processes = []
         for process in self.processes:
             if isinstance(type, list) and (process.type.name not in type):
@@ -113,7 +114,14 @@ class MockLims():
                         a.id for a in process.input_artifact_list
                 ]:
                     continue
+            if last_modified:
+                LOG.info(process.modified)
+                if last_modified > process.modified:
+                    LOG.info('jjj')
+                    continue
+                LOG.info('akakaka')
             processes.append(process)
+        LOG.info(str(processes))
         return processes
 
     def _add_artifact(self, parent_process=None, samples=[], id=None):
