@@ -91,7 +91,6 @@ class VougeAdapter(MongoAdapter):
 
     def add_or_update_run(self, run_news: dict):
         """Adds/updates a flowcell in the database"""
-
         lims_id = run_news['_id']
         update_result = self.db.flowcell.update_one({'_id': lims_id},
                                                     {'$set': run_news},
