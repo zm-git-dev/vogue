@@ -37,7 +37,6 @@ def flowcell(run_id, all_runs, dry, days):
             LOG.error(err)
             raise click.Abort()
         load_recent(current_app.adapter,lims, the_date)
-        LOG.info('ggggg')
     elif all_runs:
         load_all(current_app.adapter, lims=lims)
     elif run_id:

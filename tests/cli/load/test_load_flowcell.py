@@ -55,7 +55,7 @@ def test_flowcell_days(database, lims):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     run_id1 = '190301_A00621_0010_AHHNTLDSXX'
-    run_id2 = '190301_A00622_0010_AHHNTLDSXX'
+    run_id2 = '190301_A00689_0010_AHHNTLDSXX'
     process_type = lims._add_process_type(name = RUN_TYPES[0])
     run1 = lims._add_process(process_type = process_type)
     run1.udf = {'Run ID':run_id1}
@@ -74,6 +74,27 @@ def test_flowcell_days(database, lims):
     # THEN only one of the flowcells are added
     assert app.adapter.flowcell(run_id1)['instrument'] == INSTRUMENTS['A00621']
     assert app.adapter.flowcell(run_id2) is None
+
+def test_flowcell_all(database, lims):
+    # GIVEN a app context with a mock lims with a process of correct type and udf 
+    app.db = database
+    app.adapter = VougeAdapter(database.client, db_name = database.name)
+    process_type = lims._add_process_type(name = RUN_TYPES[0])
+    run_id1 = '190301_A00621_0010_AHHNTLDSXX'
+    run_id2 = '190301_A00689_0010_AHHNTLDSXX'
+    lims_run1 = lims._add_process(process_type = process_type)
+    lims_run1.udf = {'Run ID':run_id1}
+    lims_run2 = lims._add_process(process_type = process_type)
+    lims_run2.udf = {'Run ID':run_id2}
+    app.lims = lims
+
+    # WHEN adding a flowcell to the flowcell collection
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'flowcell', '-a'])
+
+    # THEN a flowcell was created
+    assert app.adapter.flowcell(run_id1)['instrument'] == INSTRUMENTS['A00621']
+    assert app.adapter.flowcell(run_id2)['instrument'] == INSTRUMENTS['A00689']
 
 
 def test_flowcell_days_wrong_type(database, lims):
