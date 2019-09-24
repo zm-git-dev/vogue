@@ -184,7 +184,6 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
     if concentration_art:
         concentration = concentration_art.udf.get(concentration_udf)
         lotnr = concentration_art.parent_process.udf.get(lot_nr_udf)
-        print(concentration_art.parent_process)
         this_date = str_to_datetime(concentration_art.parent_process.date_run)
 
         # Ignore if multiple lot numbers:
@@ -195,7 +194,6 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
             # Find the dates for all processes where the lotnr was used (all_defrosts),
             # and pick the once before or equal to this_date
             for defrost in all_defrosts:
-                print(defrost)
                 if defrost.date_run and str_to_datetime(defrost.date_run) <= this_date:
                     defrosts_before_this_process.append(defrost)
 
