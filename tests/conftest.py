@@ -85,6 +85,9 @@ class MockLims():
         self.process_types = []
         self.samples = []
 
+    def get_samples(self)-> list:
+        return self.samples
+
     def get_artifacts(self, process_type, samplelimsid) -> list:
         """"Get a list of artifacts."""
         if not isinstance(process_type, list):
