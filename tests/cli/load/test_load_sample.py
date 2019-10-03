@@ -70,7 +70,6 @@ def test_sample_all(database, lims):
     three_days_ago = date.today() - timedelta(days=3)
     process.modified = three_days_ago.strftime("%Y-%m-%dT00:00:00Z")
 
-    print(lims.get_samples())
     adapter = VougeAdapter(database.client, db_name = database.name)
     app.adapter = adapter
     app.db = database
