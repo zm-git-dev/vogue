@@ -36,7 +36,7 @@ def test_genotype_no_id(database, lims):
 
 
 def test_genotype_badly_formated_json(database, lims):
-    # GIVEN a database and a sample_doc formated in the correct way
+    # GIVEN a database and a badly formated sample_doc
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
     sample_id = 'test'
@@ -46,8 +46,6 @@ def test_genotype_badly_formated_json(database, lims):
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'genotype', '-s', sample_doc])
 
-    print(result)
-    # THEN assert Badly formated json! Can not load json. Exiting. 
-    assert result.exit_code == 1
+
     # THEN assert no sample was added
     assert app.adapter.maf_analysis_collection.count() == 0
