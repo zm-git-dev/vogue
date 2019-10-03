@@ -4,7 +4,7 @@ from vogue.adapter.plugin import VougeAdapter
 
 app = create_app(test= True)
 
-def test_genotype(database, lims):
+def test_genotype(database):
     # GIVEN a database and a sample_doc formated in the correct way
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
@@ -20,7 +20,7 @@ def test_genotype(database, lims):
     assert app.adapter.maf_analysis_collection.count() == 1
     assert added_sample['_id'] == sample_id
 
-def test_genotype_no_id(database, lims):
+def test_genotype_no_id(database):
     # GIVEN a database and a sample_doc formated in the correct way
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)
@@ -35,7 +35,7 @@ def test_genotype_no_id(database, lims):
     assert app.adapter.maf_analysis_collection.count() == 0
 
 
-def test_genotype_badly_formated_json(database, lims):
+def test_genotype_badly_formated_json(database):
     # GIVEN a database and a badly formated sample_doc
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name = database.name)

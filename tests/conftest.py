@@ -42,10 +42,14 @@ class MockProcess():
         self.input_artifact_list = []
         self.id = pid
         self.outputs = []
+        self.inputs = []
         self.modified = modified
 
     def all_outputs(self):
         return self.outputs
+
+    def all_inputs(self):
+        return self.inputs
 
     def __repr__(self):
         return f"Process:date_run={self.date_run},type={self.type}"
