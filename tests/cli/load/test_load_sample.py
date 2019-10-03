@@ -15,18 +15,16 @@ def test_sample(lims_sample, database, lims):
 
     # a lims with a lims sample                                  
     lims_sample.udf['Sequencing Analysis'] = 'WGSPCFC030'
-    
-    
-    #process_type = lims._add_process_type(name = 'HEJ')
-    process = lims._add_process()#process_type = process_type)
+
+    # and a artifact related to the sample
+    artifact = lims._add_artifact(samples = [lims_sample])
+
+    # that was input to a process that was modifyed 3 days ago
+    process = lims._add_process()
+    process.inputs.append(artifact)
     three_days_ago = date.today() - timedelta(days=3)
     process.modified = three_days_ago.strftime("%Y-%m-%dT00:00:00Z")
 
-    artifact = lims._add_artifact(samples = [lims_sample])
-
-    
-    
-    process.inputs.append(artifact)
 
     adapter = VougeAdapter(database.client, db_name = database.name)
     app.adapter = adapter
@@ -39,3 +37,13 @@ def test_sample(lims_sample, database, lims):
 
     # THEN the sample was added
     assert app.adapter.sample_collection.count() == 1
+
+def test_sample_wrong_days():
+    # GIVEN a app context
+
+    # WHEN trying to tun the cli with incorect argument format for -d 
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'sample', '-d', 'U'])
+
+    # THEN the program exits
+    assert result.exit_code == 2
