@@ -23,6 +23,40 @@ def test_flowcell(database, lims):
     # THEN a flowcell was created
     assert app.adapter.flowcell(run_id)['instrument'] == INSTRUMENTS['A00621']
 
+def test_flowcell_no_instrument_name(database, lims):
+    # GIVEN a app context with a mock lims with a process of correct type and udf 
+    app.db = database
+    app.adapter = VougeAdapter(database.client, db_name = database.name)
+    run_id = '19001_A021_010_AHHLDSXX'
+    process_type = lims._add_process_type(name = RUN_TYPES[0])
+    lims_run = lims._add_process(process_type = process_type)
+    lims_run.udf = {'Run ID':run_id}
+    app.lims = lims
+
+    # WHEN adding a flowcell to the flowcell collection
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'flowcell', '-r', run_id])
+
+    # THEN no flowcell was created
+    assert app.adapter.flowcell(run_id) is None
+
+def test_flowcell_missing_RUN_ID(database, lims):
+    # GIVEN a app context with a mock lims with a process of correct type and udf 
+    app.db = database
+    app.adapter = VougeAdapter(database.client, db_name = database.name)
+    run_id = '190301_A00621_0010_AHHNTLDSXX'
+    process_type = lims._add_process_type(name = RUN_TYPES[0])
+    lims_run = lims._add_process(process_type = process_type)
+    app.lims = lims
+
+    # WHEN adding a flowcell to the flowcell collection
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'flowcell', '-r', run_id])
+
+    # THEN no flowcell was created
+    assert result.exit_code == 1
+    assert app.adapter.flowcell(run_id) is None
+
 def test_flowcell_no_lims(database):
     # GIVEN a app context with no lims connection 
     app.db = database
