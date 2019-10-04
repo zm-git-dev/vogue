@@ -83,3 +83,19 @@ def test_sample_all(database, lims):
     assert app.adapter.sample_collection.count() == 1
 
 
+
+def test_sample_no_lims(database):
+    # GIVEN a app context with no lims
+
+    adapter = VougeAdapter(database.client, db_name = database.name)
+    app.adapter = adapter
+    app.db = database
+    app.lims = None
+
+    # WHEN runing load sample
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'sample', '-d', 4])
+
+    # THEN the program exits
+    assert result.exit_code == 1
+
