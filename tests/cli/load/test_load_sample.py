@@ -37,7 +37,7 @@ def test_sample_days(database, lims):
     result = runner.invoke(cli, ['load', 'sample', '-d', 4])
 
     # THEN the sample was added
-    assert app.adapter.sample_collection.count() == 1
+    assert app.adapter.sample_collection.estimated_document_count() == 1
 
 def test_sample_wrong_days():
     # GIVEN a app context
@@ -81,7 +81,7 @@ def test_sample_all(database, lims):
     result = runner.invoke(cli, ['load', 'sample', '-a'])
 
     # THEN the sample was added
-    assert app.adapter.sample_collection.count() == 1
+    assert app.adapter.sample_collection.estimated_document_count() == 1
 
 
 
@@ -99,4 +99,38 @@ def test_sample_no_lims(database):
 
     # THEN the program exits
     assert result.exit_code == 1
+
+
+def test_sample_test(database, lims):
+    # GIVEN a sample that is in the test sample list
+
+    adapter = VougeAdapter(database.client, db_name = database.name)
+    app.adapter = adapter
+    app.db = database
+    app.lims = lims
+
+    # WHEN runing load sample 
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'sample', '-s', 'test'])
+
+    # THEN the sample is not added
+    assert app.adapter.sample_collection.estimated_document_count() == 0
+
+
+def test_sample_dry_all(database, lims, caplog):
+    # GIVEN a adapter
+    adapter = VougeAdapter(database.client, db_name = database.name)
+    app.adapter = adapter
+    app.db = database
+    app.lims = lims
+
+    # WHEN runing load all with dry 
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'sample', '-a', '--dry'])
+
+    # THEN the program will log, and do nothig
+    assert "Will load all lims samples." in caplog.text
+    assert app.adapter.sample_collection.estimated_document_count() == 0
+
+
 

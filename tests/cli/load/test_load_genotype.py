@@ -17,7 +17,7 @@ def test_genotype(database):
 
     # THEN its added to the database
     added_sample = app.adapter.maf_analysis_collection.find_one({'_id': sample_id})
-    assert app.adapter.maf_analysis_collection.count() == 1
+    assert app.adapter.maf_analysis_collection.estimated_document_count() == 1
     assert added_sample['_id'] == sample_id
 
 def test_genotype_no_id(database):
@@ -32,7 +32,7 @@ def test_genotype_no_id(database):
     result = runner.invoke(cli, ['load', 'genotype', '-s', sample_doc])
 
     # THEN no sample was added
-    assert app.adapter.maf_analysis_collection.count() == 0
+    assert app.adapter.maf_analysis_collection.estimated_document_count() == 0
 
 
 def test_genotype_badly_formated_json(database):
@@ -48,4 +48,4 @@ def test_genotype_badly_formated_json(database):
 
 
     # THEN assert no sample was added
-    assert app.adapter.maf_analysis_collection.count() == 0
+    assert app.adapter.maf_analysis_collection.estimated_document_count() == 0

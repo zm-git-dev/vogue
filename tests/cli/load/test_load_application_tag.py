@@ -20,7 +20,7 @@ def test_application_tag(database):
     result = runner.invoke(cli, ['load', 'apptag', app_tags])
 
     # THEN assert the new apptags should be added to the colleciton
-    assert app.adapter.app_tag_collection.count() == 2
+    assert app.adapter.app_tag_collection.estimated_document_count() == 2
     assert app.adapter.app_tag('MELPCFR030')['category'] == 'wgs'
     assert app.adapter.app_tag('MELPCFR090')['category'] == 'hej'
 
@@ -36,7 +36,7 @@ def test_application_tag_missing_tag(database):
     result = runner.invoke(cli, ['load', 'apptag', app_tags])
 
     # THEN assert the new apptag should be added to the colleciton
-    assert app.adapter.app_tag_collection.count() == 1
+    assert app.adapter.app_tag_collection.estimated_document_count() == 1
 
 
 def test_application_tag_wrong_input(database):
