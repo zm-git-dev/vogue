@@ -17,6 +17,7 @@ LOG = logging.getLogger(__name__)
 
 def create_app(test = False):
     app = Flask(__name__, instance_relative_config=True)
+    app.static_folder='static'
     if not test:
         try:
             app.lims = Lims(BASEURI,USERNAME,PASSWORD)
