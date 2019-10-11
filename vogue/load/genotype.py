@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import logging
 import json
-from datetime import datetime as dt
+from dateutil.parser import parse
 
 
 LOG = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ def load_sample(adapter, genotype_sample_string):
     LOG.info('Trying to build json')
     try:
         mongo_sample = json.loads(genotype_sample_string)
-        date = dt.strptime(mongo_sample['sample_created_in_genotype_db'],'%Y-%m-%d')
+        date = parse(mongo_sample['sample_created_in_genotype_db'])
         mongo_sample['sample_created_in_genotype_db'] = date
     except ValueError as e:
         LOG.error(e)
