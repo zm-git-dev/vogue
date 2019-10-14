@@ -9,6 +9,22 @@ from vogue.tools.cli_utils import convert_defaultdict_to_regular_dict
 
 LOG = logging.getLogger(__name__)
 
+def get_common_keys(valid_analysis:list, analysis_type: str):
+    '''
+    Match a list of values with keys from a MODEL dictionary
+
+    input: valid_analysis as list
+    output: analysis_common_keys as list
+    '''
+
+    # Match valid_analysis with the analysis_type of ANALYSIS_SETS
+    analysis_common_keys = list()
+    for my_analysis in valid_analysis:
+        if my_analysis in list(
+                analysis_model.ANALYSIS_SETS[analysis_type].keys()):
+            analysis_common_keys.append(my_analysis)
+    
+    return analysis_common_keys 
 
 def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
                            valid_analysis: list):
@@ -26,12 +42,7 @@ def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
 
     case_analysis_type = analysis_dict['case_analysis_type']
 
-    # Match valid_analysis with the analysis_type of ANALYSIS_SETS
-    analysis_common_keys = list()
-    for my_analysis in valid_analysis:
-        if my_analysis in list(
-                analysis_model.ANALYSIS_SETS[analysis_type].keys()):
-            analysis_common_keys.append(my_analysis)
+    analysis_common_keys = get_common_keys(valid_analysis, analysis_type)
 
     # A new dictionary is constructed instead of dropping unrelevant keys. Or maybe one could deepcopy analysis_dict and
     # remove the irrelevant keys.
