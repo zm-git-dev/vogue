@@ -33,12 +33,8 @@ def sample(sample_lims_id, all_samples, load_from, days, dry):
     lims = current_app.lims
         
     if days:
-        try:
-            some_days_ago = date.today() - timedelta(days=days) 
-            the_date = some_days_ago.strftime("%Y-%m-%dT00:00:00Z")
-        except Exception as err:
-            LOG.error(err)
-            raise click.Abort()
+        some_days_ago = date.today() - timedelta(days=days) 
+        the_date = some_days_ago.strftime("%Y-%m-%dT00:00:00Z")
         load_recent(current_app.adapter,lims, the_date)
     elif all_samples:
         if dry:

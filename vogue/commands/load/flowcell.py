@@ -17,11 +17,12 @@ LOG = logging.getLogger(__name__)
 @click.option('-a', '--all-runs', is_flag = True, help = 'Loads all flowcells found in LIMS.')
 @click.option('--dry', is_flag = True, help = 'Load from flowcell or not. (dry-run)')
 @click.option('-d', '--days', type = int,
-                help = 'Update only samples updated in the latest number of days')
+                help = 'Update only runs updated in the latest number of days')
 
 @with_appcontext
 def flowcell(run_id, all_runs, dry, days):
     """Read and load lims data for a one or all many runs"""
+    
     if not current_app.lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
