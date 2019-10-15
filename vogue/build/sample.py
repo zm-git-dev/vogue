@@ -13,6 +13,7 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     mongo_sample['family'] = sample.udf.get('Family')
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
+    mongo_sample['customer'] = sample.udf.get('customer')
     mongo_sample['priority'] = sample.udf.get('priority')
     mongo_sample['initial_qc'] = sample.udf.get('Passed Initial QC')
     mongo_sample['library_qc'] = sample.udf.get('Passed Library QC')
