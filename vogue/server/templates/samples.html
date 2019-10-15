@@ -6,8 +6,22 @@
         {% include 'navigation.html' %}
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
-            <div class="col-lg-12" id="received"></div>
-            <div class="col-lg-12" id="received_application"></div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="received"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="received_application"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </div>
@@ -26,13 +40,13 @@
     Highcharts.chart('received', {
         chart: { type: 'areaspline' },
         title: { text: {{ plot_prio.title | tojson }} },
-        xAxis: { categories: {{ plot_prio.labels| tojson }}},
+        xAxis: { categories: {{ plot_prio.labels | tojson }}},
         yAxis: { title: { text: {{ plot_prio.axis.y | tojson }} } },
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
     var series = []
@@ -46,13 +60,13 @@
     Highcharts.chart('received_application', {
         chart: { type: 'areaspline' },
         title: { text: {{ plot_cat.title | tojson }} },
-        xAxis: { categories: {{ plot_cat.labels| tojson }}},
+        xAxis: { categories: {{ plot_cat.labels | tojson }}},
         yAxis: { title: { text: {{ plot_cat.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
 </script>

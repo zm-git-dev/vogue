@@ -8,7 +8,11 @@
             {% include 'header_section.html' %}
             <div class="row">
                 <div class="col-lg-12">
-                    <div id="microbial_concentration_time"></div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="microbial_concentration_time"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -31,33 +35,35 @@
             type: 'spline'
         },
         title: {
-            text: '{{plot_attributes.title}}'},
+            text: '{{plot_attributes.title}}'
+        },
         xAxis: {
-            categories: {{ plot_attributes.labels| tojson }}},
+            categories: {{ plot_attributes.labels | tojson }}},
         yAxis: {
-            title: { text: {{ plot_attributes.axis.y | tojson }}}},
+        title: { text: {{ plot_attributes.axis.y | tojson }}}},
         legend: {
-            title: {
-                    text: 'Organism<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
-                    style: {fontStyle: 'italic'}},
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle'
+        title: {
+            text: 'Organism<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+            style: { fontStyle: 'italic' }
         },
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
         tooltip: {
-            crosshairs: true,
-            shared: true
-        },
+        crosshairs: true,
+        shared: true
+    },
         plotOptions: {
-            series: { connectNulls: true },
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
             }
-        },
+        }
+    },
         series: series 
 });
 
