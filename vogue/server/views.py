@@ -4,6 +4,7 @@ from flask import url_for, redirect, render_template, request, Blueprint, curren
 
 from vogue.constants.constants import *
 from vogue.server.utils import *
+from vogue import __version__
 
 
 app = current_app
@@ -11,10 +12,9 @@ blueprint = Blueprint('server', __name__)
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
-    year = request.form.get('year')
-    if not year:
-        year = THIS_YEAR
 
+    year = request.form.get('year', str(THIS_YEAR))
+    
     if request.form.get('page') == 'turn_around_times':
         return redirect(url_for('server.turn_around_times', year=year))
     if request.form.get('page') == 'samples':
@@ -44,9 +44,21 @@ def index():
     if request.form.get('page') == 'genotype_time':
         return redirect(url_for('server.genotype_time', year=year))
 
+    month = int(request.form.get('month', 0))
+    sample_series, cathegories =  home_samples(app.adapter, int(year), month)
+    customers = home_customers(app.adapter, int(year), month)
     return render_template(
         'index.html',
-        year_of_interest = year)
+        version = __version__,
+        sample_series = sample_series,
+        cathegories = cathegories ,
+        customers = customers,
+        page_id = 'index',
+        year_of_interest = year,
+        month_of_interest = month,
+        months = MONTHS,
+        month_name = MONTHS[month -1][1] if month else '',
+        years = YEARS)
 
 @blueprint.route('/common/turn_around_times/<year>')
 def turn_around_times(year):
@@ -80,6 +92,7 @@ def turn_around_times(year):
         prepped_to_sequenced_prio = plot_attributes( title = p2s_p , y_axis_label = y_axis_label),
         sequenced_to_delivered_cat = plot_attributes( title = s2d_c , y_axis_label = y_axis_label),
         sequenced_to_delivered_prio = plot_attributes( title = s2d_p , y_axis_label = y_axis_label),
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -97,6 +110,7 @@ def common_samples(year):
         data_cat = data_cat['count'],
         plot_prio = plot_attributes( title = 'Received samples per month (grouped by priority)' , y_axis_label = y_axis_label),
         plot_cat = plot_attributes( title = 'Received samples per month (grouped by application tag)' , y_axis_label = y_axis_label),
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -111,6 +125,7 @@ def microbial(year):
         page_id = 'microbial',
         data = data['microbial_library_concentration'], 
         plot_attributes = plot_attributes( title = 'Microbial' , y_axis_label = 'Concentration (nM)'),
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -128,6 +143,7 @@ def target_enrichment(year):
         data_post_hyb = data['library_size_post_hyb'],
         plot_post_hyb = plot_attributes( title = 'Post-hybridization QC' , y_axis_label = y_axis_label),
         plot_pre_hyb = plot_attributes( title = 'Pre-hybridization QC' , y_axis_label = y_axis_label),
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -143,6 +159,7 @@ def wgs(year):
         concentration_defrosts = concentration_defrosts,
         concentration_time = concentration_time['nr_defrosts-concentration'],
         plot_attributes = plot_attributes( title = 'WGS illumina PCR-free' , y_axis_label = 'Concentration (nM)'),
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -159,6 +176,7 @@ def lucigen(year):
         plot_conc_time = plot_attributes( title = 'Lucigen PCR-free, Average Library concentration over time', y_axis_label = 'Concentration (nM)'),
         plot_amount_conc = plot_attributes(title = 'Lucigen PCR-free, Library concentration vs Input amount', y_axis_label = 'Concentration (nM)', x_axis_label = 'Amount (ng)'),
         amount = concentration_amount,
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -174,6 +192,7 @@ def runs(year):
         metric = selcted_metric,
         metrices = LANE_UDFS,
         results = aggregate_result,
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -192,6 +211,7 @@ def mip_picard_time(year):
         PICARD_HS_METRIC = PICARD_HS_METRIC,
         header = 'MIP',
         page_id = 'mip_picard_time',
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -210,6 +230,7 @@ def mip_picard(year):
         PICARD_HS_METRIC = PICARD_HS_METRIC,
         header = 'MIP',
         page_id = 'mip_picard',
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -220,6 +241,7 @@ def balsamic(year):
     return render_template('balsamic.html',
         header = 'Balsamic',
         page_id = 'balsamic',
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -235,6 +257,7 @@ def microsalt_strain_st(year):
         categories = results.keys(),
         header = 'Microsalt',
         page_id = 'strain_st',
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
@@ -252,6 +275,7 @@ def microsalt_qc_time(year):
         selected_metric = metric_path.split('.')[1],
         header = 'Microsalt',
         page_id = 'microsalt_qc_time',
+        version = __version__,
         year_of_interest=year,
         MICROSALT = MICROSALT,
         years = YEARS)
@@ -266,6 +290,7 @@ def microsalt_untyped(year):
         categories = results['labels'],
         header = 'Microsalt',
         page_id = 'microsalt_untyped',
+        version = __version__,
         year_of_interest=year,
         MICROSALT = MICROSALT,
         years = YEARS)
@@ -285,6 +310,7 @@ def microsalt_st_time(year):
         categories = results_all['labels'],
         header = 'Microsalt',
         page_id = 'microsalt_st_time',
+        version = __version__,
         year_of_interest=year,
         MICROSALT = MICROSALT,
         years = YEARS)
@@ -298,6 +324,7 @@ def genotype_time(year):
         labels = plot_data['labels'],
         header = 'MAF',
         page_id = 'genotype_time',
+        version = __version__,
         year_of_interest=year,
         years = YEARS)
 
