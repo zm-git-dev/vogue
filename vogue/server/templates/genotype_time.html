@@ -8,7 +8,11 @@
             {% include 'header_section.html' %}
             <div class="row">
                 <div class="col-lg-12">
-                    <div id="faild_time"></div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="faild_time"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -20,47 +24,47 @@
 <script>
     var series = []
     {% for group in data %}
-        series.push({
-            name: "{{group}}",
-            data: {{ data[group] | tojson }}
+    series.push({
+        name: "{{group}}",
+        data: {{ data[group] | tojson }}
             })
     {% endfor %}
-    
+
 
 
 
     Highcharts.chart('faild_time', {
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: 'Sample Status over Time'
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        categories: {{ labels| tojson }},
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Sample Status over Time'
+        },
+        subtitle: {
+            text: ''
+        },
+        xAxis: {
+            categories: {{ labels| tojson }},
         crosshair: true
     },
-    yAxis: {
+        yAxis: {
         min: 0,
         title: {
             text: 'Nr samples'
         }
     },
-    tooltip: {
+        tooltip: {
         shared: true,
         useHTML: true
     },
-    plotOptions: {
+        plotOptions: {
         column: {
             pointPadding: 0.2,
             borderWidth: 0
         }
     },
-    series: series 
+        series: series 
 });
-    
+
 </script>
 {% endblock %}

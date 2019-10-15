@@ -7,13 +7,19 @@
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
             <div class="row">
-                <div class="col-lg-12">
-                    <div id="amount"></div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="amount"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div id="amount_concentration_time"></div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="amount_concentration_time"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -29,26 +35,30 @@
         xAxis: {
             title: { text: {{ plot_amount_conc.axis.x | tojson }}}},
         yAxis: {
-            title: { text: {{ plot_amount_conc.axis.y | tojson }}}},
+        title: { text: {{ plot_amount_conc.axis.y | tojson }}}},
         legend: {
-            enabled: false
-        },
+        enabled: false
+    },
         tooltip: {
         formatter: function () {
             var output = ''
-            if (this.point.name ) {
-                output = output + 'Sample ID: <b>' + this.point.name +'</b> <br>'}
-            output = output + 'Concenration: <b>'+ this.y + '</b> <br> Amount: <b>'+ this.x + '</b>'
-            return output ;}
-        },
+            if (this.point.name) {
+                output = output + 'Sample ID: <b>' + this.point.name + '</b> <br>'
+            }
+            output = output + 'Concenration: <b>' + this.y + '</b> <br> Amount: <b>' + this.x + '</b>'
+            return output;
+        }
+    },
         plotOptions: {
-            scatter:{marker: {
-                    enabled: true,
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }}
-        },
+        scatter: {
+            marker: {
+                enabled: true,
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
+            }
+        }
+    },
         series: [{
             regression: true,
             regressionSettings: {
@@ -56,7 +66,7 @@
                 dashStyle: 'dash'
             },
             type: 'scatter',
-            data: {{ amount.data| tojson }}
+            data: {{ amount.data | tojson }}
         }]
 });
 </script>
@@ -71,26 +81,27 @@
 
     Highcharts.chart('amount_concentration_time', {
         chart: { type: 'spline' },
-        title: { text: '{{plot_conc_time.title}}'},
+        title: { text: '{{plot_conc_time.title}}' },
         subtitle: { text: '' },
-        xAxis: { categories: {{ plot_conc_time.labels| tojson }}},
+        xAxis: { categories: {{ plot_conc_time.labels | tojson }}},
         yAxis: { title: { text: {{ plot_conc_time.axis.y | tojson }}}},
         legend: { enabled: false },
         tooltip: { crosshairs: true, shared: true },
         plotOptions: {
-            series: { connectNulls: true },
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
             }
-        },
+        }
+    },
         series: [{
             name: 'Average Concnetration',
             data: data,
-            marker: { symbol: 'circle' }}] 
+            marker: { symbol: 'circle' }
+        }] 
 });
 
 </script>

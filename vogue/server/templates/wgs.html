@@ -7,13 +7,19 @@
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
             <div class="row">
-                <div class="col-lg-12">
-                    <div id="concentration_defrosts"></div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="concentration_defrosts"></div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div id="concentration_time"></div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="concentration_time"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -27,55 +33,58 @@
         name: "{{group}}",
         data: {{ concentration_defrosts.data[group].median | tojson }},
         marker: {
-            radius: 3,
-            symbol: 'circle',
-            lineColor: '#666666',
-            lineWidth: 1},
+        radius: 3,
+        symbol: 'circle',
+        lineColor: '#666666',
+        lineWidth: 1
+    },
         color: Highcharts.getOptions().colors[{{ loop.index }}]
-        },{
-        name: 'Interquartile Range',
-        data: {{ concentration_defrosts.data[group].quartile | tojson }},
+        }, {
+            name: 'Interquartile Range',
+            data: {{ concentration_defrosts.data[group].quartile | tojson }},
         type: 'areasplinerange',
         lineWidth: 0,
         linkedTo: ':previous',
         color: Highcharts.getOptions().colors[{{ loop.index }}],
         fillOpacity: 0.2,
         zIndex: 0,
-        marker: {enabled: false}
+        marker: { enabled: false }
         })
     {% endfor %}
 
     Highcharts.chart('concentration_defrosts', {
         chart: { type: 'spline' },
         title: {
-            text: '{{concentration_defrosts.title}}'},
+            text: '{{concentration_defrosts.title}}'
+        },
         xAxis: {
-            categories: {{ concentration_defrosts.labels| tojson }},
+            categories: {{ concentration_defrosts.labels | tojson }},
         title: { text: {{ concentration_defrosts.axis.x | tojson }}}},
         yAxis: {
-            title: { text: {{ concentration_defrosts.axis.y | tojson }}}},
+        title: { text: {{ concentration_defrosts.axis.y | tojson }}}},
         legend: {
-            title: {
-                    text: 'Lot Number<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
-                    style: {fontStyle: 'italic'}},
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle'
+        title: {
+            text: 'Lot Number<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+            style: { fontStyle: 'italic' }
         },
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
         tooltip: {
-            crosshairs: true,
-            shared: true
-        },
+        crosshairs: true,
+        shared: true
+    },
         plotOptions: {
-            series: { connectNulls: true },
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
             }
-        },
+        }
+    },
         series: series});
 
 </script>
@@ -88,25 +97,26 @@
 
     Highcharts.chart('concentration_time', {
         chart: { type: 'spline' },
-        title: { text: '{{plot_attributes.title}}'},
-        xAxis: { categories: {{ plot_attributes.labels| tojson }}},
+        title: { text: '{{plot_attributes.title}}' },
+        xAxis: { categories: {{ plot_attributes.labels | tojson }}},
         yAxis: { title: { text: {{ plot_attributes.axis.y | tojson }}}},
         legend: { enabled: false },
         tooltip: { crosshairs: true, shared: true },
         plotOptions: {
-            series: { connectNulls: true },
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
             }
-        },
+        }
+    },
         series: [{
             name: 'Average Concentration',
             data: data,
-            marker: { symbol: 'circle' }}] 
+            marker: { symbol: 'circle' }
+        }] 
 });
 
 </script>

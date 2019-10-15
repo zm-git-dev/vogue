@@ -6,11 +6,12 @@
         {% include 'navigation.html' %}
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
-            <div class="row">
-                <div class="container">
-                    <form action="{{ url_for('server.mip_picard_time' , year=year_of_interest) }}" method="POST">
-                        <div class="row">
-                            <div class="col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="btn mb-2 mb-md-0">
+                            <form action="{{ url_for('server.mip_picard_time' , year=year_of_interest) }}"
+                                method="POST">
                                 <select name="picard_metric" class="form-control form-control-sm"
                                     placeholder=".form-control-sm" required onchange="this.form.submit()">
                                     <optgroup label="Picard insert size">
@@ -26,15 +27,15 @@
                                         </option>
                                         {% endfor %}
                                 </select>
-                            </div>
+                            </form>
                         </div>
-                    </form>
-                </div>
-            </div>
-            <hr>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div id="picard_plot"></div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="picard_plot"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -57,25 +58,25 @@
         yAxis: { title: { text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" } },
         legend: { enabled: false },
         tooltip: {
-            formatter: function () {
-                var output = ''
-                if (this.point.name) {
-                    output = output + 'Sample ID: <b>' + this.point.name + '</b> <br>'
-                }
-                output = output + "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" + ': <b>' + this.y + '</b> <br> Sample Recieved in: <b>' + this.x + '</b>'
-                return output;
+        formatter: function () {
+            var output = ''
+            if (this.point.name) {
+                output = output + 'Sample ID: <b>' + this.point.name + '</b> <br>'
             }
-        },
+            output = output + "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" + ': <b>' + this.y + '</b> <br> Sample Recieved in: <b>' + this.x + '</b>'
+            return output;
+        }
+    },
         plotOptions: {
-            series: { connectNulls: true },
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
             }
-        },
+        }
+    },
         series: [{
             name: 'Average Insert Size',
             data: data,

@@ -7,20 +7,68 @@
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
             <div class="row">
-                <div class="col-lg-6" , id='received_to_delivered_tag'></div>
-                <div class="col-lg-6" , id='received_to_delivered_prio'></div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id='received_to_delivered_tag'></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id='received_to_delivered_prio'></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row">
-                    <div class="col-lg-6" id="received_to_prepped_tag"></div>
-                    <div class="col-lg-6" id="received_to_prepped_prio"></div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="received_to_prepped_tag"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="received_to_prepped_prio"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row">
-                    <div class="col-lg-6" id="prepped_to_sequenced_tag"></div>
-                    <div class="col-lg-6" id="prepped_to_sequenced_prio"></div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="prepped_to_sequenced_tag"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="prepped_to_sequenced_prio"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row">
-                    <div class="col-lg-6" id="sequenced_to_delivered_tag"></div>
-                    <div class="col-lg-6" id="sequenced_to_delivered_prio"></div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="sequenced_to_delivered_tag"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="sequenced_to_delivered_prio"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -37,14 +85,14 @@
 
     Highcharts.chart('sequenced_to_delivered_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ sequenced_to_delivered_prio.title| tojson }}},
-        xAxis: { categories: {{ sequenced_to_delivered_prio.labels| tojson }}},
+        title: { text: {{ sequenced_to_delivered_prio.title | tojson }}},
+        xAxis: { categories: {{ sequenced_to_delivered_prio.labels | tojson }}},
         yAxis: { title: { text: {{ sequenced_to_delivered_prio.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
 
@@ -58,14 +106,14 @@
 
     Highcharts.chart('prepped_to_sequenced_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ prepped_to_sequenced_prio.title| tojson }}},
-        xAxis: { categories: {{ prepped_to_sequenced_prio.labels| tojson }}},
+        title: { text: {{ prepped_to_sequenced_prio.title | tojson }}},
+        xAxis: { categories: {{ prepped_to_sequenced_prio.labels | tojson }}},
         yAxis: { title: { text: {{ prepped_to_sequenced_prio.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
     var series = []
@@ -78,14 +126,14 @@
 
     Highcharts.chart('received_to_prepped_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_prepped_prio.title| tojson }}},
-        xAxis: { categories: {{ received_to_prepped_prio.labels| tojson }}},
+        title: { text: {{ received_to_prepped_prio.title | tojson }}},
+        xAxis: { categories: {{ received_to_prepped_prio.labels | tojson }}},
         yAxis: { title: { text: {{ received_to_prepped_prio.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
     var series = []
@@ -98,14 +146,14 @@
 
     Highcharts.chart('received_to_delivered_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_delivered_prio.title| tojson }}},
-        xAxis: { categories: {{ received_to_delivered_prio.labels| tojson }}},
+        title: { text: {{ received_to_delivered_prio.title | tojson }}},
+        xAxis: { categories: {{ received_to_delivered_prio.labels | tojson }}},
         yAxis: { title: { text: {{ received_to_delivered_prio.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
     var series = []
@@ -118,14 +166,14 @@
 
     Highcharts.chart('sequenced_to_delivered_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ sequenced_to_delivered_cat.title| tojson }}},
-        xAxis: { categories: {{ sequenced_to_delivered_cat.labels| tojson }}},
+        title: { text: {{ sequenced_to_delivered_cat.title | tojson }}},
+        xAxis: { categories: {{ sequenced_to_delivered_cat.labels | tojson }}},
         yAxis: { title: { text: {{ sequenced_to_delivered_cat.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
 
@@ -139,14 +187,14 @@
 
     Highcharts.chart('prepped_to_sequenced_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ prepped_to_sequenced_cat.title| tojson }}},
-        xAxis: { categories: {{ prepped_to_sequenced_cat.labels| tojson }}},
+        title: { text: {{ prepped_to_sequenced_cat.title | tojson }}},
+        xAxis: { categories: {{ prepped_to_sequenced_cat.labels | tojson }}},
         yAxis: { title: { text: {{ prepped_to_sequenced_cat.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
     var series = []
@@ -159,14 +207,14 @@
 
     Highcharts.chart('received_to_prepped_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_prepped_cat.title| tojson }}},
-        xAxis: { categories: {{ received_to_prepped_cat.labels| tojson }}},
+        title: { text: {{ received_to_prepped_cat.title | tojson }}},
+        xAxis: { categories: {{ received_to_prepped_cat.labels | tojson }}},
         yAxis: { title: { text: {{ received_to_prepped_cat.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
     var series = []
@@ -179,14 +227,14 @@
 
     Highcharts.chart('received_to_delivered_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_delivered_cat.title| tojson }}},
-        xAxis: { categories: {{ received_to_delivered_cat.labels| tojson }}},
+        title: { text: {{ received_to_delivered_cat.title | tojson }}},
+        xAxis: { categories: {{ received_to_delivered_cat.labels | tojson }}},
         yAxis: { title: { text: {{ received_to_delivered_cat.axis.y | tojson }}}},
         tooltip: {
-            shared: true,
-            valueSuffix: ' days'
-        },
-        plotOptions: {areaspline: {fillOpacity: 0.2}},
+        shared: true,
+        valueSuffix: ' days'
+    },
+        plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 </script>
 {% endblock %}
