@@ -3,47 +3,43 @@
   <div class="sidebar-sticky">
     <ul class="nav flex-column">
       <br>
+
       <li class="nav-item">
         <a class="nav-link " href="{{ url_for('server.index') }}">
           <span data-feather="home"></span>
           Home <span class="sr-only">(current)</span>
         </a>
       </li>
-      <li class="nav-item dropright">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          Common trends
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+      <li class="nav-item dropdown">
+        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Common trends</a>
+        <ul class="dropdown-menu">
           <a class="dropdown-item btn-sm" href="{{ url_for('server.turn_around_times', year=year_of_interest) }}">Turnaround
             Times</a>
           <a class="dropdown-item btn-sm" href="{{ url_for('server.common_samples', year=year_of_interest) }}">Samples</a>
-        </div>
+        </ul>
       </li>
-      <li class="nav-item dropright">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          Preps
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+      <li class="nav-item dropdown">
+        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Preps</a>
+        <ul class="dropdown-menu">
           <a class="dropdown-item btn-sm" href="{{ url_for('server.microbial' , year=year_of_interest) }}">Microbial</a>
           <a class="dropdown-item btn-sm" href="{{ url_for('server.wgs' , year=year_of_interest) }}">WGS Illumina
             PCR-free</a>
           <a class="dropdown-item btn-sm" href="{{ url_for('server.lucigen' , year=year_of_interest) }}">Lucigen PCR-free</a>
           <a class="dropdown-item btn-sm" href="{{ url_for('server.target_enrichment' , year=year_of_interest) }}">Targeted
             enrichment</a>
-        </div>
+          </ul>
       </li>
-      <li class="nav-item dropright ">
-        <a class="nav-link btn-sm" href="#" id="navbarDropdown"  data-toggle="dropdown"
-          aria-haspopup="true" aria-expanded="false">
-          Sequencing
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+      <li class="nav-item dropdown ">
+        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Sequencing</a>
+        <ul class="dropdown-menu">
           <a class="dropdown-item btn-sm" href="{{ url_for('server.runs' , year=year_of_interest) }}">Instruments</a>
-        </div>
+        </ul>
       </li>
-      <li class="nav-item dropright">
+
+      <li class="nav-item dropdown">
         <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Bioinfo</a>
         <ul class="dropdown-menu">
           <li class="dropdown-item btn-sm dropdown-submenu">
@@ -84,17 +80,16 @@
               </li>
         </ul>
       </li>
-      <li class="nav-item dropright">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            Genotypes
-          </a>
+
+      <li class="nav-item dropdown">
+          <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Genotypes</a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item btn-sm" href="{{ url_for('server.genotype_time' , year=year_of_interest) }}">Genotypes over time</a>
           </div>
         </li>
     </ul>
   </div>
+
   <div class="container text-center">
       <small>The database is updated every hour.</small>
     </div>
