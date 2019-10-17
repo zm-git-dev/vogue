@@ -19,20 +19,22 @@
                                         {{ group}}
                                     </option>
                                     {% endfor %}
-
                                 </select>
-
                             </form>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-12">
                             <div id="run_info"></div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </main>
     </div>
 </div>
+
 
 
 
@@ -51,7 +53,6 @@
         marker: { symbol: 'circle' }
     })
     {% endfor %}
-
     Highcharts.chart('run_info', {
         chart: { type: 'spline' },
         title: { text: '{{metric}}' },
@@ -89,7 +90,6 @@
         }
     },
         series: series 
-});
-
+    });
 </script>
 {% endblock %}
