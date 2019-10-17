@@ -11,6 +11,9 @@ cd vogue
 pip install -e .
 ```
 
+## Contributing
+Vogue is using git flow branching model as described in our [development manual](http://www.clinicalgenomics.se/development/dev/gitflow/).
+
 ## Front End
 All views in vogue should be self-explanatory. There should be no further documentation needed to be able to interpret the content of the web page.
 

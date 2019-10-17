@@ -14,7 +14,7 @@ def load_one(adapter, run):
     date, instrument = run_id.split('_')[0:2]
     instrument_name =  INSTRUMENTS.get(instrument)
     if not instrument_name:
-        LOG.warning("Run ID is missing")
+        LOG.warning("Could not get instrument name")
         return
     mongo_run = build_run(run=run, instrument = instrument_name, date=date)
     adapter.add_or_update_run(mongo_run)

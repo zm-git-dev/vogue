@@ -8,7 +8,7 @@ from vogue import __version__
 
 
 app = current_app
-blueprint = Blueprint('server', __name__)
+blueprint = Blueprint('server', __name__ )
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
