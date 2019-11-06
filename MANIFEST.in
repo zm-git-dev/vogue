@@ -1,1 +1,2 @@
 include vogue/server/templates/*.html
+include vogue/server/static/* 
