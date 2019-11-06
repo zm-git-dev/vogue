@@ -40,7 +40,7 @@
     var data = []
     {% for date, value, run_id in results['data'][metric][group].data %}
     // in this context january is 0, february 1,..., december 11 thereby date.month-1
-    data.push({ 'x': Date.UTC({{ date.year }}, {{ date.month - 1 }}, {{ date.day }}), 'y': { { value } }, 'name': { { run_id | tojson } }} )
+    data.push({ 'x': Date.UTC({{ date.year }}, {{ date.month - 1 }}, {{ date.day }}), 'y': {{ value }}, 'name': {{ run_id | tojson }} } )
     {% endfor %}
     series.push({
         findNearestPointBy: 'xy',
