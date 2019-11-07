@@ -14,6 +14,8 @@ blueprint = Blueprint('server', __name__ )
 def index():
 
     year = request.form.get('year', str(THIS_YEAR))
+    print('indexx')
+    print(year)
     
     if request.form.get('page') == 'turn_around_times':
         return redirect(url_for('server.turn_around_times', year=year))
@@ -43,6 +45,8 @@ def index():
         return redirect(url_for('server.microsalt_st_time', year=year))
     if request.form.get('page') == 'genotype_time':
         return redirect(url_for('server.genotype_time', year=year))
+    if request.form.get('page') == 'genotype_plate':
+        return redirect(url_for('server.genotype_plate'))
 
     month = int(request.form.get('month', 0))
     sample_series, cathegories =  home_samples(app.adapter, int(year), month)
@@ -327,4 +331,22 @@ def genotype_time(year):
         version = __version__,
         year_of_interest=year,
         years = YEARS)
+
+
+@blueprint.route('/Bioinfo/Genotype/plate',  methods=['GET', 'POST'])
+def genotype_plate():
+     
+    plate_id = request.form.get('plate_id')
+    plot_data = get_genotype_plate(app.adapter, plate_id=plate_id)
+
+    return render_template('genotype_plate.html',
+        data = plot_data['data'],
+        x_labels = plot_data['x_labels'],
+        y_labels = plot_data['y_labels'],
+        year_of_interest = str(THIS_YEAR),
+        header = 'MAF',
+        page_id = 'genotype_plate',
+        version = __version__,
+        plate_id = int(plot_data['plate_id']),
+        plates = plot_data['plates'])
 
