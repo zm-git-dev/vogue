@@ -297,6 +297,10 @@ class VougeAdapter(MongoAdapter):
         """Function to make a aggregation on the maf analysis colleciton"""
         return self.maf_analysis_collection.aggregate(pipe)
 
+    def find_maf_plate(self, plate_id : str):
+        """find all samples from plate"""
+        return self.maf_analysis_collection.find({'plate': plate_id})
+
     def get_category(self, app_tag):
         """Function get category based on application tag from the application tag collection"""
         tag = self.app_tag_collection.find_one({'_id': app_tag},
