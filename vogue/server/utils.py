@@ -683,7 +683,7 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
     plate_id = plates[0] if not plate_id else plate_id
 
     samples_pipe = [{'$match': {
-                'plate': int(plate_id), 
+                'plate': plate_id, 
             'snps.comp': {
                 '$exists': 'True'}}}]
 

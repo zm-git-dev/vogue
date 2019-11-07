@@ -347,6 +347,6 @@ def genotype_plate():
         header = 'MAF',
         page_id = 'genotype_plate',
         version = __version__,
-        plate_id = int(plot_data['plate_id']),
+        plate_id = plot_data['plate_id'],
         plates = plot_data['plates'])
 
