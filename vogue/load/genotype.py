@@ -11,7 +11,7 @@ def load_sample(adapter, genotype_sample_string):
     LOG.info('Trying to build json')
     try:
         mongo_sample = json.loads(genotype_sample_string)
-        if mongo_sample['sample_created_in_genotype_db']:
+        if mongo_sample.get('sample_created_in_genotype_db'):
             date = parse(mongo_sample['sample_created_in_genotype_db'])
             mongo_sample['sample_created_in_genotype_db'] = date
     except ValueError as e:
