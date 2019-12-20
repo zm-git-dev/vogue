@@ -16,7 +16,6 @@ def home_samples(adapter, year, month):
             'received_date': {'$exists': 'True'}}
         }, {
         '$project': {
-            'month': {'$month': '$received_date'}, 
             'year': {'$year': '$received_date'}, 
             'category': 1, 
             'priority': 1}

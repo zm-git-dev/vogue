@@ -31,7 +31,9 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
     # Get the last atrtifact
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=True)
     if artifact:
-        final_date = str_to_datetime(artifact.parent_process.date_run)
+        final_date = artifact.parent_process.udf.get('Finish Date')
+        if not final_date:
+            final_date = str_to_datetime(artifact.parent_process.date_run)
 
     return final_date
     
@@ -276,7 +278,7 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     if not application_tag:
         return None
 
-    if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
+    if not application_tag[0:3] in ['EXO', 'EFT', 'PAN', 'PAL']:
         return None
 
     size_step = ['CG002 - Amplify Adapter-Ligated Library (SS XT)']
@@ -297,7 +299,7 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) ->
     if not application_tag:
         return None
 
-    if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
+    if not application_tag[0:3] in ['EXO', 'EFT', 'PAN', 'PAL']:
         return None
 
     size_step = ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)']

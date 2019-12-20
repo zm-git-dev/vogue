@@ -1,9 +1,14 @@
 {% block content %}
+<div class="wrapper">
+
+<div class="sidebar">
 <nav class="col-md-2 d-none d-md-block bg-light sidebar ">
-  <div class="sidebar-sticky">
     <ul class="nav flex-column">
       <br>
-      <li class="nav-item">
+      <br>
+      <br>
+      <br>
+      <li class="nav-item dropright">
         <a class="nav-link " href="{{ url_for('server.index') }}">
           <span data-feather="home"></span>
           Home <span class="sr-only">(current)</span>
@@ -50,10 +55,10 @@
             <a href="#" data-toggle="dropdown" class="dropdown-toggle">Rare Disease</a>
             <ul class="dropdown-menu">
               <li class="dropdown-item btn-sm">
-                <a href="{{ url_for('server.mip_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
+                <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.mip_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
               </li>
               <li class="dropdown-item btn-sm">
-                <a href="{{ url_for('server.mip_picard' , year=year_of_interest) }}">Picard QC</a>
+                <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.mip_picard' , year=year_of_interest) }}">Picard QC</a>
               </li>
             </ul>
           </li>
@@ -61,7 +66,7 @@
               <a href="#" data-toggle="dropdown" class="dropdown-toggle">Cancer</a>
               <ul class="dropdown-menu">
                 <li class="dropdown-item btn-sm">
-                  <a href="{{ url_for('server.balsamic' , year=year_of_interest) }}">Nothing here yet</a>
+                  <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.balsamic' , year=year_of_interest) }}">Nothing here yet</a>
                 </li>
               </ul>
             </li>
@@ -69,16 +74,16 @@
                 <a href="#" data-toggle="dropdown" class="dropdown-toggle">Microbial</a>
                 <ul class="dropdown-menu">
                   <li class="dropdown-item btn-sm">
-                    <a href="{{ url_for('server.microsalt_strain_st' , year=year_of_interest) }}">ST total</a>
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.microsalt_strain_st' , year=year_of_interest) }}">ST total</a>
                   </li>
                   <li class="dropdown-item btn-sm">
-                    <a href="{{ url_for('server.microsalt_qc_time' , year=year_of_interest) }}">QC over time</a>
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.microsalt_qc_time' , year=year_of_interest) }}">QC over time</a>
                   </li>
                   <li class="dropdown-item btn-sm">
-                      <a href="{{ url_for('server.microsalt_untyped' , year=year_of_interest) }}">Untyped organisms</a>
+                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.microsalt_untyped' , year=year_of_interest) }}">Untyped organisms</a>
                   </li>
                   <li class="dropdown-item btn-sm">
-                      <a href="{{ url_for('server.microsalt_st_time' , year=year_of_interest) }}">ST over time</a>
+                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.microsalt_st_time' , year=year_of_interest) }}">ST over time</a>
                   </li>
                 </ul>
               </li>
@@ -95,10 +100,10 @@
           </div>
         </li>
     </ul>
-  </div>
-  <div class="container text-center">
+  <div class="container sticky-bottom">
       <small>The database is updated every hour.</small>
-    </div>
+  </div>
 </nav>
-
+</div>
+</div>
 {% endblock %}
