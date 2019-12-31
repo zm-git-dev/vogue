@@ -1,7 +1,7 @@
 from genologics.lims import Lims
 from genologics.entities import Sample, Artifact
 from vogue.constants.lims_constants import MASTER_STEPS_UDFS
-from datetime import datetime as dt
+from datetime import time, datetime as dt
 import operator
 import logging
 LOG = logging.getLogger(__name__)
@@ -32,8 +32,11 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=True)
     if artifact:
         final_date = artifact.parent_process.udf.get('Finish Date')
-        if not final_date:
+        if final_date:
+            final_date = dt.combine(final_date, time.min)
+        else:
             final_date = str_to_datetime(artifact.parent_process.date_run)
+        
 
     return final_date
     
