@@ -21,7 +21,6 @@
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 
 </head>
 
@@ -56,14 +55,13 @@
       submenu.next('.dropdown-menu').addClass('show');
       e.stopPropagation();
     });
-
     $('.dropdown').on("hidden.bs.dropdown", function () {
       // hide any open menus when parent closes
       $('.dropdown-menu.show').removeClass('show');
     });
-
   </script>
 
+<link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
 
 </body>
 

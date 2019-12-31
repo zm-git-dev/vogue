@@ -89,6 +89,7 @@
         xAxis: { categories: {{ sequenced_to_delivered_prio.labels | tojson }}},
         yAxis: { title: { text: {{ sequenced_to_delivered_prio.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
         valueSuffix: ' days'
     },
@@ -110,6 +111,7 @@
         xAxis: { categories: {{ prepped_to_sequenced_prio.labels | tojson }}},
         yAxis: { title: { text: {{ prepped_to_sequenced_prio.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
         valueSuffix: ' days'
     },
@@ -130,6 +132,7 @@
         xAxis: { categories: {{ received_to_prepped_prio.labels | tojson }}},
         yAxis: { title: { text: {{ received_to_prepped_prio.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
         valueSuffix: ' days'
     },
@@ -150,6 +153,7 @@
         xAxis: { categories: {{ received_to_delivered_prio.labels | tojson }}},
         yAxis: { title: { text: {{ received_to_delivered_prio.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
         valueSuffix: ' days'
     },
@@ -170,6 +174,7 @@
         xAxis: { categories: {{ sequenced_to_delivered_cat.labels | tojson }}},
         yAxis: { title: { text: {{ sequenced_to_delivered_cat.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
         valueSuffix: ' days'
     },
@@ -191,6 +196,7 @@
         xAxis: { categories: {{ prepped_to_sequenced_cat.labels | tojson }}},
         yAxis: { title: { text: {{ prepped_to_sequenced_cat.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
         valueSuffix: ' days'
     },
@@ -211,6 +217,7 @@
         xAxis: { categories: {{ received_to_prepped_cat.labels | tojson }}},
         yAxis: { title: { text: {{ received_to_prepped_cat.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
         valueSuffix: ' days'
     },
@@ -231,6 +238,7 @@
         xAxis: { categories: {{ received_to_delivered_cat.labels | tojson }}},
         yAxis: { title: { text: {{ received_to_delivered_cat.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
         valueSuffix: ' days'
     },

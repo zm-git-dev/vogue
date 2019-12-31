@@ -17,9 +17,11 @@ def load_one(adapter, lims_sample=None, lims=None):
 def load_all(adapter, lims, start_sample = None):
     """Function to load all lims samples into the database"""
 
-    for sample in lims.get_samples():
+    all_samples = lims.get_samples()
+    total_nr_samples = len(all_samples)
+    for nr, sample in enumerate(all_samples):
         if not start_sample:
-            LOG.info(sample.id)
+            LOG.info('%s/%s %s' % (nr, total_nr_samples, sample.id))
             load_one(adapter, lims_sample=sample, lims=lims)
         elif start_sample and start_sample == sample.id:
             start_sample = None
@@ -35,9 +37,11 @@ def load_recent(adapter, lims, the_date):
     for process in latest_processes:
         for analyte in process.all_inputs():
             samples += analyte.samples
-    LOG.info('%s samples will be added or updated.', len(set(samples)))
-    for sample in set(samples):
-        LOG.info(sample.id)
+    unique_samples = set(samples)
+    nr_unique_samples = len(unique_samples)
+    LOG.info('%s samples will be added or updated.', nr_unique_samples)
+    for nr, sample in enumerate(unique_samples):
+        LOG.info('%s/%s %s' % (nr, nr_unique_samples, sample.id))
         load_one(adapter, lims_sample=sample, lims=lims)    
 
 

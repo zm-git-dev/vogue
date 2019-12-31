@@ -43,8 +43,9 @@
         xAxis: { categories: {{ plot_prio.labels | tojson }}},
         yAxis: { title: { text: {{ plot_prio.axis.y | tojson }} } },
         tooltip: {
+        valueDecimals: 0,
         shared: true,
-        valueSuffix: ' days'
+        valueSuffix: ' samples'
     },
         plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
@@ -63,8 +64,9 @@
         xAxis: { categories: {{ plot_cat.labels | tojson }}},
         yAxis: { title: { text: {{ plot_cat.axis.y | tojson }}}},
         tooltip: {
+        valueDecimals: 0,
         shared: true,
-        valueSuffix: ' days'
+        valueSuffix: ' samples'
     },
         plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});

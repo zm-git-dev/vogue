@@ -14,8 +14,6 @@ blueprint = Blueprint('server', __name__ )
 def index():
 
     year = request.form.get('year', str(THIS_YEAR))
-    print('indexx')
-    print(year)
     
     if request.form.get('page') == 'turn_around_times':
         return redirect(url_for('server.turn_around_times', year=year))
@@ -64,6 +62,13 @@ def index():
         month_name = MONTHS[month -1][1] if month else '',
         years = YEARS)
 
+
+def round_dict(dict_of_lists, decimals):
+    for k, v in dict_of_lists.items():
+        dict[k]=[ round(elem, decimals) for elem in v ]
+    return dict_of_lists
+
+
 @blueprint.route('/common/turn_around_times/<year>')
 def turn_around_times(year):
 
@@ -72,8 +77,6 @@ def turn_around_times(year):
     results_grouped_by_prio = value_per_month(app.adapter, year, y_vals, "priority")
     results_grouped_by_cat = value_per_month(app.adapter, year, y_vals, "category")
     y_axis_label = 'Days'
-
-    # plot titles
     r2d_c = 'Time from recieved to delivered (grouped by application tag category)'
     r2d_p = 'Time from recieved to delivered (grouped by priority)'
     r2p_c = 'Time from recieved to prepped (grouped by application tag category)'

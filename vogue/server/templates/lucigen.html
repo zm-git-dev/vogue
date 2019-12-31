@@ -86,7 +86,10 @@
         xAxis: { categories: {{ plot_conc_time.labels | tojson }}},
         yAxis: { title: { text: {{ plot_conc_time.axis.y | tojson }}}},
         legend: { enabled: false },
-        tooltip: { crosshairs: true, shared: true },
+        tooltip: { 
+        valueDecimals: 2,
+        crosshairs: true, 
+        shared: true },
         plotOptions: {
         series: { connectNulls: true },
         spline: {
