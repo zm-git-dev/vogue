@@ -1,9 +1,9 @@
 from vogue.build.flowcell import build_run
-from vogue.constants.constants import RUN_TYPES, INSTRUMENTS
+from vogue.constants.lims_constants import MASTER_STEPS_UDFS, INSTRUMENTS
 import logging
 LOG = logging.getLogger(__name__)
 
-
+SEQUENCING_STEPS = MASTER_STEPS_UDFS['sequenced']['steps']
 
 def load_one(adapter, run):
     """Function to load one lims flowcell into the database"""
@@ -22,12 +22,12 @@ def load_one(adapter, run):
 
 def load_all(adapter, lims):
     """Function to load all lims flowcell into the database"""
-    for run in lims.get_processes(type=RUN_TYPES):
+    for run in lims.get_processes(type=SEQUENCING_STEPS ):
         load_one(adapter, run)
 
 def load_recent(adapter, lims, the_date):
     """Function to load all lims flowcell into the database"""
-    for run in lims.get_processes(type=RUN_TYPES, last_modified = the_date):
+    for run in lims.get_processes(type=SEQUENCING_STEPS, last_modified = the_date):
         load_one(adapter, run)
       
 

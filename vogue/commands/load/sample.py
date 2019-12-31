@@ -16,7 +16,7 @@ LOG = logging.getLogger(__name__)
 @click.option('-a', '--all_samples', is_flag = True, 
                 help = 'Loads all lims samples if no other options are selected')
 @click.option('-f', '--load-from', 
-                help = 'load from this sample lims id. Use if load all broke. Start where it ended')
+                help = 'Use together with --all_samples. Load from this sample lims id. Use if load all broke. Start where it ended')
 @click.option('-d', '--days', type = int,
                 help = 'Update only samples updated in the latest number of days')
 @click.option('--dry', is_flag = True, 
