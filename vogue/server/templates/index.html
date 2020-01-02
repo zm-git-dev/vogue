@@ -44,6 +44,7 @@
                   <div class="btn mb-2 mb-md-0">
                     <form action="{{ url_for('server.index')}}" method="POST">
                       <input type="hidden" name="page" value="{{page_id}}">
+                      <input type="hidden" name="year" value="{{year_of_interest}}">
                       <select name="month" class="form-control" required onchange="this.form.submit()">
                         <option value=0 {{ 'selected' if month_of_interest==0 }}>All year </option>
                         {% for month in months %}
