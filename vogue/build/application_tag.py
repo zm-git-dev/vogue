@@ -9,7 +9,7 @@ def build_application_tag(app_tag: dict)-> dict:
         mongo_application_tag(dict): {'_id':'MELPCFR030', 'category':'wgs'} """
 
     tag = app_tag.get('tag')
-    category = app_tag.get('category')
+    category = app_tag.get('prep_category')
 
     if not tag:
         raise MissingApplicationTag
