@@ -36,10 +36,6 @@ MASTER_STEPS_UDFS = {
         'concentration_udf': 'Concentration (nM)',
         'apptags': ['WGSPCF', 'WGTPCF']
     },
-    'microbial_library_concentration': {
-        'concentration_step': 'CG002 - Aggregate QC (Library Validation)',
-        'concentration_udf': 'Concentration (nM)'
-    },
     'final_conc_and_amount_dna': {
         'amount_udf': 'Amount (ng)',
         'concentration_udf': 'Concentration (nM)',

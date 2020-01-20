@@ -39,9 +39,10 @@
 
     Highcharts.chart('received', {
         chart: { type: 'areaspline' },
-        title: { text: {{ plot_prio.title | tojson }} },
-        xAxis: { categories: {{ plot_prio.labels | tojson }}},
-        yAxis: { title: { text: {{ plot_prio.axis.y | tojson }} } },
+        title: { text: 'Received samples per month' },
+        subtitle: {text: 'Grouped by priority'},
+        xAxis: { categories: {{ months | tojson }}},
+        yAxis: { title: { text: 'Nr of samples' } },
         tooltip: {
         valueDecimals: 0,
         shared: true,
@@ -60,9 +61,10 @@
 
     Highcharts.chart('received_application', {
         chart: { type: 'areaspline' },
-        title: { text: {{ plot_cat.title | tojson }} },
-        xAxis: { categories: {{ plot_cat.labels | tojson }}},
-        yAxis: { title: { text: {{ plot_cat.axis.y | tojson }}}},
+        title: { text: 'Received samples per month' },
+        subtitle: {text: 'Grouped by application tag'},
+        xAxis: { categories: {{ months | tojson }}},
+        yAxis: { title: { text: 'Nr of samples' }},
         tooltip: {
         valueDecimals: 0,
         shared: true,

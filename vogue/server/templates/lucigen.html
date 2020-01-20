@@ -30,12 +30,12 @@
 <script>
     Highcharts.chart('amount', {
         title: {
-            text: "{{plot_amount_conc.title}}"
+            text: 'Library Concentration vs Input Amount'
         },
         xAxis: {
-            title: { text: {{ plot_amount_conc.axis.x | tojson }}}},
+            title: { text: 'Amount (ng)' }},
         yAxis: {
-        title: { text: {{ plot_amount_conc.axis.y | tojson }}}},
+        title: { text: 'Concentration (nM)' }},
         legend: {
         enabled: false
     },
@@ -81,10 +81,10 @@
 
     Highcharts.chart('amount_concentration_time', {
         chart: { type: 'spline' },
-        title: { text: '{{plot_conc_time.title}}' },
+        title: { text: 'Average Library Concentration over Time' },
         subtitle: { text: '' },
-        xAxis: { categories: {{ plot_conc_time.labels | tojson }}},
-        yAxis: { title: { text: {{ plot_conc_time.axis.y | tojson }}}},
+        xAxis: { categories: {{ months | tojson }}},
+        yAxis: { title: { text: 'Average Concentration (nM)'}},
         legend: { enabled: false },
         tooltip: { 
         valueDecimals: 2,
@@ -101,7 +101,7 @@
         }
     },
         series: [{
-            name: 'Average Concnetration',
+            name: 'Average Concentration',
             data: data,
             marker: { symbol: 'circle' }
         }] 

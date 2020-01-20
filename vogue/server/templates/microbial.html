@@ -34,13 +34,12 @@
         chart: {
             type: 'spline'
         },
-        title: {
-            text: '{{plot_attributes.title}}'
-        },
+        title: {text: 'Average Concentration over Time'},
+        subtitle: {text: 'Grouped by Organism'},
         xAxis: {
-            categories: {{ plot_attributes.labels | tojson }}},
+            categories: {{months| tojson }} },
         yAxis: {
-        title: { text: {{ plot_attributes.axis.y | tojson }}}},
+        title: { text: 'Average Concentration (nM)' }},
         legend: {
         title: {
             text: 'Organism<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',

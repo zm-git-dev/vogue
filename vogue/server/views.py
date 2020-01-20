@@ -76,29 +76,13 @@ def turn_around_times(year):
 
     results_grouped_by_prio = value_per_month(app.adapter, year, y_vals, "priority")
     results_grouped_by_cat = value_per_month(app.adapter, year, y_vals, "category")
-    y_axis_label = 'Days'
-    r2d_c = 'Time from recieved to delivered (grouped by application tag category)'
-    r2d_p = 'Time from recieved to delivered (grouped by priority)'
-    r2p_c = 'Time from recieved to prepped (grouped by application tag category)'
-    r2p_p = 'Time from recieved to prepped (grouped by priority)'
-    p2s_c = 'Time from prepped to sequenced (grouped by application tag category)'
-    p2s_p = 'Time from prepped to sequenced (grouped by priority)'                            
-    s2d_c = 'Time from sequenced to delivered (grouped by application tag category)'
-    s2d_p = 'Time from sequenced to delivered (grouped by priority)'
 
     return render_template('turn_around_times.html',
         header = 'Turnaround Times',
         page_id = 'turn_around_times',
         data_prio = results_grouped_by_prio,
         data_cat = results_grouped_by_cat,
-        received_to_delivered_cat = plot_attributes( title = r2d_c , y_axis_label = y_axis_label),
-        received_to_delivered_prio = plot_attributes( title = r2d_p , y_axis_label = y_axis_label),
-        received_to_prepped_cat = plot_attributes( title = r2p_c , y_axis_label = y_axis_label),
-        received_to_prepped_prio = plot_attributes( title = r2p_p , y_axis_label = y_axis_label),
-        prepped_to_sequenced_cat = plot_attributes( title = p2s_c , y_axis_label = y_axis_label),
-        prepped_to_sequenced_prio = plot_attributes( title = p2s_p , y_axis_label = y_axis_label),
-        sequenced_to_delivered_cat = plot_attributes( title = s2d_c , y_axis_label = y_axis_label),
-        sequenced_to_delivered_prio = plot_attributes( title = s2d_p , y_axis_label = y_axis_label),
+        months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
         years = YEARS)
@@ -109,14 +93,12 @@ def common_samples(year):
     y_vals = ['count']
     data_cat = value_per_month(app.adapter, year, y_vals, 'category')
     data_prio = value_per_month(app.adapter, year, y_vals, 'priority')
-    y_axis_label = 'Nr of samples'
     return render_template('samples.html',
         header = 'Samples',
         page_id = 'samples',
         data_prio = data_prio['count'],
         data_cat = data_cat['count'],
-        plot_prio = plot_attributes( title = 'Received samples per month (grouped by priority)' , y_axis_label = y_axis_label),
-        plot_cat = plot_attributes( title = 'Received samples per month (grouped by application tag)' , y_axis_label = y_axis_label),
+        months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
         years = YEARS)
@@ -131,7 +113,7 @@ def microbial(year):
         header = 'Microbial Samples',
         page_id = 'microbial',
         data = data['microbial_library_concentration'], 
-        plot_attributes = plot_attributes( title = 'Microbial' , y_axis_label = 'Concentration (nM)'),
+        months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
         years = YEARS)
@@ -141,15 +123,14 @@ def microbial(year):
 def target_enrichment(year):
     y_vals = ['library_size_post_hyb', 'library_size_pre_hyb']
     data = value_per_month(app.adapter, year, y_vals, "source")
-    y_axis_label = 'library size'
+    y_axis_label = 'Average Library Size'
 
     return render_template('target_enrichment.html',
         header = 'Target Enrichment (exom/panels)',
         page_id = 'target_enrichment',
         data_pre_hyb = data['library_size_pre_hyb'],
         data_post_hyb = data['library_size_post_hyb'],
-        plot_post_hyb = plot_attributes( title = 'Post-hybridization QC' , y_axis_label = y_axis_label),
-        plot_pre_hyb = plot_attributes( title = 'Pre-hybridization QC' , y_axis_label = y_axis_label),
+        months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
         years = YEARS)
@@ -165,7 +146,7 @@ def wgs(year):
         page_id = 'wgs',
         concentration_defrosts = concentration_defrosts,
         concentration_time = concentration_time['nr_defrosts-concentration'],
-        plot_attributes = plot_attributes( title = 'WGS illumina PCR-free' , y_axis_label = 'Concentration (nM)'),
+        months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
         years = YEARS)
@@ -180,8 +161,7 @@ def lucigen(year):
         header = 'Lucigen PCR-free',
         page_id = 'lucigen',
         amount_concentration_time = amount_concentration_time['amount-concentration'],
-        plot_conc_time = plot_attributes( title = 'Lucigen PCR-free, Average Library concentration over time', y_axis_label = 'Concentration (nM)'),
-        plot_amount_conc = plot_attributes(title = 'Lucigen PCR-free, Library concentration vs Input amount', y_axis_label = 'Concentration (nM)', x_axis_label = 'Amount (ng)'),
+        months = [m[1] for m in MONTHS],
         amount = concentration_amount,
         version = __version__,
         year_of_interest=year,

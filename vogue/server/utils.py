@@ -189,16 +189,6 @@ def value_per_month(adapter, year: str, y_vals: list, group_key: str = None):
     aggregate_result = adapter.samples_aggregate(pipe)
     return reformat_aggregate_results(list(aggregate_result), y_vals, group_key)
 
-def plot_attributes( y_axis_label: str = '', title: str = '', x_axis_label: str = ''):
-    """Prepares some plot atributes general for plots showing some data per month.
-
-    Arguments:
-        y_axis_label(str): eg. 'Concentration (nM)' or 'Days' 
-        title(str): Title of the plot."""
-
-    return {'axis' : {'y' : y_axis_label, 'x' : x_axis_label}, 
-            'title' : title, 
-            'labels' : [m[1] for m in MONTHS]}
 
 
 def find_concentration_amount(adapter, year : int = None)-> dict:
