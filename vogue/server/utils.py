@@ -643,14 +643,12 @@ def genotype_status_time(adapter,  year : int)-> dict:
             }
     }}]
     aggregate_result = list(adapter.maf_analysis_aggregate(pipe))
-    massaged_results = {'pass' : [None]*12 ,'fail' : [None]*12,'missing' : [None]*12, 'cancel':[None]*12 }
+    massaged_results = {'pass' : [None]*12 ,'fail' : [None]*12, 'cancel':[None]*12 }
     for item in aggregate_result:
         status = item['_id']['status']
         month_index = item['_id']['month'] -1
         number = item['number']
-        if not status:
-            massaged_results['missing'][month_index] = number
-        else:
+        if status:
             massaged_results[status][month_index] = number
 
     plot_data = {'data':massaged_results,
