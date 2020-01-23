@@ -187,15 +187,14 @@ def runs(year):
 @blueprint.route('/Bioinfo/Rare_Disease/picard_time/<year>', methods=['GET', 'POST'])
 def mip_picard_time(year):
     mip_results = mip_picard_time_plot(app.adapter, year)
-    selcted_metric = request.form.get('picard_metric')
-    if not selcted_metric:
-        selcted_metric = 'MEAN_INSERT_SIZE'
-
+    selected_group, selcted_metric = request.form.get('picard_metric', 'PICARD_INSERT_SIZE MEAN_INSERT_SIZE').split()
     return render_template('mip_picard_time.html',
+        selected_group = selected_group,
         selcted_metric = selcted_metric,
         mip_results = mip_results,
-        PICARD_INSERT_SIZE = PICARD_INSERT_SIZE, 
-        PICARD_HS_METRIC = PICARD_HS_METRIC,
+        MIP_PICARD = MIP_PICARD,
+        help_urls = BIOINFO_HELP_URLS,
+        months = [m[1] for m in MONTHS],
         header = 'MIP',
         page_id = 'mip_picard_time',
         version = __version__,
@@ -206,15 +205,15 @@ def mip_picard_time(year):
 @blueprint.route('/Bioinfo/Rare_Disease/picard/<year>', methods=['GET', 'POST'])
 def mip_picard(year):    
     mip_results = mip_picard_plot(app.adapter, year)
-    Y_axis = request.form.get('Y_axis', 'MEAN_INSERT_SIZE')
-    X_axis = request.form.get('X_axis', 'MEAN_INSERT_SIZE')
-
+    Y_group, Y_axis = request.form.get('Y_axis', 'PICARD_INSERT_SIZE MEAN_INSERT_SIZE').split()
+    X_group, X_axis = request.form.get('X_axis', 'PICARD_INSERT_SIZE MEAN_INSERT_SIZE').split()
     return render_template('mip_picard.html',
         Y_axis = Y_axis,
         X_axis = X_axis,
+        groups = list(set([Y_group, X_group])),
         mip_results = mip_results,
-        PICARD_INSERT_SIZE = PICARD_INSERT_SIZE, 
-        PICARD_HS_METRIC = PICARD_HS_METRIC,
+        MIP_PICARD = MIP_PICARD,
+        help_urls = BIOINFO_HELP_URLS,
         header = 'MIP',
         page_id = 'mip_picard',
         version = __version__,

@@ -14,7 +14,6 @@ LOG = logging.getLogger(__name__)
 def genotype(sample_doc):
     """Reads data from the genotype database collection and parses out plot specific data on sample 
     level to put into the maf_analysis colleciton"""
-
     if sample_doc:
         load_sample(current_app.adapter, sample_doc)
         return

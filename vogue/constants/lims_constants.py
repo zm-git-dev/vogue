@@ -49,12 +49,14 @@ MASTER_STEPS_UDFS = {
         'apptags': 'NX'
         },
     'library_size_pre_hyb': {
-        'size_step': ['CG002 - Amplify Adapter-Ligated Library (SS XT)'],
+        'size_step': ['CG002 - Amplify Adapter-Ligated Library (SS XT)', 
+                      'Aggregate QC (Library Validation) TWIST v1'],
         'size_udf': 'Size (bp)',
         'apptags': ['EXO', 'EFT', 'PAN', 'PAL']
     },
     'library_size_post_hyb': {
-        'size_step': ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'],
+        'size_step': ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)', 
+                      'Aggregate QC (Library Validation) TWIST v1'],
         'size_udf': 'Size (bp)',
         'apptags': ['EXO', 'EFT', 'PAN', 'PAL']
     }

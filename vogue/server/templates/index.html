@@ -71,7 +71,7 @@
 
   <script>
     var series = []
-    {% for cust in customers %}
+    {% for cust in customers|sort %}
     series.push({
       name: "{{cust}}",
       y: {{ customers[cust]| tojson }} })

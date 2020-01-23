@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import (MONTHS, TEST_SAMPLES, PICARD_INSERT_SIZE, PICARD_HS_METRIC, LANE_UDFS)
+from vogue.constants.constants import (MONTHS, TEST_SAMPLES, MIP_PICARD, LANE_UDFS)
 from statistics import mean
 
 
@@ -328,7 +328,10 @@ def mip_picard_time_plot(adapter, year : int)-> dict:
         '$match': {'year': {'$eq': int(year)}}
         }]
     aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
-    final_data = {k:[] for k in PICARD_INSERT_SIZE + PICARD_HS_METRIC }
+    final_data={}
+    for data in MIP_PICARD.values():
+        for key in data:
+           final_data[key]=[] 
 
     for sample in aggregate_result:
         sample_id = sample['_id']
