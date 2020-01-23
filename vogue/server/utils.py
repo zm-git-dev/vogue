@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import (MONTHS, TEST_SAMPLES, PICARD_INSERT_SIZE, PICARD_HS_METRIC, LANE_UDFS)
+from vogue.constants.constants import (MONTHS, TEST_SAMPLES, MIP_PICARD, LANE_UDFS)
 from statistics import mean
 
 
@@ -189,16 +189,6 @@ def value_per_month(adapter, year: str, y_vals: list, group_key: str = None):
     aggregate_result = adapter.samples_aggregate(pipe)
     return reformat_aggregate_results(list(aggregate_result), y_vals, group_key)
 
-def plot_attributes( y_axis_label: str = '', title: str = '', x_axis_label: str = ''):
-    """Prepares some plot atributes general for plots showing some data per month.
-
-    Arguments:
-        y_axis_label(str): eg. 'Concentration (nM)' or 'Days' 
-        title(str): Title of the plot."""
-
-    return {'axis' : {'y' : y_axis_label, 'x' : x_axis_label}, 
-            'title' : title, 
-            'labels' : [m[1] for m in MONTHS]}
 
 
 def find_concentration_amount(adapter, year : int = None)-> dict:
@@ -338,7 +328,10 @@ def mip_picard_time_plot(adapter, year : int)-> dict:
         '$match': {'year': {'$eq': int(year)}}
         }]
     aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
-    final_data = {k:[] for k in PICARD_INSERT_SIZE + PICARD_HS_METRIC }
+    final_data={}
+    for data in MIP_PICARD.values():
+        for key in data:
+           final_data[key]=[] 
 
     for sample in aggregate_result:
         sample_id = sample['_id']
@@ -653,14 +646,12 @@ def genotype_status_time(adapter,  year : int)-> dict:
             }
     }}]
     aggregate_result = list(adapter.maf_analysis_aggregate(pipe))
-    massaged_results = {'pass' : [None]*12 ,'fail' : [None]*12,'missing' : [None]*12, 'cancel':[None]*12 }
+    massaged_results = {'pass' : [None]*12 ,'fail' : [None]*12, 'cancel':[None]*12 }
     for item in aggregate_result:
         status = item['_id']['status']
         month_index = item['_id']['month'] -1
         number = item['number']
-        if not status:
-            massaged_results['missing'][month_index] = number
-        else:
+        if status:
             massaged_results[status][month_index] = number
 
     plot_data = {'data':massaged_results,

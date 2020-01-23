@@ -6,6 +6,7 @@
         {% include 'navigation.html' %}
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
+            Samples with more than one lot number are not included in these plots.
             <div class="row">
                 <div class="col-sm-6">
                     <div class="card">
@@ -55,13 +56,16 @@
     Highcharts.chart('concentration_defrosts', {
         chart: { type: 'spline' },
         title: {
-            text: '{{concentration_defrosts.title}}'
+            text: 'Kit Efficiency over Time'
+        },
+        subtitle: {
+            text: 'WGS illumina PCR-free'
         },
         xAxis: {
             categories: {{ concentration_defrosts.labels | tojson }},
-        title: { text: {{ concentration_defrosts.axis.x | tojson }}}},
+            title: { text:  'Number of Defrosts'}},
         yAxis: {
-        title: { text: {{ concentration_defrosts.axis.y | tojson }}}},
+            title: { text: 'Average Library Concentration (nM)' }},
         legend: {
         title: {
             text: 'Lot Number<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
@@ -97,9 +101,13 @@
 
     Highcharts.chart('concentration_time', {
         chart: { type: 'spline' },
-        title: { text: '{{plot_attributes.title}}' },
-        xAxis: { categories: {{ plot_attributes.labels | tojson }}},
-        yAxis: { title: { text: {{ plot_attributes.axis.y | tojson }}}},
+        title: { text: 'Library Concentration over Time'  },
+        subtitle: {
+            text: 'WGS illimina PCR-free'
+        },
+        xAxis: { categories: {{ months | tojson }},
+                title: { text: 'Reception Date' }},
+        yAxis: { title: { text: 'Average Library Concentration (nM)'  }},
         legend: { enabled: false },
         tooltip: { 
         valueDecimals: 2,

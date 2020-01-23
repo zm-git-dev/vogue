@@ -5,7 +5,7 @@
     <div class="row">
         {% include 'navigation.html' %}
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-            {% include 'header_section.html' %}
+            {% include 'header_section.html' %}                  
             <div class="card">
                 <div class="card-body">
                     <div class="row">
@@ -14,23 +14,23 @@
                                 method="POST">
                                 <select name="picard_metric" class="form-control form-control-sm"
                                     placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                    <optgroup label="Picard insert size">
-                                        {% for metric in PICARD_INSERT_SIZE %}
-                                        <option value="{{ metric }}" {{ 'selected' if metric == selcted_metric }}>
-                                            {{ metric.lower().capitalize().replace('_', ' ')}}
-                                        </option>
+                                    {% for group in MIP_PICARD %}
+                                        <optgroup label="{{group}}" >
+                                        {% for metric in MIP_PICARD[group] %}
+                                            <option value="{{group}} {{metric}}" {{ 'selected' if metric == selcted_metric }}>
+                                                {{ metric.lower().capitalize().replace('_', ' ')}}
+                                            </option>
                                         {% endfor %}
-                                    <optgroup label="Picard HS metric">
-                                        {% for metric in PICARD_HS_METRIC %}
-                                        <option value="{{ metric }}" {{ 'selected' if metric == selcted_metric }}>
-                                            {{ metric.lower().capitalize().replace('_', ' ')}}
-                                        </option>
-                                        {% endfor %}
+                                    {% endfor %}
                                 </select>
                             </form>
                         </div>
+                        
                     </div>
                     <hr>
+                    A subset of the picard qc metricses that are being procued by MIP are visualized here. Write a request <a href="https://github.com/Clinical-Genomics/vogue/issues/new/choose">here</a>. if you want to add more data to this plot. <br>
+                    This plot shows <b>{{selected_group.lower().capitalize().replace('_', ' ')}}</b> over Time. {{help_urls[selected_group]['text']}}
+                    Definitions of specific metrices auch as (<b>{{selcted_metric.lower().capitalize().replace('_', ' ')}}</b>) can be found <a href="{{help_urls[selected_group]['url']}}">here</a>. <br><br>
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="picard_plot"></div>
@@ -45,16 +45,18 @@
 <script>
     var data = []
     {% if mip_results.data[selcted_metric] is defined %}
-    var data = {{ mip_results.data[selcted_metric] | tojson }}
+        {% for result in mip_results.data[selcted_metric] %}
+            // in this context january is 0, february 1,..., december 11 thereby result.x-1
+            data.push({'name': {{result.name| tojson}}, 'x': {{result.x-1}}, 'y': {{result.y}}} )
+        {% endfor %}
     {% endif %}
-
     Highcharts.chart('picard_plot', {
         chart: { type: 'scatter' },
-        title: { text: 'Picard QC over time' },
-        subtitle: { text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" },
+        title: { text: "{{selected_group.lower().capitalize().replace('_', ' ')}}" },
+        subtitle: { text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}} over Time" },
         xAxis: {
             title: { text: 'Date recived' },
-            categories: {{ mip_results.labels | tojson }}},
+            categories: {{ months | tojson }}},
         yAxis: { title: { text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" } },
         legend: { enabled: false },
         tooltip: {

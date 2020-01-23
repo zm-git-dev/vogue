@@ -85,9 +85,10 @@
 
     Highcharts.chart('sequenced_to_delivered_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ sequenced_to_delivered_prio.title | tojson }}},
-        xAxis: { categories: {{ sequenced_to_delivered_prio.labels | tojson }}},
-        yAxis: { title: { text: {{ sequenced_to_delivered_prio.axis.y | tojson }}}},
+        title: { text: 'Time from sequenced to delivered' },
+        subtitle: {text: 'Grouped by priority'},
+        xAxis: { categories: {{ months| tojson }}},
+        yAxis: { title: { text: 'Average Days' }},
         tooltip: {
         valueDecimals: 0,
         shared: true,
@@ -107,9 +108,10 @@
 
     Highcharts.chart('prepped_to_sequenced_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ prepped_to_sequenced_prio.title | tojson }}},
-        xAxis: { categories: {{ prepped_to_sequenced_prio.labels | tojson }}},
-        yAxis: { title: { text: {{ prepped_to_sequenced_prio.axis.y | tojson }}}},
+        title: { text: 'Time from prepped to sequenced' },
+        subtitle: {text: 'Grouped by priority'},
+        xAxis: { categories: {{ months | tojson }}},
+        yAxis: { title: { text: 'Average Days'}},
         tooltip: {
         valueDecimals: 0,
         shared: true,
@@ -128,9 +130,10 @@
 
     Highcharts.chart('received_to_prepped_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_prepped_prio.title | tojson }}},
-        xAxis: { categories: {{ received_to_prepped_prio.labels | tojson }}},
-        yAxis: { title: { text: {{ received_to_prepped_prio.axis.y | tojson }}}},
+        title: { text: 'Time from received to prepped' },
+        subtitle: {text: 'Grouped by priority'},
+        xAxis: { categories: {{ months| tojson }}},
+        yAxis: { title: { text: 'Average Days'}},
         tooltip: {
         valueDecimals: 0,
         shared: true,
@@ -149,9 +152,10 @@
 
     Highcharts.chart('received_to_delivered_prio', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_delivered_prio.title | tojson }}},
-        xAxis: { categories: {{ received_to_delivered_prio.labels | tojson }}},
-        yAxis: { title: { text: {{ received_to_delivered_prio.axis.y | tojson }}}},
+        title: { text: 'Time from received to delivered' },
+        subtitle: {text: 'Grouped by priority'},
+        xAxis: { categories: {{ months | tojson }}},
+        yAxis: { title: { text: 'Average Days'}},
         tooltip: {
         valueDecimals: 0,
         shared: true,
@@ -170,9 +174,10 @@
 
     Highcharts.chart('sequenced_to_delivered_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ sequenced_to_delivered_cat.title | tojson }}},
-        xAxis: { categories: {{ sequenced_to_delivered_cat.labels | tojson }}},
-        yAxis: { title: { text: {{ sequenced_to_delivered_cat.axis.y | tojson }}}},
+        title: { text: 'Time from sequenced to delivered' },
+        subtitle: {text: 'Grouped by application tag category'},
+        xAxis: { categories: {{ months| tojson }}},
+        yAxis: { title: { text: 'Average Days'}},
         tooltip: {
         valueDecimals: 0,
         shared: true,
@@ -192,9 +197,10 @@
 
     Highcharts.chart('prepped_to_sequenced_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ prepped_to_sequenced_cat.title | tojson }}},
-        xAxis: { categories: {{ prepped_to_sequenced_cat.labels | tojson }}},
-        yAxis: { title: { text: {{ prepped_to_sequenced_cat.axis.y | tojson }}}},
+        title: { text: 'Time from prepped to sequenced' },
+        subtitle: {text: 'Grouped by application tag category'},
+        xAxis: { categories: {{ months| tojson }}},
+        yAxis: { title: { text: 'Average Days'}},
         tooltip: {
         valueDecimals: 0,
         shared: true,
@@ -213,9 +219,10 @@
 
     Highcharts.chart('received_to_prepped_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_prepped_cat.title | tojson }}},
-        xAxis: { categories: {{ received_to_prepped_cat.labels | tojson }}},
-        yAxis: { title: { text: {{ received_to_prepped_cat.axis.y | tojson }}}},
+        title: { text: 'Time from received to prepped' },
+        subtitle: {text: 'Grouped by application tag category'},
+        xAxis: { categories: {{ months | tojson }}},
+        yAxis: { title: { text: 'Average Days'}},
         tooltip: {
         valueDecimals: 0,
         shared: true,
@@ -234,9 +241,10 @@
 
     Highcharts.chart('received_to_delivered_tag', {
         chart: { type: 'areaspline' },
-        title: { text: {{ received_to_delivered_cat.title | tojson }}},
-        xAxis: { categories: {{ received_to_delivered_cat.labels | tojson }}},
-        yAxis: { title: { text: {{ received_to_delivered_cat.axis.y | tojson }}}},
+        title: { text: 'Time from received to delivered' },
+        subtitle: {text: 'Grouped by application tag category'},
+        xAxis: { categories: {{ months | tojson }}},
+        yAxis: { title: { text: 'Average Days'}},
         tooltip: {
         valueDecimals: 0,
         shared: true,
