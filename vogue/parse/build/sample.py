@@ -289,7 +289,6 @@ def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> 
     size_udf = MASTER_STEPS_UDFS['library_size_pre_hyb']['size_udf']
 
     size_art = get_output_artifact(size_step, lims_id, lims, last=False)
-    print('pre')
     if size_art:
         return size_art.udf.get(size_udf)
     else:
@@ -308,7 +307,6 @@ def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) ->
 
     size_step = MASTER_STEPS_UDFS['library_size_post_hyb']['size_step']
     size_udf = MASTER_STEPS_UDFS['library_size_post_hyb']['size_udf']
-    print('post')
     size_art = get_output_artifact(size_step, lims_id, lims, last=True)
     if size_art:
         return size_art.udf.get(size_udf)
