@@ -683,12 +683,16 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
     data = []
     x_labels = list(samples[0]['snps']['comp'].keys())
     y_labels = []
-    
+    x_labels.sort()
     for row, sample in enumerate(samples):
         comp = sample['snps'].get('comp')
+        genotype = sample['snps'].get('genotype')
+        sequence = sample['snps'].get('sequence')
         y_labels.append(sample['_id'])
         for col, key in enumerate(x_labels):
-            data.append([col, row, int(comp[key])])
+            internal=''.join(genotype[key])
+            external=''.join(sequence[key])
+            data.append( (col, row, int(comp[key]),f'{internal} : {external}')) 
             
     return {'data': data, 
             'x_labels': x_labels, 

@@ -35,6 +35,11 @@
 
 
 <script>
+    var data=[]
+    {% for x, y, value, name in plate_data %}
+    data.push({ 'x': {{x}}, 'y': {{y}}, 'value': {{ value}}, 'name': {{name|tojson}} })
+    {% endfor %}
+
     Highcharts.chart('plate', {
         chart: { type: 'heatmap' },
         title: { text: 'Plate: {{plate_id}}' },
@@ -55,12 +60,13 @@
                 },
         legend: {enabled: false},
         tooltip: {
-                formatter: function () {return 'Sample  <b>' + this.series.yAxis.categories[this.point.y] + '</b> <br> snp: <b>' + this.series.xAxis.categories[this.point.x] + '</b> <br> comparison: <b>' + this.point.value + '</b>';}
+                formatter: function () {return 'Sample  <b>' + this.series.yAxis.categories[this.point.y] + '</b> <br> snp: <b>' + this.series.xAxis.categories[this.point.x] + '</b> <br> Comparison int vs ext: <b>' + this.point.name + '</b>';}
                 },
 
         series: [{
+            turboThreshold: 100000,
             name: '',
-            data: {{ data }},
+            data:data,
     
     }],
 
