@@ -23,7 +23,7 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <div id="plate" style="height: 800px; min-width: 400px; max-width: 1000px; margin: 0 auto">
+                            <div id="plate" style="min-height: 500px; height: {{(y_labels|length)*15}}px; min-width: 400px; max-width: 1000px; margin: 0 auto">
                             </div>
                         </div>
                     </div>
@@ -42,8 +42,7 @@
         xAxis: {
             categories: {{ x_labels| tojson}},
             title: { text: 'snps' },
-            labels: {
-            rotation: 90}},
+            labels: {rotation: 90}},
         yAxis: {
             categories: {{ y_labels| tojson}},
             title: { text: 'Samples' }},

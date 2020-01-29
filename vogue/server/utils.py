@@ -693,7 +693,7 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
     return {'data': data, 
             'x_labels': x_labels, 
             'y_labels': y_labels, 
-            'plates': list(set(plates)), 
+            'plates': plates, 
             'plate_id' : plate_id}
 
 
