@@ -23,7 +23,7 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <div id="plate" style="min-height: 500px; height: {{(y_labels|length)*15}}px; min-width: 400px; max-width: 1000px; margin: 0 auto">
+                            <div id="plate" style="height: 500px; width: 1000px; margin: 0 auto">
                             </div>
                         </div>
                     </div>
@@ -36,7 +36,12 @@
 
 <script>
     Highcharts.chart('plate', {
-        chart: { type: 'heatmap' },
+        chart: { 
+            type: 'heatmap',
+            scrollablePlotArea: {
+            minHeight: {{(y_labels|length)*15}},
+            scrollPositionY: 1
+        }},
         title: { text: 'Plate: {{plate_id}}' },
         subtitle: {text: 'Comparison of snps from internal and external analysis.'},
         xAxis: {
