@@ -320,7 +320,7 @@ def genotype_plate():
      
     plate_id = request.form.get('plate_id')
     plot_data = get_genotype_plate(app.adapter, plate_id=plate_id)
-
+    plot_data['plates'].sort()
     return render_template('genotype_plate.html',
         data = plot_data['data'],
         x_labels = plot_data['x_labels'],
