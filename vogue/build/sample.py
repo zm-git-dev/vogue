@@ -53,9 +53,9 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
                                                             'TWIST', 'library_size_post_hyb')
     if not mongo_sample['library_size_post_hyb']:
         if not received_at or received_at < dt(2019, 1, 1):
-        mongo_sample['library_size_pre_hyb'] = get_library_size(application_tag, sample.id, lims, 
+            mongo_sample['library_size_pre_hyb'] = get_library_size(application_tag, sample.id, lims, 
                                                                 'SureSelect', 'library_size_pre_hyb')
-        mongo_sample['library_size_post_hyb'] = get_library_size(application_tag, sample.id, lims, 
+            mongo_sample['library_size_post_hyb'] = get_library_size(application_tag, sample.id, lims, 
                                                                 'SureSelect', 'library_size_post_hyb')
 
     for key in list(mongo_sample.keys()):
