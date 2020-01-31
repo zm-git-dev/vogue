@@ -280,10 +280,11 @@ def get_library_size(app_tag: str, lims_id: str, lims: Lims, workflow: str, hyb_
 
     if workflow == 'TWIST':
         out_art=get_output_artifact(size_step, lims_id, lims, last=True)
-        sample=Sample(lims, id=lims_id)
-        for inart in out_art.parent_process.all_inputs():
-            if sample in inart.samples and inart.workflow_stages[0].id == size_stage:
-                return inart.udf.get(size_udf)
+        if out_art:
+            sample=Sample(lims, id=lims_id)
+            for inart in out_art.parent_process.all_inputs():
+                if sample in inart.samples and inart.workflow_stages[0].id == size_stage:
+                    return inart.udf.get(size_udf)
     elif workflow == 'SureSelect':
         size_art = get_output_artifact(size_step, lims_id, lims, last=True)
         if size_art:
