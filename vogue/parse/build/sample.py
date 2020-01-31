@@ -267,48 +267,26 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
 
 
 
-# The following two functions will get the udf Size (bp) that in fact is set on the 
-# aggregate qc librar validation step.
-# But since the same qc protocol is used both for pre-hyb and post-hyb, there is no way to 
-# distiguish from within the aggregation step, wether it is pre-hyb or post-hyb qc. 
-# Because of that, we instead look for the inpus atrifact to the aggregation step. 
-# For pre hyb, the input artifact will come from 'CG002 - Amplify Adapter-Ligated Library (SS XT)'. 
-# For post hyb, it will come from 'CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'.
-
-def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> int:
+def get_library_size(app_tag: str, lims_id: str, lims: Lims, workflow: str, hyb_type: str) -> int:
     """Check only 'Targeted enrichment exome/panels'.
     Get size_udf from size_step."""
 
-    if not application_tag:
+    if not app_tag or app_tag[0:3] not in MASTER_STEPS_UDFS[hyb_type][workflow]['apptags']:
         return None
 
-    if not application_tag[0:3] in MASTER_STEPS_UDFS['library_size_pre_hyb']['apptags']:
-        return None
+    size_step = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_step')
+    size_udf = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_udf')
+    size_stage = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_stage')
 
-    size_step = MASTER_STEPS_UDFS['library_size_pre_hyb']['size_step']
-    size_udf = MASTER_STEPS_UDFS['library_size_pre_hyb']['size_udf']
-
-    size_art = get_output_artifact(size_step, lims_id, lims, last=False)
-    if size_art:
-        return size_art.udf.get(size_udf)
-    else:
-        return None
-
-
-def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) -> int:
-    """Check only 'Targeted enrichment exome/panels'.
-    Get size_udf from size_step."""
-
-    if not application_tag:
-        return None
-
-    if not application_tag[0:3] in MASTER_STEPS_UDFS['library_size_post_hyb']['apptags']:
-        return None
-
-    size_step = MASTER_STEPS_UDFS['library_size_post_hyb']['size_step']
-    size_udf = MASTER_STEPS_UDFS['library_size_post_hyb']['size_udf']
-    size_art = get_output_artifact(size_step, lims_id, lims, last=True)
-    if size_art:
-        return size_art.udf.get(size_udf)
-    else:
-        return None
+    if workflow == 'TWIST':
+        out_art=get_output_artifact(size_step, lims_id, lims, last=True)
+        sample=Sample(lims, id=lims_id)
+        for inart in out_art.parent_process.all_inputs():
+            if sample in inart.samples and inart.workflow_stages[0].id == size_stage:
+                return inart.udf.get(size_udf)
+    elif workflow == 'SureSelect':
+        size_art = get_output_artifact(size_step, lims_id, lims, last=True)
+        if size_art:
+            return size_art.udf.get(size_udf)
+    
+    return None

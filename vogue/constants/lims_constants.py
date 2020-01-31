@@ -48,15 +48,27 @@ MASTER_STEPS_UDFS = {
         'concentration_udf': 'Concentration (nM)',
         'apptags': 'NX'
         },
-    'library_size_pre_hyb': {
-        'size_step': ['CG002 - Amplify Adapter-Ligated Library (SS XT)'],
-        'size_udf': 'Size (bp)',
-        'apptags': ['EXO', 'EFT', 'PAN', 'PAL']
-    },
+    'library_size_pre_hyb': { 
+        'TWIST': {
+            'size_step': ['pool samples TWIST v1'],
+            'size_stage': '3999',
+            'size_udf': 'Size (bp)',
+            'apptags': ['EXO', 'EFT', 'PAN', 'PAL']},
+        'SureSelect' : {
+            'size_step': ['CG002 - Amplify Adapter-Ligated Library (SS XT)'],
+            'size_udf': 'Size (bp)',
+            'apptags': ['EXO', 'EFT', 'PAN', 'PAL']}
+        },
     'library_size_post_hyb': {
-        'size_step': ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'],
-        'size_udf': 'Size (bp)',
-        'apptags': ['EXO', 'EFT', 'PAN', 'PAL']
+        'TWIST': {
+            'size_step': ['CG002 - Sort HiSeq Samples'],
+            'size_stage': '4005',
+            'size_udf': 'Size (bp)',
+            'apptags': ['EXO', 'EFT', 'PAN', 'PAL']},
+        'SureSelect': {
+            'size_step': ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'],
+            'size_udf': 'Size (bp)',
+            'apptags': ['EXO', 'EFT', 'PAN', 'PAL']}
     }
 }
 
