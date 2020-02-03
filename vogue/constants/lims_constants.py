@@ -34,14 +34,14 @@ MASTER_STEPS_UDFS = {
         'concentration_step': 'CG002 - Aggregate QC (Library Validation)',
         'lot_nr_udf': 'Lot no: TruSeq DNA PCR-Free Sample Prep Kit',
         'concentration_udf': 'Concentration (nM)',
-        'apptags': ['WGSPCF', 'WGTPCF']
+        'apptags': ['WGSPCF', 'WGTPCF', 'WGLPCF']
     },
     'final_conc_and_amount_dna': {
         'amount_udf': 'Amount (ng)',
         'concentration_udf': 'Concentration (nM)',
         'concentration_step': 'CG002 - Aggregate QC (Library Validation)',
         'amount_step': 'CG002 - Aggregate QC (DNA)',
-        'apptags': ['WGSLIF', 'WGTLIF']
+        'apptags': ['WGSLIF', 'WGTLIF', 'WGLLIF']
     },
     'microbial_library_concentration': {
         'concentration_step': 'CG002 - Aggregate QC (Library Validation)',
@@ -51,9 +51,9 @@ MASTER_STEPS_UDFS = {
     'library_size_pre_hyb': { 
         'TWIST': {
             'size_step': ['pool samples TWIST v1'],
-            'size_stage': '3999',
-            'size_udf': 'Size (bp)',
-            'apptags': ['EXO', 'EFT', 'PAN', 'PAL']},
+            'stage_udf': {'3999': 'Size (bp)', 
+                          '2176': 'Average Size (bp)'}
+        },
         'SureSelect' : {
             'size_step': ['CG002 - Amplify Adapter-Ligated Library (SS XT)'],
             'size_udf': 'Size (bp)',
@@ -62,9 +62,9 @@ MASTER_STEPS_UDFS = {
     'library_size_post_hyb': {
         'TWIST': {
             'size_step': ['CG002 - Sort HiSeq Samples'],
-            'size_stage': '4005',
-            'size_udf': 'Size (bp)',
-            'apptags': ['EXO', 'EFT', 'PAN', 'PAL']},
+            'stage_udf': {'4005' : 'Size (bp)', 
+                          '2182' : 'Average Size (bp)'}
+        },
         'SureSelect': {
             'size_step': ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'],
             'size_udf': 'Size (bp)',

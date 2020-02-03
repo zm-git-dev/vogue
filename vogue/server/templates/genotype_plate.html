@@ -43,7 +43,7 @@
     Highcharts.chart('plate', {
         chart: { type: 'heatmap' },
         title: { text: 'Plate: {{plate_id}}' },
-        subtitle: {text: 'Comparison of snps from internal and external analysis.'},
+        subtitle: {text: 'Genotypes obtained from external SNP analysis, are compared with the sequence data generated at SciLifeLab. A red square in the heat map means the external and internal analyses mismatch, which could indicate a sample mixup or a failed assay. The 52 SNPs are selected to give a unique profile for identification of samples. Read more about the genotype workflow in AM document 1477.'},
         xAxis: {
             categories: {{ x_labels| tojson}},
             title: { text: 'snps' },
