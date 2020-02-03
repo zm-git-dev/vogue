@@ -270,10 +270,7 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
 def get_library_size(app_tag: str, lims_id: str, lims: Lims, workflow: str, hyb_type: str) -> int:
     """Check only 'Targeted enrichment exome/panels'.
     Get size_udf from size_step."""
-
-    if not app_tag or app_tag[0:3] not in MASTER_STEPS_UDFS[hyb_type][workflow]['apptags']:
-        return None
-
+  
     size_step = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_step')
     size_udf = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_udf')
     size_stage = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_stage')
@@ -286,6 +283,8 @@ def get_library_size(app_tag: str, lims_id: str, lims: Lims, workflow: str, hyb_
                 if sample in inart.samples and inart.workflow_stages[0].id == size_stage:
                     return inart.udf.get(size_udf)
     elif workflow == 'SureSelect':
+        if not app_tag or app_tag[0:3] not in MASTER_STEPS_UDFS[hyb_type][workflow]['apptags']:
+            return None
         size_art = get_output_artifact(size_step, lims_id, lims, last=True)
         if size_art:
             return size_art.udf.get(size_udf)
