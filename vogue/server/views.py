@@ -305,7 +305,7 @@ def genotype_plate():
         x_labels = plot_data['x_labels'],
         y_labels = plot_data['y_labels'],
         year_of_interest = str(THIS_YEAR),
-        header = 'MAF',
+        header = 'Genotype',
         page_id = 'genotype_plate',
         version = __version__,
         plate_id = plot_data['plate_id'],

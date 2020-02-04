@@ -618,48 +618,6 @@ def microsalt_get_st_time(adapter,  year : int)-> dict:
 
     return {'data' : final_results, 'labels' : [m[1] for m in MONTHS]}
 
-def genotype_status_time(adapter,  year : int)-> dict:
-    pipe = [{
-        '$project': {
-            'month': {
-                '$month': '$sample_created_in_genotype_db'
-            }, 
-            'year': {
-                '$year': '$sample_created_in_genotype_db'
-            }, 
-            'status': 1
-        }
-    }, {
-        '$match': {
-            'year': {
-                '$eq': int(year)
-            }
-        }
-    }, {
-        '$group': {
-            '_id': {
-                'month': '$month', 
-                'status': '$status'
-            }, 
-            'number': {
-                '$sum': 1
-            }
-    }}]
-    aggregate_result = list(adapter.maf_analysis_aggregate(pipe))
-    massaged_results = {'pass' : [None]*12 ,'fail' : [None]*12, 'cancel':[None]*12 }
-    for item in aggregate_result:
-        status = item['_id']['status']
-        month_index = item['_id']['month'] -1
-        number = item['number']
-        if status:
-            massaged_results[status][month_index] = number
-
-    plot_data = {'data':massaged_results,
-                'labels':[m[1] for m in MONTHS]}
-
-    return plot_data   
-
-
 def get_genotype_plate(adapter,  plate_id : str)-> dict:
     plates_pipe = [{
         '$match': {
@@ -668,7 +626,7 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
         '$group': {
             '_id': {'plate': '$plate'}}
             }]
-    aggregate_result = list(adapter.maf_analysis_aggregate(plates_pipe))
+    aggregate_result = list(adapter.genotype_analysis_aggregate(plates_pipe))
     plates = [plate['_id']['plate'] for plate in aggregate_result]
 
     plate_id = plates[0] if not plate_id else plate_id
@@ -679,7 +637,7 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
                 '$exists': 'True'}}}]
 
     
-    samples = list(adapter.maf_analysis_aggregate(samples_pipe))
+    samples = list(adapter.genotype_analysis_aggregate(samples_pipe))
     data = []
     x_labels = list(samples[0]['snps']['comp'].keys())
     y_labels = []
