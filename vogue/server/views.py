@@ -41,8 +41,6 @@ def index():
         return redirect(url_for('server.microsalt_untyped', year=year))
     if request.form.get('page') == 'microsalt_st_time':
         return redirect(url_for('server.microsalt_st_time', year=year))
-    if request.form.get('page') == 'genotype_time':
-        return redirect(url_for('server.genotype_time', year=year))
     if request.form.get('page') == 'genotype_plate':
         return redirect(url_for('server.genotype_plate'))
 
@@ -293,19 +291,6 @@ def microsalt_st_time(year):
         version = __version__,
         year_of_interest=year,
         MICROSALT = MICROSALT,
-        years = YEARS)
-
-@blueprint.route('/Bioinfo/Genotype/time/<year>',  methods=['GET', 'POST'])
-def genotype_time(year):
-    
-    plot_data = genotype_status_time(app.adapter, year)
-    return render_template('genotype_time.html',
-        data = plot_data['data'],
-        labels = plot_data['labels'],
-        header = 'MAF',
-        page_id = 'genotype_time',
-        version = __version__,
-        year_of_interest=year,
         years = YEARS)
 
 
