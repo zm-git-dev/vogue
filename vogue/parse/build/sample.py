@@ -49,13 +49,11 @@ def get_received_date(sample: Sample, lims: Lims)-> dt:
     processes = lims.get_processes(type=process_types, inputartifactlimsid=sample.artifact.id)
     if not processes:
         return None
-
     first_process = processes[0]
     for process in processes:
         if process.date_run < first_process.date_run:
             first_process=processes
-    
-    date_arrived = first_process.get(udf)
+    date_arrived = first_process.udf.get(udf)
     if date_arrived:
         # We need to convert datetime.date to datetime.datetime
         datetime_arrived = str_to_datetime(date_arrived.isoformat())
