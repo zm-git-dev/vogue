@@ -6,25 +6,24 @@ MASTER_STEPS_UDFS = {
                    'Reception Control TWIST v1',
                    'Reception Control no placement v1',
                    'Reception Control (RNA) v1'],
-        'date_udfs' : ['date arrived at clinical genomics']
+        'date_udf' : 'date arrived at clinical genomics'
     },
     'prepared': {
         'steps': ['CG002 - Aggregate QC (Library Validation) (Dev)',
                   'CG002 - Aggregate QC (Library Validation)',
                   'Aggregate QC (Library Validation) TWIST v1',
                   'Aggregate QC (Library Validation) (RNA) v2',
-                  'Aggregate QC (Library Validation)'],
-        'date_udfs': []
+                  'Aggregate QC (Library Validation)']
     },
     'delivery': {
         'steps': ['CG002 - Delivery', 'Delivery v1'],
-        'date_udfs': ['Date delivered']
+        'date_udf': 'Date delivered'
     },
     'sequenced': {
         'steps': ['CG002 - Illumina Sequencing (HiSeq X)',
                   'CG002 - Illumina Sequencing (Illumina SBS)',
                   'AUTOMATED - NovaSeq Run'],
-        'date_udfs': ['Finish Date'],
+        'date_udf': 'Finish Date',
         'nova_seq': ['AUTOMATED - NovaSeq Run'],
         'q30r1_udf': '% Bases >=Q30 R1',
         'q30r2_udf': '% Bases >=Q30 R2'

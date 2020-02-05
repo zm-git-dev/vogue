@@ -20,8 +20,7 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
     """
 
     process_types = MASTER_STEPS_UDFS['sequenced']['steps']
-    
-    udf = 'Passed Sequencing QC'
+    udf = MASTER_STEPS_UDFS['sequenced']['date_udf']
 
     sample_udfs = sample.udf.get(udf)
     if not sample_udfs:
@@ -43,24 +42,26 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
 
 def get_received_date(sample: Sample, lims: Lims)-> dt:
     """Get the date when a sample was received.
-    
-    Here we do not consider first or latest parent process.
-    Assumption is that there is only one received date.
     """
 
     process_types = MASTER_STEPS_UDFS['received']['steps']
+    udf = MASTER_STEPS_UDFS['received']['date_udf']
+    processes = lims.get_processes(type=process_types, inputartifactlimsid=sample.artifact.id)
+    if not processes:
+        return None
 
-    udf = 'date arrived at clinical genomics'
-    artifact = get_output_artifact(process_types = process_types, lims_id = sample.id, lims=lims, last=False)
-
-    datetime_arrived = None
-    # This is a datetime.date object
-    date_arrived = None
-    if artifact:
-        date_arrived = artifact.parent_process.udf.get(udf)
+    first_process = processes[0]
+    for process in processes:
+        if process.date_run < first_process.date_run:
+            first_process=processes
+    
+    date_arrived = first_process.get(udf)
     if date_arrived:
         # We need to convert datetime.date to datetime.datetime
         datetime_arrived = str_to_datetime(date_arrived.isoformat())
+    else:
+        date_arrived = first_process.date_run
+        datetime_arrived = str_to_datetime(date_arrived)
 
     return datetime_arrived 
 
@@ -84,7 +85,7 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     """
 
     process_types = MASTER_STEPS_UDFS['delivery']['steps']
-    udf = 'Date delivered'
+    udf = MASTER_STEPS_UDFS['delivery']['date_udf']
     
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
     delivery_date = None
@@ -116,6 +117,7 @@ def get_output_artifact(process_types: list, lims_id: str, lims: Lims, last: boo
     If last = False return the first artifact
     """
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_types)
+    
     artifact = None
     date = None
     for art in artifacts:

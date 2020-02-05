@@ -139,7 +139,7 @@ def pipe_value_per_month(year: int, y_val: str, group_key: str = None)-> list:
         # get average of y_val:
         match['$match'][y_val] = {'$exists' : True}
         project['$project'][y_val] = 1
-        group['$group'][y_val] = {'$avg': '$' + y_val}
+        group['$group'][y_val] = {'$push': '$' + y_val}
  
     return [match, project, match_year, group, sort]
     
@@ -174,7 +174,10 @@ def reformat_aggregate_results(aggregate_result, y_val, group_key = None):
         else:
             group_name = 'all_samples'
         month = group['_id']['month']
-        value = group[y_val]
+        if y_val == 'count':
+            value = group[y_val]
+        else:
+            value = np.mean([float(val) for val in group[y_val]] )
 
         if group_name not in plot_data:
             plot_data[group_name] = {'data' : [None]*12}
@@ -657,8 +660,4 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
             'y_labels': y_labels, 
             'plates': plates, 
             'plate_id' : plate_id}
-
-
-
-    
-   
+            
