@@ -20,17 +20,16 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
     """
 
     process_types = MASTER_STEPS_UDFS['sequenced']['steps']
-    udf = MASTER_STEPS_UDFS['sequenced']['date_udf']
+    date_udf = MASTER_STEPS_UDFS['sequenced']['date_udf']
 
-    sample_udfs = sample.udf.get(udf)
+    sample_udfs = sample.udf.get( 'Passed Sequencing QC')
     if not sample_udfs:
         return None
-
     final_date = None
     # Get the last atrtifact
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=True)
     if artifact:
-        final_date = artifact.parent_process.udf.get('Finish Date')
+        final_date = artifact.parent_process.udf.get(date_udf)
         if final_date:
             final_date = dt.combine(final_date, time.min)
         else:
