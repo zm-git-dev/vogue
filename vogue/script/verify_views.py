@@ -1,30 +1,73 @@
 from genologics.lims import Lims
 from genologics.config import BASEURI,USERNAME,PASSWORD
-from genologics.entities import Process
+from genologics.entities import Process, Sample
 lims = Lims(BASEURI, USERNAME, PASSWORD)
-from vogue.constants.lims_constants import MASTER_STEPS_UDFS , INSTRUMENTS
+from vogue.constants.lims_constants import MASTER_STEPS_UDFS , INSTRUMENTS , TEST_SAMPLES
 from statistics import mean
 import numpy as np
 from vogue.server import create_app
 import datetime as dt
 app=create_app()  
 
+#getting all samples recieved in 2017
+recieved_steps=lims.get_processes(type=MASTER_STEPS_UDFS['received']['steps'])
+samples_2017={}
+for step in recieved_steps:
+    date = step.udf.get('date arrived at clinical genomics')
+    if not date:
+        date=step.date_run
+        date=dt.datetime.strptime(date, '%Y-%m-%d').date()
+    if date and date.year ==2017:
+        for art in step.all_inputs():
+            sample = art.samples[0]
+            if sample.id in TEST_SAMPLES:
+                continue
+            if sample  not in samples_2017:
+                samples_2017[sample ]=date
+            elif samples_2017[sample ]>date:
+                samples_2017[sample ]=date
+
 #getting all samples recieved in 2018
 recieved_steps=lims.get_processes(type=MASTER_STEPS_UDFS['received']['steps'])
 samples_2018={}
 for step in recieved_steps:
     date = step.udf.get('date arrived at clinical genomics')
+    if not date:
+        date=step.date_run
+        date=dt.datetime.strptime(date, '%Y-%m-%d').date()
     if date and date.year ==2018:
         for art in step.all_inputs():
-            if art.samples[0] not in samples_2018:
-                samples_2018[art.samples[0]]=date
-            elif samples_2018[art.samples[0]]>date:
-                samples_2018[art.samples[0]]=date
+            sample = art.samples[0]
+            if sample.id in TEST_SAMPLES:
+                continue
+            if sample  not in samples_2018:
+                samples_2018[sample ]=date
+            elif samples_2018[sample ]>date:
+                samples_2018[sample ]=date
+
+#getting all samples recieved in 2019
+recieved_steps=lims.get_processes(type=MASTER_STEPS_UDFS['received']['steps'])
+samples_2019={}
+for step in recieved_steps:
+    date = step.udf.get('date arrived at clinical genomics')
+    if not date:
+        date=step.date_run
+        date=dt.datetime.strptime(date, '%Y-%m-%d').date()
+    if date and date.year ==2019:
+        for art in step.all_inputs():
+            sample = art.samples[0]
+            if sample.id in TEST_SAMPLES:
+                continue
+            if sample  not in samples_2019:
+                samples_2019[sample ]=date
+            elif samples_2019[sample ]>date:
+                samples_2019[sample ]=date
+
             
-samples_2018_grouped_priority = {'express':[], 'priority':[], 'standard':[],'research':[]}
-for sample in samples_2018:
+samples_2019_grouped_priority = {'express':[], 'priority':[], 'standard':[],'research':[]}
+for sample in samples_2019:
     priority=sample.udf.get('priority')
-    samples_2018_grouped_priority[priority].append(sample)
+    samples_2019_grouped_priority[priority].append(sample)
 
 
 # Customers in 2017
@@ -103,6 +146,7 @@ for sample, date in samples_2017.items():
     if artifacts:
         inarts=artifacts[-1].parent_process.all_inputs()
         for art in inarts:
+            
             if art.samples[0].id != sample.id:
                 continue
             conc =  art.udf.get(MASTER_STEPS_UDFS['final_conc_and_amount_dna']['concentration_udf'])
@@ -127,11 +171,9 @@ for month in concentrations_months_sorted:
 ## Concentration amount lucigen
 concentration_amount = []
 
-for sample in samples_2017:
-    
-    if sample.udf.get('Sequencing Analysis')[0:6] not in ['WGSLIF', 'WGTLIF']:
+for sample in samples_2018:
+    if sample.udf.get('Sequencing Analysis')[0:6] not in MASTER_STEPS_UDFS['final_conc_and_amount_dna']['apptags']:
         continue
-    
     artifacts = lims.get_artifacts(process_type=MASTER_STEPS_UDFS['final_conc_and_amount_dna']['concentration_step'], 
                        samplelimsid=sample.id)
     if artifacts:
@@ -151,6 +193,8 @@ for sample in samples_2017:
             if amount>200:
                 amount=200
     concentration_amount.append({'name':sample.id, 'x': amount,'y':round(conc,2)})
+
+concentration_amount
            
 
 
@@ -292,23 +336,18 @@ for run in nova_runs:
 
 
 ## Target Enrichment size bp over time
+#Sure select
 size_months_source = {}
-arts=lims.get_artifacts(process_type=MASTER_STEPS_UDFS['library_size_pre_hyb']['size_step'])
+arts=lims.get_artifacts(process_type=MASTER_STEPS_UDFS['library_size_post_hyb']['SureSelect']['size_step'])
 for art in arts:
-    if len(art.samples)>1:
-        continue
     sample =art.samples[0] 
     if not sample in samples_2018:
         continue
-    if sample.udf.get('Sequencing Analysis')[0:3] not in MASTER_STEPS_UDFS['library_size_pre_hyb']['apptags']:
+    if sample.udf.get('Sequencing Analysis')[0:3] not in MASTER_STEPS_UDFS['library_size_post_hyb']['SureSelect']['apptags']:
         continue
-    
     date =samples_2018[art.samples[0]]
-   
-    #get Source and size
     source=sample.udf.get('Source')
-    size=art.udf.get(MASTER_STEPS_UDFS['library_size_pre_hyb']['size_udf'])
-
+    size=art.udf.get(MASTER_STEPS_UDFS['library_size_post_hyb']['SureSelect']['size_udf'])
     if not (source and size):
         continue
     month=date.month
@@ -318,13 +357,44 @@ for art in arts:
         size_months_source[source][month] =[size]
     else:
         size_months_source[source][month].append(size)
-    #get output artifacts from the correct step that are related to the sample 
 
 for source, month_data in size_months_source.items():
     print(source)
     for month, data in month_data.items():
         print(month,round(np.mean(data),2))
 
+# TWIST
+size_months_source = {}
+stage_udfs = MASTER_STEPS_UDFS['library_size_pre_hyb']['TWIST'].get('stage_udf')
+process_types = MASTER_STEPS_UDFS['library_size_pre_hyb']['TWIST']['size_step']
+for samp, date in samples_2019.items():
+    artifacts = lims.get_artifacts(samplelimsid = samp.id, process_type = process_types)
+    if not artifacts:
+        continue
+    art=artifacts[-1]
+    size = None
+    for inart in art.parent_process.all_inputs():
+        stage = inart.workflow_stages[0].id
+        if samp in inart.samples and stage in stage_udfs:
+            size_udf = stage_udfs[stage]
+            size = inart.udf.get(size_udf)
+            break
+    if size:
+        month=date.month
+        source=samp.udf.get('Source')
+        if not source in size_months_source:
+            size_months_source[source]={month :[(size, samp.id)]}
+        elif not month in size_months_source[source]:
+            size_months_source[source][month] = [(size, samp.id)]
+        else:
+            size_months_source[source][month].append((size, samp.id))
+
+for source, month_data in size_months_source.items():
+    print(source)
+    for month, data in month_data.items():
+        sizes = [float(size[0]) for size in data]
+        #print(data)
+        print(month,round(np.mean(sizes),2))
 
 ##Turnaround Times
 def str_to_datetime(date: str)-> dt:
