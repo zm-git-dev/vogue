@@ -21,7 +21,10 @@ def test_sample_days(database, lims):
     artifact = lims._add_artifact(samples = [lims_sample])
 
     # that was input to a process that was modifyed 3 days ago
-    process = lims._add_process()
+    date_str='2018-12-31'
+    process_type_name = 'CG002 - Illumina Sequencing (HiSeq X)'
+    process_type = lims._add_process_type(name = 'CG002 - Reception Control (Dev)')
+    process = lims._add_process(process_type = process_type, date_str=date_str)
     process.inputs.append(artifact)
     three_days_ago = date.today() - timedelta(days=3)
     process.modified = three_days_ago.strftime("%Y-%m-%dT00:00:00Z")
@@ -63,11 +66,15 @@ def test_sample_all(database, lims):
     lims_sample.udf['Sequencing Analysis'] = 'WGSPCFC030'
 
     # and a artifact related to the sample
-    artifact = lims._add_artifact(samples = [lims_sample])
+    artifact = lims._add_artifact(samples = [lims_sample], id='tjena')
 
     # that was input to a process that was modifyed 3 days ago
-    process = lims._add_process()
+    date_str='2018-12-31'
+    process_type_name = 'CG002 - Illumina Sequencing (HiSeq X)'
+    process_type = lims._add_process_type(name = 'CG002 - Reception Control (Dev)')
+    process = lims._add_process(process_type = process_type, date_str=date_str)
     process.inputs.append(artifact)
+    lims_sample.artifact=artifact
     three_days_ago = date.today() - timedelta(days=3)
     process.modified = three_days_ago.strftime("%Y-%m-%dT00:00:00Z")
 
