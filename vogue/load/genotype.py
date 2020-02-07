@@ -22,4 +22,4 @@ def load_sample(adapter, genotype_sample_string):
         LOG.error('Not a propper mongo document. Missing _id')
         return 
         
-    adapter.add_or_update_maf_analysis(mongo_sample)
+    adapter.add_or_update_genotype_analysis(mongo_sample)

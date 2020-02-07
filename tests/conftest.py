@@ -155,9 +155,10 @@ class MockLims():
 
 
 class MockSample():
-    def __init__(self, sample_id='sample', lims=MockLims(), udfs={}):
+    def __init__(self, sample_id='sample', lims=MockLims(), udfs={}, artifact=MockArtifact()):
         self.id = sample_id
         self.udf = udfs
+        self.artifact = artifact
 
     def __repr__(self):
         return f"Sample:id={self.id},udf={self.udf}"

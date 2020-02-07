@@ -13,12 +13,12 @@ def test_application_tag(database):
     app.adapter = VougeAdapter(database.client, db_name = database.name)
 
     # GIVEN a correct foramted input string
-    app_tags = '[{"tag":"MELPCFR030", "category":"wgs"}, {"tag":"MELPCFR090", "category":"hej"}]'
+    app_tags = '[{"tag":"MELPCFR030", "prep_category":"wgs"}, {"tag":"MELPCFR090", "prep_category":"hej"}]'
     
     # WHEN adding a application tags
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'apptag', app_tags])
-
+   
     # THEN assert the new apptags should be added to the colleciton
     assert app.adapter.app_tag_collection.estimated_document_count() == 2
     assert app.adapter.app_tag('MELPCFR030')['category'] == 'wgs'

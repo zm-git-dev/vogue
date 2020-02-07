@@ -78,29 +78,35 @@ def home_customers(adapter, year, month):
         customers[customer]= cust['count']
     return customers
 
-def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
-    """Build aggregation pipeline to get information for one or more plots.
+def pipe_value_per_month(year: int, y_val: str, group_key: str = None)-> list:
+    """Build aggregation pipeline to get information for a plot from the sample colection.
 
-    A plot is going to show some value (determined by y_vals) per month, 
+    A plot is going to show some average value (determined by y_val) per month, 
     grouped by some group (determined by group_key). And it will only show 
-    data from a specific year (determined by year).
-
-    The number of values in the list y_vals, is the number of plots that we are preparing data for.
+    data from a specific year (determined by year). If y_val='count' the value on the y-axis
+    will instead be nr per samples.
      
     Arguments:
         year(int):      Any year.
-        y_vals(list):   A list of keys (of a sample document) that we want to plot.
-                        The list can also contain the element: 'count'.
+        y_val(str):     A key (of a sample document) that we want to plot. Or 'count'
         group_key(str): A key (of the sample document) on wich we want to group. Can be None!
 
-    eg:  
-        y_vals = ['library_size_post_hyb', 'count'] 
-        year = 2018
+    eg 1:  
+        y_val = 'library_size_post_hyb'
+        year = 2018 
         group_key = 'source'
         
-        will prepare data for two plots. 
-            1) The average library_size_post_hyb/month for all samples during 2018 grouped by source
-            2) Number of revieved samples/month during 2018 grouped by source. """
+        Plot content: 
+            Average library_size_post_hyb/month for all samples during 2018 grouped by source
+
+    eg 2:  
+        y_val = 'count'
+        year = 2017 
+        group_key = 'priority'
+
+        Plot content: 
+            Number of revieved samples/month during 2017 grouped by priority. 
+            """
     
     match = {'$match':{
                     'received_date' : {'$exists' : True},
@@ -126,28 +132,27 @@ def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
         group['$group']['_id'][group_key] = '$' + group_key
         sort['$sort']['_id.' + group_key] =  1
     
-    for y_val in y_vals:
-        if y_val == 'count':
-            # count nr samples per month:
-            group['$group'][y_val] = {'$sum': 1}
-        else:
-            # get average of y_val:
-            project['$project'][y_val] = 1
-            group['$group'][y_val] = {'$avg': '$' + y_val}
+    if y_val == 'count':
+        # count nr samples per month:
+        group['$group'][y_val] = {'$sum': 1}
+    else:
+        # get average of y_val:
+        match['$match'][y_val] = {'$exists' : True}
+        project['$project'][y_val] = 1
+        group['$group'][y_val] = {'$push': '$' + y_val}
  
     return [match, project, match_year, group, sort]
     
 
-def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
+def reformat_aggregate_results(aggregate_result, y_val, group_key = None):
     """Reformats raw output from the aggregation query to the format required by the plots.
     
     Arguments:
         aggregate_result (list): output from aggregation query.
-        y_vals(list):   A list of keys (of a sample document) that we want to plot.
-                        The list can also contain the element: 'count'.
+        y_val(str):   A key (of a sample document) that we want to plot. Or 'count'
         group_key(str): A key (of the sample document) on wich we want to group. Can be None!
     Returns:
-        results_reformated (dict): see example   
+        plot_data(dict): see example   
         
     Example: 
         aggregate_result: 
@@ -157,37 +162,35 @@ def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
          {'_id': {'strain': 'E. coli', 'month': 2}, 'microbial_library_concentration': 7.68},
          ...]
     
-        results_reformated:
-        {'microbial_library_concentration': {'A. baumannii': {'data': [21.96, None, 43.25,...]},
-                                            'E. coli': {'data': [None, 7.68, ...]},
+        plot_data: {'A. baumannii': {'data': [21.96, None, 43.25,...]},
+                    'E. coli': {'data': [None, 7.68, ...]},
                                             ...}
         """
 
-    results_reformated = {}
-    for plot in y_vals:
-        plot_data = {}
-        for group in aggregate_result: 
-            if group_key:
-                group_name = group['_id'][group_key]
-            else:
-                group_name = 'all_samples'
-            month = group['_id']['month']
-            value = group[plot]
+    plot_data = {}
+    for group in aggregate_result: 
+        if group_key:
+            group_name = group['_id'][group_key]
+        else:
+            group_name = 'all_samples'
+        month = group['_id']['month']
+        if y_val == 'count':
+            value = group[y_val]
+        else:
+            value = np.mean([float(val) for val in group[y_val]] )
 
-            if group_name not in plot_data:
-                plot_data[group_name] = {'data' : [None]*12}
-            plot_data[group_name]['data'][month -1] = value
+        if group_name not in plot_data:
+            plot_data[group_name] = {'data' : [None]*12}
+        plot_data[group_name]['data'][month -1] = value
+    return plot_data
 
-        results_reformated[plot] = plot_data
-    return results_reformated
-
-def value_per_month(adapter, year: str, y_vals: list, group_key: str = None):
+def value_per_month(adapter, year: str, y_val: str, group_key: str = None):
     """Wraper function that will build a pipe, aggregate results from database and 
-    prepare the data for the plots."""
+    prepare the data for the plot."""
 
-    pipe = pipe_value_per_month(int(year), y_vals, group_key)
+    pipe = pipe_value_per_month(int(year), y_val, group_key)
     aggregate_result = adapter.samples_aggregate(pipe)
-    return reformat_aggregate_results(list(aggregate_result), y_vals, group_key)
+    return reformat_aggregate_results(list(aggregate_result), y_val, group_key)
 
 
 
@@ -618,48 +621,6 @@ def microsalt_get_st_time(adapter,  year : int)-> dict:
 
     return {'data' : final_results, 'labels' : [m[1] for m in MONTHS]}
 
-def genotype_status_time(adapter,  year : int)-> dict:
-    pipe = [{
-        '$project': {
-            'month': {
-                '$month': '$sample_created_in_genotype_db'
-            }, 
-            'year': {
-                '$year': '$sample_created_in_genotype_db'
-            }, 
-            'status': 1
-        }
-    }, {
-        '$match': {
-            'year': {
-                '$eq': int(year)
-            }
-        }
-    }, {
-        '$group': {
-            '_id': {
-                'month': '$month', 
-                'status': '$status'
-            }, 
-            'number': {
-                '$sum': 1
-            }
-    }}]
-    aggregate_result = list(adapter.maf_analysis_aggregate(pipe))
-    massaged_results = {'pass' : [None]*12 ,'fail' : [None]*12, 'cancel':[None]*12 }
-    for item in aggregate_result:
-        status = item['_id']['status']
-        month_index = item['_id']['month'] -1
-        number = item['number']
-        if status:
-            massaged_results[status][month_index] = number
-
-    plot_data = {'data':massaged_results,
-                'labels':[m[1] for m in MONTHS]}
-
-    return plot_data   
-
-
 def get_genotype_plate(adapter,  plate_id : str)-> dict:
     plates_pipe = [{
         '$match': {
@@ -668,7 +629,7 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
         '$group': {
             '_id': {'plate': '$plate'}}
             }]
-    aggregate_result = list(adapter.maf_analysis_aggregate(plates_pipe))
+    aggregate_result = list(adapter.genotype_analysis_aggregate(plates_pipe))
     plates = [plate['_id']['plate'] for plate in aggregate_result]
 
     plate_id = plates[0] if not plate_id else plate_id
@@ -679,7 +640,7 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
                 '$exists': 'True'}}}]
 
     
-    samples = list(adapter.maf_analysis_aggregate(samples_pipe))
+    samples = list(adapter.genotype_analysis_aggregate(samples_pipe))
     data = []
     x_labels = list(samples[0]['snps']['comp'].keys())
     y_labels = []
@@ -699,8 +660,4 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
             'y_labels': y_labels, 
             'plates': plates, 
             'plate_id' : plate_id}
-
-
-
-    
-   
+            

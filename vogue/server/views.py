@@ -41,8 +41,6 @@ def index():
         return redirect(url_for('server.microsalt_untyped', year=year))
     if request.form.get('page') == 'microsalt_st_time':
         return redirect(url_for('server.microsalt_st_time', year=year))
-    if request.form.get('page') == 'genotype_time':
-        return redirect(url_for('server.genotype_time', year=year))
     if request.form.get('page') == 'genotype_plate':
         return redirect(url_for('server.genotype_plate'))
 
@@ -63,19 +61,15 @@ def index():
         years = YEARS)
 
 
-def round_dict(dict_of_lists, decimals):
-    for k, v in dict_of_lists.items():
-        dict[k]=[ round(elem, decimals) for elem in v ]
-    return dict_of_lists
-
-
 @blueprint.route('/common/turn_around_times/<year>')
 def turn_around_times(year):
 
     y_vals = ['received_to_delivered', 'received_to_prepped', 'prepped_to_sequenced', 'sequenced_to_delivered']
-
-    results_grouped_by_prio = value_per_month(app.adapter, year, y_vals, "priority")
-    results_grouped_by_cat = value_per_month(app.adapter, year, y_vals, "category")
+    results_grouped_by_prio = {}
+    results_grouped_by_cat = {}
+    for y_val in y_vals:
+        results_grouped_by_prio[y_val] = value_per_month(app.adapter, year, y_val, "priority")
+        results_grouped_by_cat[y_val] = value_per_month(app.adapter, year, y_val, "category")
 
     return render_template('turn_around_times.html',
         header = 'Turnaround Times',
@@ -90,14 +84,13 @@ def turn_around_times(year):
 
 @blueprint.route('/common/samples/<year>')
 def common_samples(year):
-    y_vals = ['count']
-    data_cat = value_per_month(app.adapter, year, y_vals, 'category')
-    data_prio = value_per_month(app.adapter, year, y_vals, 'priority')
+    data_cat = value_per_month(app.adapter, year, 'count', 'category')
+    data_prio = value_per_month(app.adapter, year, 'count', 'priority')
     return render_template('samples.html',
         header = 'Samples',
         page_id = 'samples',
-        data_prio = data_prio['count'],
-        data_cat = data_cat['count'],
+        data_prio = data_prio,
+        data_cat = data_cat,
         months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
@@ -106,13 +99,12 @@ def common_samples(year):
 
 @blueprint.route('/prepps/microbial/<year>')
 def microbial(year):
-    y_vals = ['microbial_library_concentration']
-    data = value_per_month(app.adapter, year, y_vals, "strain")
+    data = value_per_month(app.adapter, year, 'microbial_library_concentration', "strain")
 
     return render_template('microbial.html',
         header = 'Microbial Samples',
         page_id = 'microbial',
-        data = data['microbial_library_concentration'], 
+        data = data, 
         months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
@@ -121,15 +113,15 @@ def microbial(year):
 
 @blueprint.route('/prepps/target_enrichment/<year>')
 def target_enrichment(year):
-    y_vals = ['library_size_post_hyb', 'library_size_pre_hyb']
-    data = value_per_month(app.adapter, year, y_vals, "source")
+    library_size_post_hyb = value_per_month(app.adapter, year, 'library_size_post_hyb', "source")
+    library_size_pre_hyb = value_per_month(app.adapter, year, 'library_size_pre_hyb', "source")
     y_axis_label = 'Average Library Size'
 
     return render_template('target_enrichment.html',
         header = 'Target Enrichment (exom/panels)',
         page_id = 'target_enrichment',
-        data_pre_hyb = data['library_size_pre_hyb'],
-        data_post_hyb = data['library_size_post_hyb'],
+        data_pre_hyb = library_size_pre_hyb,
+        data_post_hyb = library_size_post_hyb,
         months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
@@ -138,14 +130,14 @@ def target_enrichment(year):
 
 @blueprint.route('/prepps/wgs/<year>')
 def wgs(year):
-    concentration_time = value_per_month(app.adapter, year, ['nr_defrosts-concentration'])
+    concentration_time = value_per_month(app.adapter, year, 'nr_defrosts-concentration')
     concentration_defrosts = find_concentration_defrosts(adapter = app.adapter, year = year)
 
     return render_template('wgs.html',
         header = 'WGS illumina PCR-free',
         page_id = 'wgs',
         concentration_defrosts = concentration_defrosts,
-        concentration_time = concentration_time['nr_defrosts-concentration'],
+        concentration_time = concentration_time,
         months = [m[1] for m in MONTHS],
         version = __version__,
         year_of_interest=year,
@@ -154,13 +146,13 @@ def wgs(year):
 
 @blueprint.route('/prepps/lucigen/<year>')
 def lucigen(year):
-    amount_concentration_time = value_per_month(app.adapter, year, ['amount-concentration'])
+    amount_concentration_time = value_per_month(app.adapter, year, 'amount-concentration')
     concentration_amount = find_concentration_amount(adapter = app.adapter, year = year)
 
     return render_template('lucigen.html',
         header = 'Lucigen PCR-free',
         page_id = 'lucigen',
-        amount_concentration_time = amount_concentration_time['amount-concentration'],
+        amount_concentration_time = amount_concentration_time,
         months = [m[1] for m in MONTHS],
         amount = concentration_amount,
         version = __version__,
@@ -301,19 +293,6 @@ def microsalt_st_time(year):
         MICROSALT = MICROSALT,
         years = YEARS)
 
-@blueprint.route('/Bioinfo/Genotype/time/<year>',  methods=['GET', 'POST'])
-def genotype_time(year):
-    
-    plot_data = genotype_status_time(app.adapter, year)
-    return render_template('genotype_time.html',
-        data = plot_data['data'],
-        labels = plot_data['labels'],
-        header = 'MAF',
-        page_id = 'genotype_time',
-        version = __version__,
-        year_of_interest=year,
-        years = YEARS)
-
 
 @blueprint.route('/Bioinfo/Genotype/plate',  methods=['GET', 'POST'])
 def genotype_plate():
@@ -326,7 +305,7 @@ def genotype_plate():
         x_labels = plot_data['x_labels'],
         y_labels = plot_data['y_labels'],
         year_of_interest = str(THIS_YEAR),
-        header = 'MAF',
+        header = 'Genotype',
         page_id = 'genotype_plate',
         version = __version__,
         plate_id = plot_data['plate_id'],
