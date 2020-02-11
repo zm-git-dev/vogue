@@ -1,4 +1,4 @@
-# vogue (**version** = 0.0.0) [![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/vogue/badge.svg?branch=develop)](https://coveralls.io/github/Clinical-Genomics/vogue?branch=develop) [![Build Status](https://travis-ci.org/Clinical-Genomics/vogue.svg?branch=develop)](https://travis-ci.org/Clinical-Genomics/vogue)
+# vogue (**version** = 1.0.0) [![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/vogue/badge.svg?branch=develop)](https://coveralls.io/github/Clinical-Genomics/vogue?branch=develop) [![Build Status](https://travis-ci.org/Clinical-Genomics/vogue.svg?branch=develop)](https://travis-ci.org/Clinical-Genomics/vogue)
 
 Vogue is Clinical Genomics solution for capturing data from various places in the data flow and to trend the data over a longer period of time.
 
