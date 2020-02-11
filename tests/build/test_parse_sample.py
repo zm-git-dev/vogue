@@ -1,9 +1,9 @@
 from datetime import datetime as dt
-from vogue.build.lims_utils import (get_sequenced_date, get_number_of_days, get_output_artifact, 
+from vogue.parse.build.sample import (get_sequenced_date, get_number_of_days, get_output_artifact, 
                                     get_latest_input_artifact, str_to_datetime, get_received_date,
                                     get_prepared_date, get_delivery_date, get_concentration_and_nr_defrosts,
                                     get_final_conc_and_amount_dna, get_microbial_library_concentration,
-                                    get_library_size_pre_hyb, get_library_size_post_hyb)
+                                    get_library_size)
 
 
 def test_get_sequenced_date_no_udfs(lims_sample, lims):
@@ -40,22 +40,22 @@ def test_get_sequenced_date_no_artifacts(lims_sample, lims):
 def test_get_sequenced_date_one_artifact(lims_sample, lims):
     # GIVEN a sample with udf: 'Passed Sequencing QC' and a lims with an artifact
     udf = 'Passed Sequencing QC'
-    date = '2018-12-31'
-
-#     lims_sample.udf[udf] = date
-#     assert lims_sample.udf.get(udf) == date
-
+    date_str='2018-12-31'
+    date = str_to_datetime(date_str)
+    lims_sample.udf[udf] = date
     process_type_name = 'CG002 - Illumina Sequencing (HiSeq X)'
     process_type = lims._add_process_type(name = process_type_name)
-    process = lims._add_process(date_str = date, process_type = process_type)
+    process = lims._add_process(process_type = process_type, date_str=date_str)
+    process.udf['Finish Date'] = date
     artifact = lims._add_artifact(parent_process = process, samples = [lims_sample])
+    process.output=[artifact]
 
     # WHEN getting the sequence date
     sequenced_date = get_sequenced_date(lims_sample, lims)
 
     # THEN assert sequenced_date is datetime
 
-    assert sequenced_date == str_to_datetime(date)
+    assert sequenced_date == date
 
 ############################# get_received_date ############################
 def test_get_received_date_no_artifacts(lims_sample, lims):
@@ -76,6 +76,7 @@ def test_get_received_date_one_artifact(lims_sample, lims):
     udf = 'date arrived at clinical genomics'
     process = lims._add_process(date_str = '1818-01-01', process_type = process_type)
     artifact = lims._add_artifact(parent_process = process, samples = [lims_sample])
+    lims_sample.artifact = artifact
     process.udf[udf] = dt.today().date()
 
     # WHEN getting the sequence date
@@ -357,7 +358,7 @@ def test_get_microbial_library_concentration(lims):
 
 
 ############################# get_library_size_pre_hyb ############################
-def test_get_library_size_pre_hyb(lims, lims_sample):
+def test_get_library_size_pre(lims, lims_sample):
     # GIVEN a l
     application_tag = 'EXOjhkjhjk'
     lims_id = 'dummy'
@@ -377,14 +378,14 @@ def test_get_library_size_pre_hyb(lims, lims_sample):
 
 
     # WHEN running get_library_size_pre_hyb
-    size = get_library_size_pre_hyb(application_tag, lims_sample.id, lims) 
+    size = get_library_size(application_tag, lims_sample.id, lims, 'SureSelect', 'library_size_pre_hyb') 
 
     # THEN the size should be fetched from A2  
     assert size == 500
 
 
-############################# get_library_size_post_hyb ############################
-def test_get_library_size_post_hyb(lims, lims_sample):
+####
+def test_get_library_size_post(lims, lims_sample):
     # GIVEN a l
     application_tag = 'EXOjhkjhjk'
     lims_id = 'dummy'
@@ -405,7 +406,7 @@ def test_get_library_size_post_hyb(lims, lims_sample):
 
 
     # WHEN running get_library_size_post_hyb
-    size = get_library_size_post_hyb(application_tag, lims_sample.id, lims) 
+    size = get_library_size(application_tag, lims_sample.id, lims, 'SureSelect', 'library_size_post_hyb') 
 
     # THEN size should be fetched from A2   
     assert size == 500

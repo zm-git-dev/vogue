@@ -1,4 +1,4 @@
-# vogue (**version** = 0.2.0)
+# vogue (**version** = 0.0.0) [![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/vogue/badge.svg?branch=develop)](https://coveralls.io/github/Clinical-Genomics/vogue?branch=develop) [![Build Status](https://travis-ci.org/Clinical-Genomics/vogue.svg?branch=develop)](https://travis-ci.org/Clinical-Genomics/vogue)
 
 Vogue is Clinical Genomics solution for capturing data from various places in the data flow and to trend the data over a longer period of time.
 
@@ -10,6 +10,9 @@ git clone https://github.com/Clinical-Genomics/vogue.git
 cd vogue
 pip install -e .
 ```
+
+## Contributing
+Vogue is using git flow branching model as described in our [development manual](http://www.clinicalgenomics.se/development/dev/gitflow/).
 
 ## Front End
 All views in vogue should be self-explanatory. There should be no further documentation needed to be able to interpret the content of the web page.

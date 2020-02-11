@@ -1,4 +1,4 @@
-from vogue.constants.constants import LANE_UDFS
+from vogue.constants.lims_constants import LANE_UDFS, MASTER_STEPS_UDFS
 import numpy as np
 import datetime as dt
 import math
@@ -30,14 +30,20 @@ def run_data(run):
         """
     lane_data = {}
     avg_data = {}
-
-    for lane in run.all_outputs():
-        name=lane.name
-        if not 'Lane' in name.split():
-            lane = lane.input_artifact_list()[0]
-            if not lane.location:
+    if run.type.name in MASTER_STEPS_UDFS['sequenced']['nova_seq']:
+        lanes=run.all_outputs()
+    else:
+        lanes=run.all_inputs()
+    for lane in lanes:
+        if not lane.location:
+            continue
+        if run.type.name in MASTER_STEPS_UDFS['sequenced']['nova_seq']:
+            name=lane.name
+            if not 'Lane' in name.split():
                 continue
+        else:
             name = lane.location[1]
+
 
         lane_data[name] = {}
         for udf in LANE_UDFS:
@@ -52,12 +58,10 @@ def run_data(run):
     for udf, values in avg_data.items():
         avg_data[udf]= round(np.mean(values),2)
 
-    q30_r1 = '% Bases >=Q30 R1'
-    q30_r2 = '% Bases >=Q30 R2'
+    q30_r1 = MASTER_STEPS_UDFS['sequenced']['q30r1_udf']
+    q30_r2 = MASTER_STEPS_UDFS['sequenced']['q30r2_udf']
     if q30_r1 in avg_data.keys() and  q30_r2 in avg_data.keys():
         Q30 = np.mean([avg_data[q30_r1],avg_data[q30_r2]])
-        avg_data.pop(q30_r1)
-        avg_data.pop(q30_r2)
         avg_data['% Bases >=Q30'] = Q30
     avg_data = filter_none(avg_data)    
 

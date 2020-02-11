@@ -1,8 +1,8 @@
 import logging
 import click
-from vogue.load.sample import load_one, load_all, load_one_dry, load_all_dry
+from vogue.load.sample import load_one, load_all, load_recent, load_one_dry, load_all_dry
 from flask.cli import with_appcontext, current_app
-from datetime import datetime
+from datetime import date, timedelta
 
 
 from genologics.entities import Sample
@@ -13,20 +13,18 @@ LOG = logging.getLogger(__name__)
 @click.command("sample", short_help = "load sample/samples into db.")
 @click.option('-s', '--sample-lims-id', 
                 help = 'Input sample lims id')
-@click.option('-m', '--many', is_flag = True, 
+@click.option('-a', '--all_samples', is_flag = True, 
                 help = 'Loads all lims samples if no other options are selected')
+@click.option('-f', '--load-from', 
+                help = 'Use together with --all_samples. Load from this sample lims id. Use if load all broke. Start where it ended')
+@click.option('-d', '--days', type = int,
+                help = 'Update only samples updated in the latest number of days')
 @click.option('--dry', is_flag = True, 
                 help = 'Load from sample or not. (dry-run)')
-@click.option('-f', '--load-from', 
-                help = 'load from this sample lims id. Use if load all broke. Start where it ended')
-@click.option('-n', '--new', is_flag = True,
-                help = 'Use this flagg if you only want to load samples that dont exist in the database')
-@click.option('-d', '--date', 
-                help = 'Update only samples delivered after date')
+
 @with_appcontext
-def sample(sample_lims_id, dry, many, load_from, new, date):
-    """Read and load lims data for one ore all samples. When loading many smaples,
-    the different options -f, -n, -d are used to delimit the subset of samples to load."""
+def sample(sample_lims_id, all_samples, load_from, days, dry):
+    """Read and load lims data for one sample, all samples or the most recently updated samples."""
     
     if not current_app.lims:
         LOG.warning("Lims connection failed.")
@@ -34,19 +32,16 @@ def sample(sample_lims_id, dry, many, load_from, new, date):
 
     lims = current_app.lims
         
-    if date:
-        try:
-            date = datetime.strptime(date, "%y%m%d").date()
-        except Exception as err:
-            LOG.error(err)
-            raise click.Abort()
-
-    if many:
+    if days:
+        some_days_ago = date.today() - timedelta(days=days) 
+        the_date = some_days_ago.strftime("%Y-%m-%dT00:00:00Z")
+        load_recent(current_app.adapter,lims, the_date)
+    elif all_samples:
         if dry:
             load_all_dry()
         else:
-            load_all(current_app.adapter, lims=lims, start_sample=load_from, new_only=new, date=date)
-    else:
+            load_all(current_app.adapter, lims=lims, start_sample=load_from)
+    elif sample_lims_id:
         lims_sample = Sample(lims, id = sample_lims_id)
         if not lims_sample:
             LOG.critical("The sample does not exist in the database in the LIMS database.")
@@ -54,7 +49,7 @@ def sample(sample_lims_id, dry, many, load_from, new, date):
         if dry:
             load_one_dry(lims_sample)
         else:
-            load_one(current_app.adapter, lims_sample , lims=lims, new_only=new, date = date)
+            load_one(current_app.adapter, lims_sample , lims=lims)
 
 
 

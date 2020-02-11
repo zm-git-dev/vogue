@@ -1,18 +1,27 @@
 {% extends 'layout.html' %}
 {% block body %}
+{% include 'header.html' %}
 <div class="container-fluid">
     <div class="row">
         {% include 'navigation.html' %}
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
             {% include 'header_section.html' %}
             <div class="row">
-                <div class="col-lg-12">
-                    <div id="library_size_post_hyb"></div>
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="library_size_pre_hyb"></div>  
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-12">
-                    <div id="library_size_pre_hyb"></div>
+                <div class="col-sm-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="library_size_post_hyb"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -36,31 +45,35 @@
         chart: {
             type: 'spline'
         },
-        title: {
-            text: '{{plot_post_hyb.title}}'},
+        title: {text: 'Post-hybridization QC'},
         xAxis: {
-            categories: {{ plot_post_hyb.labels| tojson }}},
+            categories: {{ months| tojson }}},
         yAxis: {
-            title: { text: {{ plot_post_hyb.axis.y | tojson }}}},
+        title: { text: 'Average Library Size' }},
         legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle'
+        title: {
+            text: 'Source<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+            style: { fontStyle: 'italic' }
         },
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
         tooltip: {
-            crosshairs: true,
-            shared: true
-        },
+        valueDecimals: 0,
+        crosshairs: true,
+        shared: true
+    },
         plotOptions: {
-            series: { connectNulls: true },
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
             }
-        },
+        }
+    },
         series: series 
 });
 
@@ -82,31 +95,35 @@
         chart: {
             type: 'spline'
         },
-        title: {
-            text: '{{plot_pre_hyb.title}}'},
+        title: {text: 'Pre-hybridization QC'},
         xAxis: {
-            categories: {{ plot_pre_hyb.labels| tojson }}},
+            categories: {{ months| tojson }}},
         yAxis: {
-            title: { text: {{ plot_pre_hyb.axis.y | tojson }}}},
+        title: { text: 'Average Library Size' }},
         legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle'
+        title: {
+            text: 'Source<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+            style: { fontStyle: 'italic' }
         },
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
         tooltip: {
-            crosshairs: true,
-            shared: true
-        },
+        valueDecimals: 0,
+        crosshairs: true,
+        shared: true
+    },
         plotOptions: {
-            series: { connectNulls: true },
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
             }
-        },
+        }
+    },
         series: series 
 });
 

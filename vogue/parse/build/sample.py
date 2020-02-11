@@ -1,7 +1,7 @@
 from genologics.lims import Lims
 from genologics.entities import Sample, Artifact
-
-from datetime import datetime as dt
+from vogue.constants.lims_constants import MASTER_STEPS_UDFS
+from datetime import time, datetime as dt
 import operator
 import logging
 LOG = logging.getLogger(__name__)
@@ -19,49 +19,53 @@ def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
     This will return the last time that the sample passed sequencing.
     """
 
-    process_types = ['CG002 - Illumina Sequencing (HiSeq X)', 
-                     'CG002 - Illumina Sequencing (Illumina SBS)']  
-    udf = 'Passed Sequencing QC'
+    process_types = MASTER_STEPS_UDFS['sequenced']['steps']
+    date_udf = MASTER_STEPS_UDFS['sequenced']['date_udf']
 
-    sample_udfs = sample.udf.get(udf)
+    sample_udfs = sample.udf.get( 'Passed Sequencing QC')
     if not sample_udfs:
         return None
-
     final_date = None
     # Get the last atrtifact
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=True)
     if artifact:
-        final_date = str_to_datetime(artifact.parent_process.date_run)
+        final_date = artifact.parent_process.udf.get(date_udf)
+        if final_date:
+            final_date = dt.combine(final_date, time.min)
+        else:
+            final_date = str_to_datetime(artifact.parent_process.date_run)
+        
 
     return final_date
     
 
 def get_received_date(sample: Sample, lims: Lims)-> dt:
     """Get the date when a sample was received.
-    
-    Here we do not consider first or latest parent process.
-    Assumption is that there is only one received date.
     """
 
-    process_types = ['CG002 - Reception Control']
-    udf = 'date arrived at clinical genomics'
-    artifact = get_output_artifact(process_types = process_types, lims_id = sample.id, lims=lims, last=False)
-
-    datetime_arrived = None
-    # This is a datetime.date object
-    date_arrived = None
-    if artifact:
-        date_arrived = artifact.parent_process.udf.get(udf)
+    process_types = MASTER_STEPS_UDFS['received']['steps']
+    udf = MASTER_STEPS_UDFS['received']['date_udf']
+    processes = lims.get_processes(type=process_types, inputartifactlimsid=sample.artifact.id)
+    if not processes:
+        return None
+    first_process = processes[0]
+    for process in processes:
+        if process.date_run < first_process.date_run:
+            first_process=processes
+    date_arrived = first_process.udf.get(udf)
     if date_arrived:
         # We need to convert datetime.date to datetime.datetime
         datetime_arrived = str_to_datetime(date_arrived.isoformat())
+    else:
+        date_arrived = first_process.date_run
+        datetime_arrived = str_to_datetime(date_arrived)
 
     return datetime_arrived 
 
 def get_prepared_date(sample: Sample, lims: Lims)-> dt:
     """Get the first date when a sample was prepared in the lab.
     """
-    process_types = ['CG002 - Aggregate QC (Library Validation)']
+    process_types = MASTER_STEPS_UDFS['prepared']['steps']
 
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
 
@@ -77,8 +81,8 @@ def get_delivery_date(sample: Sample, lims: Lims)-> dt:
     This will return the first time a sample was delivered
     """
 
-    process_types = ['Delivery v1', 'Delivery']
-    udf = 'Date delivered'
+    process_types = MASTER_STEPS_UDFS['delivery']['steps']
+    udf = MASTER_STEPS_UDFS['delivery']['date_udf']
     
     artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
     delivery_date = None
@@ -110,6 +114,7 @@ def get_output_artifact(process_types: list, lims_id: str, lims: Lims, last: boo
     If last = False return the first artifact
     """
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_types)
+    
     artifact = None
     date = None
     for art in artifacts:
@@ -171,13 +176,13 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
     if not application_tag:
         return {}
 
-    if not application_tag[0:6] in ['WGSPCF', 'WGTPCF']:
+    if not application_tag[0:6] in MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['apptags']:
         return {}
 
-    lot_nr_step = 'CG002 - End repair Size selection A-tailing and Adapter ligation (TruSeq PCR-free DNA)'
-    concentration_step = 'CG002 - Aggregate QC (Library Validation)'
-    lot_nr_udf = 'Lot no: TruSeq DNA PCR-Free Sample Prep Kit'
-    concentration_udf = 'Concentration (nM)'
+    lot_nr_step = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['lot_nr_step']
+    concentration_step = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['concentration_step']
+    lot_nr_udf = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['lot_nr_udf']
+    concentration_udf = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['concentration_udf']
 
     return_dict = {}
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
@@ -193,8 +198,8 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
 
             # Find the dates for all processes where the lotnr was used (all_defrosts),
             # and pick the once before or equal to this_date
-            for defrost in all_defrosts:  
-                if str_to_datetime(defrost.date_run) <= this_date:
+            for defrost in all_defrosts:
+                if defrost.date_run and str_to_datetime(defrost.date_run) <= this_date:
                     defrosts_before_this_process.append(defrost)
 
             nr_defrosts = len(defrosts_before_this_process)
@@ -212,14 +217,14 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
     if not application_tag:
         return {}
 
-    if not application_tag[0:6] in ['WGSLIF', 'WGTLIF']:
+    if not application_tag[0:6] in MASTER_STEPS_UDFS['final_conc_and_amount_dna']['apptags']:
         return {}
 
     return_dict = {}
-    amount_udf = 'Amount (ng)'
-    concentration_udf = 'Concentration (nM)'
-    concentration_step = 'CG002 - Aggregate QC (Library Validation)'
-    amount_step = 'CG002 - Aggregate QC (DNA)'
+    amount_udf = MASTER_STEPS_UDFS['final_conc_and_amount_dna']['amount_udf']
+    concentration_udf = MASTER_STEPS_UDFS['final_conc_and_amount_dna']['concentration_udf']
+    concentration_step = MASTER_STEPS_UDFS['final_conc_and_amount_dna']['concentration_step']
+    amount_step = MASTER_STEPS_UDFS['final_conc_and_amount_dna']['amount_step']
 
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
     if concentration_art:
@@ -246,11 +251,11 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
     if not application_tag:
         return {}
 
-    if not application_tag[3:5] == 'NX':
+    if not application_tag[3:5] == MASTER_STEPS_UDFS['microbial_library_concentration']['apptags']:
         return None
 
-    concentration_step = 'CG002 - Aggregate QC (Library Validation)'
-    concentration_udf = 'Concentration (nM)'
+    concentration_step = MASTER_STEPS_UDFS['microbial_library_concentration']['concentration_step']
+    concentration_udf = MASTER_STEPS_UDFS['microbial_library_concentration']['concentration_udf']
 
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
 
@@ -261,51 +266,39 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
 
 
 
-# The following two functions will get the udf Size (bp) that in fact is set on the 
-# aggregate qc librar validation step.
-# But since the same qc protocol is used both for pre-hyb and post-hyb, there is no way to 
-# distiguish from within the aggregation step, wether it is pre-hyb or post-hyb qc. 
-# Because of that, we instead look for the inpus atrifact to the aggregation step. 
-# For pre hyb, the input artifact will come from 'CG002 - Amplify Adapter-Ligated Library (SS XT)'. 
-# For post hyb, it will come from 'CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'.
+def get_library_size(app_tag: str, lims_id: str, lims: Lims, workflow: str, hyb_type: str) -> int:
+    """Getting the udf Size (bp) that in fact is set on the aggregate qc librar validation step.
 
-def get_library_size_pre_hyb(application_tag: str, lims_id: str, lims: Lims) -> int:
-    """Check only 'Targeted enrichment exome/panels'.
-    Get size_udf from size_step."""
+    But since the same qc protocol is used both for pre-hyb and post-hyb, there is no way to 
+    distiguish from within the aggregation step, wether it is pre-hyb or post-hyb qc. 
 
-    if not application_tag:
-        return None
+    Because of that, we instead search for
+        TWIST: the input artifact of the output artifacts of the steps that are AFTER the 
+        aggregations step:
+            For pre hyb: MASTER_STEPS_UDFS['pre_hyb']['TWIST'].get('size_step')
+            For post hyb: MASTER_STEPS_UDFS['post_hyb']['TWIST'].get('size_step')
+        SureSelect: the output artifacts of the steps that are BEFORE the aggregations step:
+            For pre hyb: MASTER_STEPS_UDFS['pre_hyb']['SureSelect'].get('size_step')
+            For post hyb: MASTER_STEPS_UDFS['post_hyb']['SureSelect'].get('size_step')"""
+  
+    size_steps = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_step')
 
-    if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
-        return None
-
-    size_step = ['CG002 - Amplify Adapter-Ligated Library (SS XT)']
-    size_udf = 'Size (bp)'
-
-    size_art = get_output_artifact(size_step, lims_id, lims, last=True)
-
-    if size_art:
-        return size_art.udf.get(size_udf)
-    else:
-        return None
-
-
-def get_library_size_post_hyb(application_tag: str, lims_id: str, lims: Lims) -> int:
-    """Check only 'Targeted enrichment exome/panels'.
-    Get size_udf from size_step."""
-
-    if not application_tag:
-        return None
-
-    if not application_tag[0:3] in ['EXO', 'EFT', 'PAN']:
-        return None
-
-    size_step = ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)']
-    size_udf = 'Size (bp)'
-
-    size_art = get_output_artifact(size_step, lims_id, lims, last=True)
-
-    if size_art:
-        return size_art.udf.get(size_udf)
-    else:
-        return None
+    if workflow == 'TWIST':
+        stage_udfs = MASTER_STEPS_UDFS[hyb_type][workflow].get('stage_udf')
+        out_art=get_output_artifact(size_steps, lims_id, lims, last=True)
+        if out_art:
+            sample=Sample(lims, id=lims_id)
+            for inart in out_art.parent_process.all_inputs():
+                stage = inart.workflow_stages[0].id
+                if sample in inart.samples and stage in stage_udfs:
+                    size_udf = stage_udfs[stage]
+                    return inart.udf.get(size_udf)
+    elif workflow == 'SureSelect':
+        if not app_tag or app_tag[0:3] not in MASTER_STEPS_UDFS[hyb_type][workflow]['apptags']:
+            return None
+        size_art = get_output_artifact(size_steps, lims_id, lims, last=True)
+        if size_art:
+            size_udf = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_udf')
+            return size_art.udf.get(size_udf)
+    
+    return None

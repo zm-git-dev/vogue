@@ -13,14 +13,30 @@ def test_application_tag(database):
     app.adapter = VougeAdapter(database.client, db_name = database.name)
 
     # GIVEN a correct foramted input string
-    app_tags = '[{"tag":"MELPCFR030", "category":"wgs"}]'
+    app_tags = '[{"tag":"MELPCFR030", "prep_category":"wgs"}, {"tag":"MELPCFR090", "prep_category":"hej"}]'
+    
+    # WHEN adding a application tags
+    runner = app.test_cli_runner()
+    result = runner.invoke(cli, ['load', 'apptag', app_tags])
+   
+    # THEN assert the new apptags should be added to the colleciton
+    assert app.adapter.app_tag_collection.estimated_document_count() == 2
+    assert app.adapter.app_tag('MELPCFR030')['category'] == 'wgs'
+    assert app.adapter.app_tag('MELPCFR090')['category'] == 'hej'
+
+def test_application_tag_missing_tag(database):
+    app.db = database
+    app.adapter = VougeAdapter(database.client, db_name = database.name)
+
+    # GIVEN a a input where the tag key is missing for one of the application tag dicts
+    app_tags = '[{"category":"wgs"}, {"tag":"MELPCFR030", "category":"wgs"}]'
     
     # WHEN adding a application tags
     runner = app.test_cli_runner()
     result = runner.invoke(cli, ['load', 'apptag', app_tags])
 
     # THEN assert the new apptag should be added to the colleciton
-    assert app.adapter.app_tag('MELPCFR030')['category'] == 'wgs'
+    assert app.adapter.app_tag_collection.estimated_document_count() == 1
 
 
 def test_application_tag_wrong_input(database):

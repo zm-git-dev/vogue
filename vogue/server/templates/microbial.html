@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 {% block body %}
+{% include 'header.html' %}
 <div class="container-fluid">
     <div class="row">
         {% include 'navigation.html' %}
@@ -7,7 +8,11 @@
             {% include 'header_section.html' %}
             <div class="row">
                 <div class="col-lg-12">
-                    <div id="microbial_concentration_time"></div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="microbial_concentration_time"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -29,31 +34,36 @@
         chart: {
             type: 'spline'
         },
-        title: {
-            text: '{{plot_attributes.title}}'},
+        title: {text: 'Average Concentration over Time'},
+        subtitle: {text: 'Grouped by Organism'},
         xAxis: {
-            categories: {{ plot_attributes.labels| tojson }}},
+            categories: {{months| tojson }} },
         yAxis: {
-            title: { text: {{ plot_attributes.axis.y | tojson }}}},
+        title: { text: 'Average Concentration (nM)' }},
         legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle'
+        title: {
+            text: 'Organism<br/><span style="font-size: 9px; color: #666; font-weight: normal">(Click to hide)</span>',
+            style: { fontStyle: 'italic' }
         },
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
         tooltip: {
-            crosshairs: true,
-            shared: true
-        },
+        valueDecimals: 2,
+        crosshairs: true,
+        shared: true
+    },
         plotOptions: {
-            series: { connectNulls: true },
-            spline: {
-                marker: {
-                    radius: 4,
-                    lineColor: '#666666',
-                    lineWidth: 1
-                }
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
             }
-        },
+        }
+    },
         series: series 
 });
 

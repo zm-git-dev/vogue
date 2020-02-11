@@ -1,42 +1,48 @@
 import logging
-from vogue.build.lims import build_sample
+from vogue.build.sample import build_sample
 LOG = logging.getLogger(__name__)
 from vogue.constants.constants import TEST_SAMPLES
+from datetime import date, timedelta
 
-
-def load_one(adapter, lims_sample=None, lims=None, new_only=True, date=None):
+def load_one(adapter, lims_sample=None, lims=None):
     """Function to load one lims sample into the database"""
 
     if lims_sample.id in TEST_SAMPLES:
         return
 
-    if not lims_sample.udf.get('Delivered'):
-        LOG.info('Will not add to database. Sample not delivered.')
-        return
-
-    if new_only and adapter.sample(lims_sample.id):
-        LOG.info('Sample already in database.')
-        return
-
-
-    if date:
-        if (lims_sample.udf.get('Delivered') < date):
-            LOG.info('Old sample. Will not be uploaded. ')
-            return
-
-
     mongo_sample = build_sample(lims_sample, lims, adapter)
     adapter.add_or_update_sample(mongo_sample)
 
 
-def load_all(adapter, lims, start_sample = None, new_only=True, date = None):
+def load_all(adapter, lims, start_sample = None):
     """Function to load all lims samples into the database"""
-    for sample in lims.get_samples():
+
+    all_samples = lims.get_samples()
+    total_nr_samples = len(all_samples)
+    for nr, sample in enumerate(all_samples):
         if not start_sample:
-            LOG.info(sample.id)
-            load_one(adapter, lims_sample=sample, lims=lims, new_only=new_only, date=date)
+            LOG.info('%s/%s %s' % (nr, total_nr_samples, sample.id))
+            load_one(adapter, lims_sample=sample, lims=lims)
         elif start_sample and start_sample == sample.id:
             start_sample = None
+
+
+def load_recent(adapter, lims, the_date):
+    """Function to load all lims samples into the database"""
+
+    latest_processes = lims.get_processes(last_modified = the_date)
+    samples = []
+    LOG.info('Found %s processes modified since %s.', len(latest_processes), the_date)
+    LOG.info('Fetching recently updated samples...')
+    for process in latest_processes:
+        for analyte in process.all_inputs():
+            samples += analyte.samples
+    unique_samples = set(samples)
+    nr_unique_samples = len(unique_samples)
+    LOG.info('%s samples will be added or updated.', nr_unique_samples)
+    for nr, sample in enumerate(unique_samples):
+        LOG.info('%s/%s %s' % (nr, nr_unique_samples, sample.id))
+        load_one(adapter, lims_sample=sample, lims=lims)    
 
 
 def load_one_dry(lims_sample, lims, adapter):

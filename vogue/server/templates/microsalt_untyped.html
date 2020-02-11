@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+{% block body %}
+{% include 'header.html' %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'navigation.html' %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            {% include 'header_section.html' %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="untyped"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    var data = []
+    {% if results is defined %}
+    var data = {{ results| tojson}}
+    {% endif %}
+
+    Highcharts.chart('untyped', {
+        chart: { type: 'spline' },
+        title: { text: 'Fraction of untyped organisms over time' },
+        xAxis: {
+            title: { text: 'Date recived' },
+            categories: {{ categories| tojson }}},
+        yAxis: { title: { text: 'Fraction Untyped' } },
+        legend: { enabled: false },
+        tooltip: { crosshairs: true, shared: true },
+        plotOptions: {
+        series: { connectNulls: true },
+        spline: {
+            marker: {
+                radius: 4,
+                lineColor: '#666666',
+                lineWidth: 1
+            }
+        }
+    },
+        series: [{
+            name: 'Fraction Untyped',
+            data: data,
+            marker: { symbol: 'circle' }
+        }] 
+    });
+
+</script>
+{% endblock %}

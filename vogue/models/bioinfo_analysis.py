@@ -1,12 +1,12 @@
 ANALYSIS_DESC = {
-    'QC':
-    'General quality control metrics for post- and pre-variant calling',
+    'multiqc':
+    'General quality control metrics for post- and pre-variant calling prepared by multiqc',
     'microsalt':
     'Results and quality control metrics output from microsalt workflow'
 }
 
 ANALYSIS_SETS = {
-    'QC': {
+    'multiqc': {
         'multiqc_picard_dups':
         'multiqc json/yaml report key for picard mark duplicate.',
         'multiqc_picard_HsMetrics':

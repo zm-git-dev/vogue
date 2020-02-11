@@ -1,0 +1,83 @@
+{% extends 'layout.html' %}
+{% block body %}
+{% include 'header.html' %}
+<div class="container-fluid">
+    <div class="row">
+        {% include 'navigation.html' %}
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            {% include 'header_section.html' %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="btn mb-2 mb-md-0">
+                            <form action="{{ url_for('server.microsalt_strain_st' , year=year_of_interest) }}"
+                                method="POST">
+                                <select id="strain" name="strain" class="form-control form-control-sm"
+                                    placeholder=".form-control-sm" required onchange="this.form.submit()">
+                                    <option value="">Select strain...</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category }}" {{ 'selected' if category == strain }}>
+                                        {{ category}}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div id="strain_st"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    Highcharts.chart('strain_st', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: "{{strain}}"
+        },
+        xAxis: {
+            type: 'category',
+            title: {
+                text: 'Sequence Types'
+            },
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Number of microbial samples'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        tooltip: {
+            formatter: function () {
+                var output = ''
+                if (this.point.name) {
+                    output = output + 'Sequence Type: <b>' + this.point.name + '</b> <br>'
+                }
+                output = output + 'Number of microbial samples: <b>' + this.y + '</b>'
+                return output;
+            }
+        },
+        series: [{
+            data: {{ data| tojson}}
+    }]
+});
+</script>
+{% endblock %}

@@ -1,7 +1,8 @@
 from genologics.entities import Sample
 from genologics.lims import Lims
+from datetime import datetime as dt
 
-from vogue.build.lims_utils import *
+from vogue.parse.build.sample import *
 
 
 def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
@@ -13,7 +14,11 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     mongo_sample['family'] = sample.udf.get('Family')
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
+    mongo_sample['customer'] = sample.udf.get('customer')
     mongo_sample['priority'] = sample.udf.get('priority')
+    mongo_sample['initial_qc'] = sample.udf.get('Passed Initial QC')
+    mongo_sample['library_qc'] = sample.udf.get('Passed Library QC')
+    mongo_sample['sequencing_qc'] = sample.udf.get('Passed Sequencing QC')
     mongo_sample['application_tag'] = application_tag
     mongo_sample['category'] = category
 
@@ -25,10 +30,6 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     mongo_sample['nr_defrosts'] = concentration_and_nr_defrosts.get('nr_defrosts')
     mongo_sample['nr_defrosts-concentration'] = concentration_and_nr_defrosts.get('concentration')
     mongo_sample['lotnr'] = concentration_and_nr_defrosts.get('lotnr')
-
-    mongo_sample['microbial_library_concentration'] = get_microbial_library_concentration(application_tag, sample.id, lims)
-    mongo_sample['library_size_pre_hyb'] = get_library_size_pre_hyb(application_tag, sample.id, lims)
-    mongo_sample['library_size_post_hyb'] = get_library_size_post_hyb(application_tag, sample.id, lims)
 
     sequenced_at = get_sequenced_date(sample, lims)
     received_at = get_received_date(sample, lims)
@@ -43,6 +44,19 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     mongo_sample['prepped_to_sequenced'] = get_number_of_days(prepared_at, sequenced_at)
     mongo_sample['received_to_prepped'] = get_number_of_days(received_at, prepared_at)
     mongo_sample['received_to_delivered'] = get_number_of_days(received_at, delivered_at)
+
+    mongo_sample['microbial_library_concentration'] = get_microbial_library_concentration(application_tag, sample.id, lims)
+    
+    mongo_sample['library_size_pre_hyb'] = get_library_size(application_tag, sample.id, lims, 
+                                                            'TWIST', 'library_size_pre_hyb')
+    mongo_sample['library_size_post_hyb'] = get_library_size(application_tag, sample.id, lims, 
+                                                            'TWIST', 'library_size_post_hyb')
+    if not mongo_sample['library_size_post_hyb']:
+        if not received_at or received_at < dt(2019, 1, 1):
+            mongo_sample['library_size_pre_hyb'] = get_library_size(application_tag, sample.id, lims, 
+                                                                'SureSelect', 'library_size_pre_hyb')
+            mongo_sample['library_size_post_hyb'] = get_library_size(application_tag, sample.id, lims, 
+                                                                'SureSelect', 'library_size_post_hyb')
 
     for key in list(mongo_sample.keys()):
         if mongo_sample[key] is None:
