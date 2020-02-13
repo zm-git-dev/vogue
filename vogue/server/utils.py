@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import (MONTHS, TEST_SAMPLES, PICARD_INSERT_SIZE, PICARD_HS_METRIC, LANE_UDFS)
+from vogue.constants.constants import (MONTHS, TEST_SAMPLES, MIP_PICARD, LANE_UDFS)
 from statistics import mean
 
 
@@ -78,29 +78,35 @@ def home_customers(adapter, year, month):
         customers[customer]= cust['count']
     return customers
 
-def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
-    """Build aggregation pipeline to get information for one or more plots.
+def pipe_value_per_month(year: int, y_val: str, group_key: str = None)-> list:
+    """Build aggregation pipeline to get information for a plot from the sample colection.
 
-    A plot is going to show some value (determined by y_vals) per month, 
+    A plot is going to show some average value (determined by y_val) per month, 
     grouped by some group (determined by group_key). And it will only show 
-    data from a specific year (determined by year).
-
-    The number of values in the list y_vals, is the number of plots that we are preparing data for.
+    data from a specific year (determined by year). If y_val='count' the value on the y-axis
+    will instead be nr per samples.
      
     Arguments:
         year(int):      Any year.
-        y_vals(list):   A list of keys (of a sample document) that we want to plot.
-                        The list can also contain the element: 'count'.
+        y_val(str):     A key (of a sample document) that we want to plot. Or 'count'
         group_key(str): A key (of the sample document) on wich we want to group. Can be None!
 
-    eg:  
-        y_vals = ['library_size_post_hyb', 'count'] 
-        year = 2018
+    eg 1:  
+        y_val = 'library_size_post_hyb'
+        year = 2018 
         group_key = 'source'
         
-        will prepare data for two plots. 
-            1) The average library_size_post_hyb/month for all samples during 2018 grouped by source
-            2) Number of revieved samples/month during 2018 grouped by source. """
+        Plot content: 
+            Average library_size_post_hyb/month for all samples during 2018 grouped by source
+
+    eg 2:  
+        y_val = 'count'
+        year = 2017 
+        group_key = 'priority'
+
+        Plot content: 
+            Number of revieved samples/month during 2017 grouped by priority. 
+            """
     
     match = {'$match':{
                     'received_date' : {'$exists' : True},
@@ -126,28 +132,27 @@ def pipe_value_per_month(year: int, y_vals: list, group_key: str = None)-> list:
         group['$group']['_id'][group_key] = '$' + group_key
         sort['$sort']['_id.' + group_key] =  1
     
-    for y_val in y_vals:
-        if y_val == 'count':
-            # count nr samples per month:
-            group['$group'][y_val] = {'$sum': 1}
-        else:
-            # get average of y_val:
-            project['$project'][y_val] = 1
-            group['$group'][y_val] = {'$avg': '$' + y_val}
+    if y_val == 'count':
+        # count nr samples per month:
+        group['$group'][y_val] = {'$sum': 1}
+    else:
+        # get average of y_val:
+        match['$match'][y_val] = {'$exists' : True}
+        project['$project'][y_val] = 1
+        group['$group'][y_val] = {'$push': '$' + y_val}
  
     return [match, project, match_year, group, sort]
     
 
-def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
+def reformat_aggregate_results(aggregate_result, y_val, group_key = None):
     """Reformats raw output from the aggregation query to the format required by the plots.
     
     Arguments:
         aggregate_result (list): output from aggregation query.
-        y_vals(list):   A list of keys (of a sample document) that we want to plot.
-                        The list can also contain the element: 'count'.
+        y_val(str):   A key (of a sample document) that we want to plot. Or 'count'
         group_key(str): A key (of the sample document) on wich we want to group. Can be None!
     Returns:
-        results_reformated (dict): see example   
+        plot_data(dict): see example   
         
     Example: 
         aggregate_result: 
@@ -157,48 +162,36 @@ def reformat_aggregate_results(aggregate_result, y_vals, group_key = None):
          {'_id': {'strain': 'E. coli', 'month': 2}, 'microbial_library_concentration': 7.68},
          ...]
     
-        results_reformated:
-        {'microbial_library_concentration': {'A. baumannii': {'data': [21.96, None, 43.25,...]},
-                                            'E. coli': {'data': [None, 7.68, ...]},
+        plot_data: {'A. baumannii': {'data': [21.96, None, 43.25,...]},
+                    'E. coli': {'data': [None, 7.68, ...]},
                                             ...}
         """
 
-    results_reformated = {}
-    for plot in y_vals:
-        plot_data = {}
-        for group in aggregate_result: 
-            if group_key:
-                group_name = group['_id'][group_key]
-            else:
-                group_name = 'all_samples'
-            month = group['_id']['month']
-            value = group[plot]
+    plot_data = {}
+    for group in aggregate_result: 
+        if group_key:
+            group_name = group['_id'][group_key]
+        else:
+            group_name = 'all_samples'
+        month = group['_id']['month']
+        if y_val == 'count':
+            value = group[y_val]
+        else:
+            value = np.mean([float(val) for val in group[y_val]] )
 
-            if group_name not in plot_data:
-                plot_data[group_name] = {'data' : [None]*12}
-            plot_data[group_name]['data'][month -1] = value
+        if group_name not in plot_data:
+            plot_data[group_name] = {'data' : [None]*12}
+        plot_data[group_name]['data'][month -1] = value
+    return plot_data
 
-        results_reformated[plot] = plot_data
-    return results_reformated
-
-def value_per_month(adapter, year: str, y_vals: list, group_key: str = None):
+def value_per_month(adapter, year: str, y_val: str, group_key: str = None):
     """Wraper function that will build a pipe, aggregate results from database and 
-    prepare the data for the plots."""
+    prepare the data for the plot."""
 
-    pipe = pipe_value_per_month(int(year), y_vals, group_key)
+    pipe = pipe_value_per_month(int(year), y_val, group_key)
     aggregate_result = adapter.samples_aggregate(pipe)
-    return reformat_aggregate_results(list(aggregate_result), y_vals, group_key)
+    return reformat_aggregate_results(list(aggregate_result), y_val, group_key)
 
-def plot_attributes( y_axis_label: str = '', title: str = '', x_axis_label: str = ''):
-    """Prepares some plot atributes general for plots showing some data per month.
-
-    Arguments:
-        y_axis_label(str): eg. 'Concentration (nM)' or 'Days' 
-        title(str): Title of the plot."""
-
-    return {'axis' : {'y' : y_axis_label, 'x' : x_axis_label}, 
-            'title' : title, 
-            'labels' : [m[1] for m in MONTHS]}
 
 
 def find_concentration_amount(adapter, year : int = None)-> dict:
@@ -338,7 +331,10 @@ def mip_picard_time_plot(adapter, year : int)-> dict:
         '$match': {'year': {'$eq': int(year)}}
         }]
     aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
-    final_data = {k:[] for k in PICARD_INSERT_SIZE + PICARD_HS_METRIC }
+    final_data={}
+    for data in MIP_PICARD.values():
+        for key in data:
+           final_data[key]=[] 
 
     for sample in aggregate_result:
         sample_id = sample['_id']
@@ -625,50 +621,6 @@ def microsalt_get_st_time(adapter,  year : int)-> dict:
 
     return {'data' : final_results, 'labels' : [m[1] for m in MONTHS]}
 
-def genotype_status_time(adapter,  year : int)-> dict:
-    pipe = [{
-        '$project': {
-            'month': {
-                '$month': '$sample_created_in_genotype_db'
-            }, 
-            'year': {
-                '$year': '$sample_created_in_genotype_db'
-            }, 
-            'status': 1
-        }
-    }, {
-        '$match': {
-            'year': {
-                '$eq': int(year)
-            }
-        }
-    }, {
-        '$group': {
-            '_id': {
-                'month': '$month', 
-                'status': '$status'
-            }, 
-            'number': {
-                '$sum': 1
-            }
-    }}]
-    aggregate_result = list(adapter.maf_analysis_aggregate(pipe))
-    massaged_results = {'pass' : [None]*12 ,'fail' : [None]*12,'missing' : [None]*12, 'cancel':[None]*12 }
-    for item in aggregate_result:
-        status = item['_id']['status']
-        month_index = item['_id']['month'] -1
-        number = item['number']
-        if not status:
-            massaged_results['missing'][month_index] = number
-        else:
-            massaged_results[status][month_index] = number
-
-    plot_data = {'data':massaged_results,
-                'labels':[m[1] for m in MONTHS]}
-
-    return plot_data   
-
-
 def get_genotype_plate(adapter,  plate_id : str)-> dict:
     plates_pipe = [{
         '$match': {
@@ -677,7 +629,7 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
         '$group': {
             '_id': {'plate': '$plate'}}
             }]
-    aggregate_result = list(adapter.maf_analysis_aggregate(plates_pipe))
+    aggregate_result = list(adapter.genotype_analysis_aggregate(plates_pipe))
     plates = [plate['_id']['plate'] for plate in aggregate_result]
 
     plate_id = plates[0] if not plate_id else plate_id
@@ -688,148 +640,24 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
                 '$exists': 'True'}}}]
 
     
-    samples = list(adapter.maf_analysis_aggregate(samples_pipe))
+    samples = list(adapter.genotype_analysis_aggregate(samples_pipe))
     data = []
     x_labels = list(samples[0]['snps']['comp'].keys())
     y_labels = []
-    
+    x_labels.sort()
     for row, sample in enumerate(samples):
         comp = sample['snps'].get('comp')
+        genotype = sample['snps'].get('genotype')
+        sequence = sample['snps'].get('sequence')
         y_labels.append(sample['_id'])
         for col, key in enumerate(x_labels):
-            data.append([col, row, int(comp[key])])
+            internal=''.join(genotype[key])
+            external=''.join(sequence[key])
+            data.append( (col, row, int(comp[key]),f'{internal} : {external}')) 
             
     return {'data': data, 
             'x_labels': x_labels, 
             'y_labels': y_labels, 
-            'plates': list(set(plates)), 
+            'plates': plates, 
             'plate_id' : plate_id}
-
-
-def index_data(adapter, index_categroy):
-
-    pipe = [{
-        '$lookup': {
-            'from': 'index_category', 
-            'localField': 'index', 
-            'foreignField': '_id', 
-            'as': 'index_category'}
-        }, {
-        '$match': {
-            'flowcell_target_reads': {'$exists': 'True', '$ne': None}, 
-            'flowcell_total_reads': {'$exists': 'True', '$ne': None}, 
-            'index_target_reads': {'$exists': 'True', '$ne': None}, 
-            'index_category.category': index_categroy}
-        }, {
-        '$project': {
-            'flowcell_id': 1, 
-            'index_total_reads': 1, 
-            'index': 1, 
-            'category': '$index_category.category', 
-            'nr_cat': {'$size': '$index_category.category'}, 
-            'index_target_reads': 1, 
-            'flowcell_total_reads': 1, 
-            'flowcell_target_reads': 1}
-        }, {
-        '$group': {
-            '_id': {'index': '$index'}, 
-            'nr_runs': {'$sum': 1}, 
-            'flowcell_total_reads': {'$push': '$flowcell_total_reads'}, 
-            'flowcell_target_reads': {'$push': '$flowcell_target_reads'}, 
-            'index_target_reads': {'$push': '$index_target_reads'}, 
-            'index_total_reads': {'$push': '$index_total_reads'}, 
-            'flowcell_id': {'$push': '$flowcell_id'}}
-        }]
-
-    aggregate_result = list(adapter.index_aggregate(pipe))
-    average_normalized_peformance = []
-    for index_data in aggregate_result:
- #       target = [float(x)/(float(y)*1000000) for x, y in zip(index['index_target_reads'], index['flowcell_target_reads'])]
- #       observed = [float(x)/(float(y)*1000000) for x, y in zip(index['index_total_reads'], index['flowcell_total_reads'])]
- #       normalized_peformance = [y/x for x, y in zip(observed, target)]
-        index=[]
-        flowcell=[]
-        normalized_peformance=[]
-        for total, target in zip(index_data['flowcell_total_reads'], index_data['flowcell_target_reads']):
-            if total and target:
-                flowcell.append(float(total)/(float(target)*1000000))
-        for total, target in zip(index_data['index_total_reads'], index_data['index_target_reads']):
-            if total and target:
-                index.append(float(total)/(float(target)*1000000))
-        for i, f in zip(index, flowcell):
-            if i and f:
-                normalized_peformance.append(i/f)
-        mean_performance =mean(normalized_peformance)
-        average_normalized_peformance.append({'name':index_data['_id']['index'], 
-                                              'y': mean_performance,
-                                              'nr_runs': len(normalized_peformance),
-                                              'url': index_data['_id']['index'].replace(' ','')})
-    return average_normalized_peformance
-
-
-def reagent_label_data(adapter, index):
-    pipe = [{
-        '$match': {
-            'flowcell_target_reads': {'$exists': 'True'}, 
-            'flowcell_total_reads': {'$exists': 'True'}, 
-            'url': {
-                '$eq': index
-            }
-        }
-    }, {
-        '$project': {
-            'flowcell_id': 1, 
-            'index_total_reads': 1, 
-            'index': 1, 
-            'index_target_reads': 1, 
-            'flowcell_total_reads': 1, 
-            'flowcell_target_reads': 1
-        }
-    }, {
-        '$group': {
-            '_id': {
-                'index': '$index'
-            }, 
-            'flowcell_total_reads': {
-                '$push': '$flowcell_total_reads'
-            }, 
-            'flowcell_target_reads': {
-                '$push': '$flowcell_target_reads'
-            }, 
-            'index_target_reads': {
-                '$push': '$index_target_reads'
-            }, 
-            'index_total_reads': {
-                '$push': '$index_total_reads'
-            }, 
-            'flowcell_id': {
-                '$push': '$flowcell_id'
-            }
-        }
-    }
-]
-
-    aggregate_result = list(adapter.index_aggregate(pipe))
-    if not aggregate_result:
-        return []
-    index_data = aggregate_result[0]
-
- #   target = [float(x)/(float(y)*1000000) for x, y in zip(index_data['index_target_reads'], index_data['flowcell_target_reads'])]
- #   observed = [float(x)/(float(y)*1000000) for x, y in zip(index_data['index_total_reads'], index_data['flowcell_total_reads'])]
- #   normalized_peformance = [[z, x/y] for x, y, z in zip(observed, target, index_data['flowcell_id'])]
-
-    normalized_peformance=[]
-    flowcell = []
-    index = []
-    for total, target in zip(index_data['flowcell_total_reads'], index_data['flowcell_target_reads']):
-        if total and target:
-            flowcell.append(float(total)/(float(target)*1000000))
-    for total, target in zip(index_data['index_total_reads'], index_data['index_target_reads']):
-        if total and target:
-            index.append(float(total)/(float(target)*1000000))
-    for ind, fc, z in zip(index, flowcell, index_data['flowcell_id']):
-        if ind and fc:
-            normalized_peformance.append([z, ind/fc])
-    return normalized_peformance
-    
-   
+            

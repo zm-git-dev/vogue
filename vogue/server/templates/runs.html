@@ -40,7 +40,7 @@
     var data = []
     {% for date, value, run_id in results['data'][metric][group].data %}
     // in this context january is 0, february 1,..., december 11 thereby date.month-1
-    data.push({ 'x': Date.UTC({{ date.year }}, {{ date.month - 1 }}, {{ date.day }}), 'y': {{ value }}, 'name': {{ run_id | tojson }} } )
+    data.push({ 'x': Date.UTC({{ date.year }}, {{ date.month - 1 }}, {{ date.day }}), 'y': {{ value }}, 'name': {{ run_id | tojson }}, 'date': "{{ date.day}}/{{ date.month }}" } )
     {% endfor %}
     series.push({
         findNearestPointBy: 'xy',
@@ -51,11 +51,11 @@
     {% endfor %}
     Highcharts.chart('run_info', {
         chart: { type: 'spline' },
-        title: { text: '{{metric}}' },
+        title: { text: '{{metric}} over Time' },
         xAxis: {
             type: 'datetime',
             dateTimeLabelFormats: {
-                month: '%e. %b',
+                month: '%b',
                 year: '%b'
             }
         },
@@ -72,7 +72,7 @@
     },
         tooltip: {
         formatter: function () {
-            return 'Run ID: <b>' + this.point.name + '</b> <br> {{metric}}: <b>' + this.y + '</b>';
+            return 'Run ID: <b>' + this.point.name + '</b> <br> {{metric}}: <b>' + this.y + '</b> <br>Sequencing finished at: <b>' + this.point.date + '</b>';
         }
     },
         plotOptions: {

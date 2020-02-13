@@ -37,9 +37,9 @@ class VougeAdapter(MongoAdapter):
         self.bioinfo_samples_collection = self.db.bioinfo_samples
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
-        self.maf_analysis_collection = self.db.maf_analysis
         self.index_collection = self.db.index
         self.index_category_collection = self.db.index_category
+        self.genotype_analysis_collection = self.db.genotype_analysis
 
         LOG.info("Use database %s.", db_name)
 
@@ -68,22 +68,22 @@ class VougeAdapter(MongoAdapter):
         else:
             LOG.info("No updates for sample %s.", lims_id)
 
-    def add_or_update_maf_analysis(self, sample_news: dict):
+    def add_or_update_genotype_analysis(self, sample_news: dict):
         """Adds/updates a sample in the database"""
 
         lims_id = sample_news['_id']
-        update_result = self.db.maf_analysis.update_one({'_id': lims_id},
+        update_result = self.db.genotype_analysis.update_one({'_id': lims_id},
                                                   {'$set': sample_news},
                                                   upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
-            self.db.maf_analysis.update_one({'_id': lims_id},
+            self.db.genotype_analysis.update_one({'_id': lims_id},
                                       {'$set': {
                                           'added': dt.today()
                                       }})
             LOG.info("Added sample %s.", lims_id)
         elif update_result.modified_count:
-            self.db.maf_analysis.update_one({'_id': lims_id},
+            self.db.genotype_analysis.update_one({'_id': lims_id},
                                       {'$set': {
                                           'updated': dt.today()
                                       }})
@@ -341,13 +341,13 @@ class VougeAdapter(MongoAdapter):
         return self.sample_collection.aggregate(pipe)
         
 
-    def maf_analysis_aggregate(self, pipe : list):
-        """Function to make a aggregation on the maf analysis colleciton"""
-        return self.maf_analysis_collection.aggregate(pipe)
+    def genotype_analysis_aggregate(self, pipe : list):
+        """Function to make a aggregation on the genotype analysis colleciton"""
+        return self.genotype_analysis_collection.aggregate(pipe)
 
-    def find_maf_plate(self, plate_id : str):
+    def find_genotype_plate(self, plate_id : str):
         """find all samples from plate"""
-        return self.maf_analysis_collection.find({'plate': plate_id})
+        return self.genotype_analysis_collection.find({'plate': plate_id})
 
     def get_category(self, app_tag):
         """Function get category based on application tag from the application tag collection"""

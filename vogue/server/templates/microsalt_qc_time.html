@@ -55,7 +55,7 @@
             title: { text: 'Date recived' },
             categories: {{ categories| tojson }}},
         yAxis: {
-        title: { text: '{{selected_metric.capitalize().replace('_', ' ')}}' },
+        title: { text: 'Average {{selected_metric.capitalize().replace('_', ' ')}}' },
         plotLines: [{
             value: {{ mean }},
         color: 'red',

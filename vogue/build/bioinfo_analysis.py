@@ -306,7 +306,7 @@ def build_bioinfo_sample(analysis_dict: dict,
     mongo_doc = recursive_default_dict()
     mongo_doc['_id'] = sample_id
     mongo_doc['workflows'] = analysis_workflows
-    mongo_doc['case_analysis_typesi'] = case_analysis_types
+    mongo_doc['case_analysis_types'] = case_analysis_types
     for workflow in analysis_workflows:
         for analysis_type in case_analysis_types:
             simple_analysis_dict = analysis_dict[workflow][analysis_type]

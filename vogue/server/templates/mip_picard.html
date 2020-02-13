@@ -14,41 +14,40 @@
                                 <label class="form-text text-muted" for="X_axis">Select X axis metric:</label>
                                 <select id="X_axis" name="X_axis" class="form-control form-control-sm"
                                     placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                    <optgroup label="Picard insert size">
-                                        {% for metric in PICARD_INSERT_SIZE %}
-                                        <option value="{{ metric }}" {{ 'selected' if metric == X_axis }}>
-                                            {{ metric.lower().capitalize().replace('_', ' ')}}
-                                        </option>
+                                    {% for group in MIP_PICARD %}
+                                        <optgroup label="{{group}}" >
+                                        {% for metric in MIP_PICARD[group] %}
+                                            <option value="{{group}} {{metric}}" {{ 'selected' if metric == X_axis }}>
+                                                {{ metric.lower().capitalize().replace('_', ' ')}}
+                                            </option>
                                         {% endfor %}
-                                    <optgroup label="Picard HS metric">
-                                        {% for metric in PICARD_HS_METRIC %}
-                                        <option value="{{ metric }}" {{ 'selected' if metric == X_axis }}>
-                                            {{ metric.lower().capitalize().replace('_', ' ')}}
-                                        </option>
-                                        {% endfor %}
+                                    {% endfor %}
                                 </select>
                         </div>
                         <div class="btn mb-3 mb-md-0">
                             <label class="form-text text-muted" for="Y_axis">Select Y axis metric:</label>
                             <select id="Y_axis" name="Y_axis" class="form-control form-control-sm"
                                 placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                <optgroup label="PICARD_INSERT_SIZE">
-                                    {% for metric in PICARD_INSERT_SIZE %}
-                                    <option value="{{ metric }}" {{ 'selected' if metric == Y_axis }}>
-                                        {{ metric.lower().capitalize().replace('_', ' ')}}
-                                    </option>
-                                    {% endfor %}
-                                <optgroup label="PICARD_HS_METRIC">
-                                    {% for metric in PICARD_HS_METRIC %}
-                                    <option value="{{ metric }}" {{ 'selected' if metric == Y_axis }}>
-                                        {{ metric.lower().capitalize().replace('_', ' ')}}
-                                    </option>
-                                    {% endfor %}
+                                {% for group in MIP_PICARD %}
+                                        <optgroup label="{{group}}" >
+                                        {% for metric in MIP_PICARD[group] %}
+                                            <option value="{{group}} {{metric}}" {{ 'selected' if metric == Y_axis }}>
+                                                {{ metric.lower().capitalize().replace('_', ' ')}}
+                                            </option>
+                                        {% endfor %}
+                                {% endfor %}
                             </select>
                             </form>
                         </div>
                     </div>
                     <hr>
+                    A subset of the picard qc metricses that are being procued by MIP are visualized here. Write a request <a href="https://github.com/Clinical-Genomics/vogue/issues/new/choose">here</a>. if you want to add more data to this plot. <br><br>
+                    This plot shows data from: <br>
+                    {% for group in groups%}
+                        <b>{{group.lower().capitalize().replace('_', ' ')}}</b>:  {{help_urls[group]['text']}}. Definitions of each specific metric can be found <a href="{{help_urls[group]['url']}}">here</a>. <br>
+                    {% endfor %}
+                    <br><br>
+                    
                     <div class="row">
                         <div class="col-lg-12">
                             <div id="picard_plot"></div>
