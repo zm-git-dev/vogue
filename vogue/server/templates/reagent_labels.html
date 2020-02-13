@@ -10,7 +10,8 @@
                 <div class="card-body">
                     <div class="row">
                             <div class="btn mb-2 mb-md-0">
-                                    <form action="{{ url_for('server.reagent_labels', reagent_label='') }}" method="POST">
+                                <form action="{{ url_for('server.index')}}" method="POST">
+                                    <input type="hidden" name="page" value="{{page_id}}"> 
                                         <select id="index_category" name="index_category" class="form-control form-control-sm"
                                             placeholder=".form-control-sm" required onchange="this.form.submit()">
                                             <option value="">Select index category...</option>
@@ -34,7 +35,6 @@
 
 
 <script>
-
     Highcharts.chart('indexes', {
     chart: {
         type: 'column',
@@ -48,10 +48,10 @@
         }
     },
     title: {
-        text: 'Normalized index performance averaged over all flowcells'
+        text: '{{index_category}}'
     },
     subtitle: {
-        text: 'Normalized index performance averaged over all runs. (Grouped by index type)'
+        text: 'Normalized index performance averaged over all runs. (Data from {{nr_indexes}} indexes)'
     },
     xAxis: {
         type: 'category',
@@ -80,25 +80,13 @@
     tooltip: {
         style: {pointerEvents: 'all'},
         useHTML: true,
-        pointFormat: "Index fraction: <b>{point.y:.1f}</b><br><a href=http://localhost:5000/reagent_label/{point.url}>{point.url}</a>"
+        pointFormat: "Index performance: <b>{point.y:.1f}</b><br>Average from <b>{point.nr_runs}</b> runs. <br><a href=http://localhost:5000/reagent_label/{{index_category_url}}/{point.url}>{point.url}</a>"
     },
     series: [{
         name: 'Population',
         data: {{results| tojson }},
-        dataSorting: {enabled: true},
-        dataLabels: {
-            enabled: true,
-            rotation: -90,
-            color: '#FFFFFF',
-            align: 'right',
-            format: '{point.y:.1f}', // one decimal
-            y: 10, // 10 pixels down from the top
-            style: {
-                fontSize: '13px',
-                fontFamily: 'Verdana, sans-serif'
-            }
-        }
-    }]
+        dataSorting: {enabled: true}    
+        }]
 });
 </script>
 

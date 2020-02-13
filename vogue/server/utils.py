@@ -759,11 +759,10 @@ def index_data(adapter, index_categroy):
         for i, f in zip(index, flowcell):
             if i and f:
                 normalized_peformance.append(i/f)
-        if index_data['_id']['index']=='pl2 B10 IDT_10nt_NXT_139 (ACAGCCAGGT-AGTACCATGA)':
-            print(normalized_peformance)
         mean_performance =mean(normalized_peformance)
         average_normalized_peformance.append({'name':index_data['_id']['index'], 
                                               'y': mean_performance,
+                                              'nr_runs': len(normalized_peformance),
                                               'url': index_data['_id']['index'].replace(' ','')})
     return average_normalized_peformance
 

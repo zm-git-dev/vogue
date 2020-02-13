@@ -44,7 +44,7 @@
         type: 'column'
     },
     title: {
-        text: 'Normalized index performance per flowcell'
+        text:'<a href="{{ url_for('server.reagent_labels', index_category_url=index_category_url) }}">{{index_category}}</a>: {{reagent_label}}'
     },
     subtitle: {
         text: 'Normalized index performance = (index_total_reads/flowcell_total_reads)/(index_target_reads/flowcell_target_reads)'
@@ -73,19 +73,7 @@
     },
     series: [{
         name: 'Population',
-        data: {{results| tojson }},
-        dataLabels: {
-            enabled: true,
-            rotation: -90,
-            color: '#FFFFFF',
-            align: 'right',
-            format: '{point.y:.1f}', // one decimal
-            y: 10, // 10 pixels down from the top
-            style: {
-                fontSize: '13px',
-                fontFamily: 'Verdana, sans-serif'
-            }
-        }
+        data: {{results| tojson }}
     }]
 });
 </script>
