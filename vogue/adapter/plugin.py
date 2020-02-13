@@ -38,6 +38,8 @@ class VougeAdapter(MongoAdapter):
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
         self.maf_analysis_collection = self.db.maf_analysis
+        self.index_collection = self.db.index
+        self.index_category_collection = self.db.index_category
 
         LOG.info("Use database %s.", db_name)
 
@@ -245,6 +247,52 @@ class VougeAdapter(MongoAdapter):
         else:
             LOG.info("No updates for sample %s.", lims_id)
 
+    def add_or_update_index(self, index_news: dict):
+        """Adds/updates a index in the database"""
+
+        index_id = index_news['_id']
+        update_result = self.db.index.update_one(
+            {'_id': index_id}, {'$set': index_news}, upsert=True)
+
+        if not update_result.raw_result['updatedExisting']:
+            self.db.index.update_one({'_id': index_id},
+                                               {'$set': {
+                                                   'added': dt.today()
+                                               }})
+            LOG.info("Added index %s.", index_id)
+        elif update_result.modified_count:
+            self.db.index.update_one(
+                {'_id': index_id}, {'$set': {
+                    'updated': dt.today()
+                }})
+            LOG.info("Updated index %s.", index_id)
+        else:
+            LOG.info("No updates for index %s.", index_id)
+
+
+    def add_or_update_index_category(self, index_news: dict):
+        """Adds/updates a index in the database"""
+
+        index_id = index_news['_id']
+        update_result = self.db.index_category.update_one(
+            {'_id': index_id}, {'$set': index_news}, upsert=True)
+
+        if not update_result.raw_result['updatedExisting']:
+            self.db.index_category.update_one({'_id': index_id},
+                                               {'$set': {
+                                                   'added': dt.today()
+                                               }})
+            LOG.info("Added index %s.", index_id)
+        elif update_result.modified_count:
+            self.db.index_category.update_one(
+                {'_id': index_id}, {'$set': {
+                    'updated': dt.today()
+                }})
+            LOG.info("Updated index %s.", index_id)
+        else:
+            LOG.info("No updates for index %s.", index_id)
+
+
     def sample(self, lims_id):
         return self.sample_collection.find_one({'_id': lims_id})
 
@@ -307,3 +355,19 @@ class VougeAdapter(MongoAdapter):
                                                {"category": 1})
         return tag.get('category') if tag else None
 
+    def get_index_category(self, index):
+        """Function get category based on application tag from the application tag collection"""
+        category = self.app_tag_collection.find_one({'name': index},
+                                                    {"category": 1})
+        return category.get('category') if category else None
+
+    def index_aggregate(self, pipe : list):
+        """Function to make a aggregation on the maf analysis colleciton"""
+        return self.index_collection.aggregate(pipe)
+
+
+    def get_all_index_names_per_category(self, categories):
+        pipe = [{'$match': {'category': {'$in': categories}}}, 
+                {'$group': {'_id': {'category': '$category'}, 
+                           'indexes': {'$push': '$name'}}}]
+        return self.index_category_collection.aggregate(pipe)

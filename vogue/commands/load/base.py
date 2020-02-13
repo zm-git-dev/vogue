@@ -14,6 +14,8 @@ from vogue.commands.load.application_tag import application_tags as status_db_co
 from vogue.commands.load.flowcell import flowcell as flowcell_command
 from vogue.commands.load.sample import sample as sample_command
 from vogue.commands.load.genotype import genotype as genotype_command
+from vogue.commands.load.index import indexes as index_command
+from vogue.commands.load.index_category import index_categories as index_category_command
 
 # Get version and doc decorator
 from vogue import __version__
@@ -32,4 +34,6 @@ load.add_command(status_db_command)
 load.add_command(sample_command)
 load.add_command(flowcell_command)
 load.add_command(genotype_command)
+load.add_command(index_command)
+load.add_command(index_category_command)
 

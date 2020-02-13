@@ -706,6 +706,131 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
             'plate_id' : plate_id}
 
 
+def index_data(adapter, index_categroy):
 
+    pipe = [{
+        '$lookup': {
+            'from': 'index_category', 
+            'localField': 'index', 
+            'foreignField': '_id', 
+            'as': 'index_category'}
+        }, {
+        '$match': {
+            'flowcell_target_reads': {'$exists': 'True', '$ne': None}, 
+            'flowcell_total_reads': {'$exists': 'True', '$ne': None}, 
+            'index_target_reads': {'$exists': 'True', '$ne': None}, 
+            'index_category.category': index_categroy}
+        }, {
+        '$project': {
+            'flowcell_id': 1, 
+            'index_total_reads': 1, 
+            'index': 1, 
+            'category': '$index_category.category', 
+            'nr_cat': {'$size': '$index_category.category'}, 
+            'index_target_reads': 1, 
+            'flowcell_total_reads': 1, 
+            'flowcell_target_reads': 1}
+        }, {
+        '$group': {
+            '_id': {'index': '$index'}, 
+            'nr_runs': {'$sum': 1}, 
+            'flowcell_total_reads': {'$push': '$flowcell_total_reads'}, 
+            'flowcell_target_reads': {'$push': '$flowcell_target_reads'}, 
+            'index_target_reads': {'$push': '$index_target_reads'}, 
+            'index_total_reads': {'$push': '$index_total_reads'}, 
+            'flowcell_id': {'$push': '$flowcell_id'}}
+        }]
+
+    aggregate_result = list(adapter.index_aggregate(pipe))
+    average_normalized_peformance = []
+    for index_data in aggregate_result:
+ #       target = [float(x)/(float(y)*1000000) for x, y in zip(index['index_target_reads'], index['flowcell_target_reads'])]
+ #       observed = [float(x)/(float(y)*1000000) for x, y in zip(index['index_total_reads'], index['flowcell_total_reads'])]
+ #       normalized_peformance = [y/x for x, y in zip(observed, target)]
+        index=[]
+        flowcell=[]
+        normalized_peformance=[]
+        for total, target in zip(index_data['flowcell_total_reads'], index_data['flowcell_target_reads']):
+            if total and target:
+                flowcell.append(float(total)/(float(target)*1000000))
+        for total, target in zip(index_data['index_total_reads'], index_data['index_target_reads']):
+            if total and target:
+                index.append(float(total)/(float(target)*1000000))
+        for i, f in zip(index, flowcell):
+            if i and f:
+                normalized_peformance.append(i/f)
+        if index_data['_id']['index']=='pl2 B10 IDT_10nt_NXT_139 (ACAGCCAGGT-AGTACCATGA)':
+            print(normalized_peformance)
+        mean_performance =mean(normalized_peformance)
+        average_normalized_peformance.append({'name':index_data['_id']['index'], 
+                                              'y': mean_performance,
+                                              'url': index_data['_id']['index'].replace(' ','')})
+    return average_normalized_peformance
+
+
+def reagent_label_data(adapter, index):
+    pipe = [{
+        '$match': {
+            'flowcell_target_reads': {'$exists': 'True'}, 
+            'flowcell_total_reads': {'$exists': 'True'}, 
+            'url': {
+                '$eq': index
+            }
+        }
+    }, {
+        '$project': {
+            'flowcell_id': 1, 
+            'index_total_reads': 1, 
+            'index': 1, 
+            'index_target_reads': 1, 
+            'flowcell_total_reads': 1, 
+            'flowcell_target_reads': 1
+        }
+    }, {
+        '$group': {
+            '_id': {
+                'index': '$index'
+            }, 
+            'flowcell_total_reads': {
+                '$push': '$flowcell_total_reads'
+            }, 
+            'flowcell_target_reads': {
+                '$push': '$flowcell_target_reads'
+            }, 
+            'index_target_reads': {
+                '$push': '$index_target_reads'
+            }, 
+            'index_total_reads': {
+                '$push': '$index_total_reads'
+            }, 
+            'flowcell_id': {
+                '$push': '$flowcell_id'
+            }
+        }
+    }
+]
+
+    aggregate_result = list(adapter.index_aggregate(pipe))
+    if not aggregate_result:
+        return []
+    index_data = aggregate_result[0]
+
+ #   target = [float(x)/(float(y)*1000000) for x, y in zip(index_data['index_target_reads'], index_data['flowcell_target_reads'])]
+ #   observed = [float(x)/(float(y)*1000000) for x, y in zip(index_data['index_total_reads'], index_data['flowcell_total_reads'])]
+ #   normalized_peformance = [[z, x/y] for x, y, z in zip(observed, target, index_data['flowcell_id'])]
+
+    normalized_peformance=[]
+    flowcell = []
+    index = []
+    for total, target in zip(index_data['flowcell_total_reads'], index_data['flowcell_target_reads']):
+        if total and target:
+            flowcell.append(float(total)/(float(target)*1000000))
+    for total, target in zip(index_data['index_total_reads'], index_data['index_target_reads']):
+        if total and target:
+            index.append(float(total)/(float(target)*1000000))
+    for ind, fc, z in zip(index, flowcell, index_data['flowcell_id']):
+        if ind and fc:
+            normalized_peformance.append([z, ind/fc])
+    return normalized_peformance
     
    

@@ -49,3 +49,5 @@ MICROSALT = {
                 'estimated_genome_length', 
                 'n50'}
         }
+
+INDEX_CATEGORIES = ['Illumina IDT UD', 'IDT Nextera UDI 10bp', 'IDT DupSeq 10bp Set A']

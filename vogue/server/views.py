@@ -45,6 +45,9 @@ def index():
         return redirect(url_for('server.genotype_time', year=year))
     if request.form.get('page') == 'genotype_plate':
         return redirect(url_for('server.genotype_plate'))
+    if request.form.get('page') == 'reagent_label':
+        name, category = request.form.get('reagent_label', "pl2 A06 IDT_10nt_NXT_123 (CGAGATTAGA-CCGCGATTAG)").split(',')
+        return redirect(url_for('server.reagent_label', reagent_label=name.replace(' ', ''), category=category))
 
     month = int(request.form.get('month', 0))
     sample_series, cathegories =  home_samples(app.adapter, int(year), month)
@@ -353,3 +356,32 @@ def genotype_plate():
         plate_id = plot_data['plate_id'],
         plates = plot_data['plates'])
 
+@blueprint.route('/reagent_labels', methods=['GET', 'POST'])
+def reagent_labels():
+    index_category = request.form.get('index_category', 'SureSelect XT')
+    aggregate_result = index_data(app.adapter, index_category)
+    print(len(aggregate_result))
+    #aggregate_result.sort()
+    return render_template('reagent_labels.html',
+        header = 'Overall performance per index',
+        page_id = 'indexes',
+        index_category = index_category,
+        index_categories = INDEX_CATEGORIES,
+        results = aggregate_result,
+        version = __version__
+        )
+
+
+@blueprint.route('/reagent_label/<reagent_label>', methods=['GET', 'POST'])
+def reagent_label(reagent_label):
+    print(reagent_label)
+    aggregate_result = reagent_label_data(app.adapter, reagent_label)
+    index_categories = list(app.adapter.get_all_index_names_per_category(INDEX_CATEGORIES))
+    return render_template('reagent_label.html',
+        header = reagent_label,#'Performance per index and flowcell',
+        page_id = 'reagent_label',
+        reagent_label = reagent_label,
+        index_categories = index_categories,
+        results = aggregate_result,
+        version = __version__
+        )
