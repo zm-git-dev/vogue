@@ -319,16 +319,13 @@ def genotype_plate():
 
 @blueprint.route('/reagent_labels/<index_category_url>', methods=['GET', 'POST'])
 def reagent_labels(index_category_url):
-    print(index_category_url)
     index_category=index_category_url.replace('_',' ')
-    aggregate_result = index_data(app.adapter, index_category)
-    #aggregate_result.sort()
+    aggregate_result = reagent_category_data(app.adapter, index_category)
     return render_template('reagent_labels.html',
         header = 'Overall performance per index',
         page_id = 'reagent_labels',
         nr_indexes = len(aggregate_result),
         index_category = index_category,
-        index_category_url = index_category_url,
         index_categories = INDEX_CATEGORIES,
         year_of_interest = THIS_YEAR,
         results = aggregate_result,
@@ -343,7 +340,6 @@ def reagent_label(index_category, reagent_label):
     return render_template('reagent_label.html',
         header = 'Normalized index performance per flowcell', 
         index_category = index_category.replace('_', ' '),
-        index_category_url = index_category,
         page_id = 'reagent_label',
         year_of_interest = THIS_YEAR,
         reagent_label = reagent_label,

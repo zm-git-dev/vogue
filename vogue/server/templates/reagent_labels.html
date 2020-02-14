@@ -80,7 +80,7 @@
     tooltip: {
         style: {pointerEvents: 'all'},
         useHTML: true,
-        pointFormat: "Index performance: <b>{point.y:.1f}</b><br>Average from <b>{point.nr_runs}</b> runs. <br><a href=http://localhost:5000/reagent_label/{{index_category_url}}/{point.url}>{point.url}</a>"
+        pointFormat: "Index performance: <b>{point.y:.1f}</b><br>Average from <b>{point.nr_runs}</b> runs. <br><a href=http://localhost:5000/reagent_label/{{index_category.replace(' ','_')}}/{point.url}>{point.url}</a>"
     },
     series: [{
         name: 'Population',

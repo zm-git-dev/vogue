@@ -660,4 +660,122 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
             'y_labels': y_labels, 
             'plates': plates, 
             'plate_id' : plate_id}
-            
+
+
+def reagent_category_data(adapter, index_categroy):
+
+    pipe = [{
+        '$lookup': {
+            'from': 'index_category', 
+            'localField': 'index', 
+            'foreignField': '_id', 
+            'as': 'index_category'}
+        }, {
+        '$match': {
+            'flowcell_target_reads': {'$exists': 'True', '$ne': None}, 
+            'flowcell_total_reads': {'$exists': 'True', '$ne': None}, 
+            'index_target_reads': {'$exists': 'True', '$ne': None}, 
+            'index_category.category': index_categroy}
+        }, {
+        '$project': {
+            'flowcell_id': 1, 
+            'index_total_reads': 1, 
+            'index': 1, 
+            'category': '$index_category.category', 
+            'nr_cat': {'$size': '$index_category.category'}, 
+            'index_target_reads': 1, 
+            'flowcell_total_reads': 1, 
+            'flowcell_target_reads': 1}
+        }, {
+        '$group': {
+            '_id': {'index': '$index'}, 
+            'nr_runs': {'$sum': 1}, 
+            'flowcell_total_reads': {'$push': '$flowcell_total_reads'}, 
+            'flowcell_target_reads': {'$push': '$flowcell_target_reads'}, 
+            'index_target_reads': {'$push': '$index_target_reads'}, 
+            'index_total_reads': {'$push': '$index_total_reads'}, 
+            'flowcell_id': {'$push': '$flowcell_id'}}
+        }]
+
+    aggregate_result = list(adapter.index_aggregate(pipe))
+    average_normalized_peformance = []
+
+    for data in aggregate_result:
+        index = []
+        flowcell = []
+        normalized_peformance = []
+        for total, target in zip(data['flowcell_total_reads'], data['flowcell_target_reads']):
+            if total and target:
+                flowcell.append(float(total)/(float(target)*1000000))
+        for total, target in zip(data['index_total_reads'], data['index_target_reads']):
+            if total and target:
+                index.append(float(total)/(float(target)*1000000))
+        for i, f in zip(index, flowcell):
+            if i and f:
+                normalized_peformance.append(i/f)
+        mean_performance = mean(normalized_peformance)
+        average_normalized_peformance.append({'name': data['_id']['index'], 
+                                              'y': mean_performance,
+                                              'nr_runs': len(normalized_peformance),
+                                              'url': data['_id']['index'].replace(' ','')})
+    return average_normalized_peformance
+
+
+def reagent_label_data(adapter, index):
+    pipe = [{
+        '$match': {
+            'flowcell_target_reads': {'$exists': 'True'}, 
+            'flowcell_total_reads': {'$exists': 'True'}, 
+            'url': {
+                '$eq': index
+            }
+        }
+    }, {
+        '$project': {
+            'flowcell_id': 1, 
+            'index_total_reads': 1, 
+            'index': 1, 
+            'index_target_reads': 1, 
+            'flowcell_total_reads': 1, 
+            'flowcell_target_reads': 1
+        }
+    }, {
+        '$group': {
+            '_id': {
+                'index': '$index'
+            }, 
+            'flowcell_total_reads': {
+                '$push': '$flowcell_total_reads'
+            }, 
+            'flowcell_target_reads': {
+                '$push': '$flowcell_target_reads'
+            }, 
+            'index_target_reads': {
+                '$push': '$index_target_reads'
+            }, 
+            'index_total_reads': {
+                '$push': '$index_total_reads'
+            }, 
+            'flowcell_id': {
+                '$push': '$flowcell_id'
+            }
+        }}]
+
+    aggregate_result = list(adapter.index_aggregate(pipe))
+    if not aggregate_result:
+        return []
+    data = aggregate_result[0]
+    normalized_peformance=[]
+    flowcell = []
+    index = []
+    for total, target in zip(data['flowcell_total_reads'], data['flowcell_target_reads']):
+        if total and target:
+            flowcell.append(float(total)/(float(target)*1000000))
+    for total, target in zip(data['index_total_reads'], data['index_target_reads']):
+        if total and target:
+            index.append(float(total)/(float(target)*1000000))
+    for ind, fc, z in zip(index, flowcell, data['flowcell_id']):
+        if ind and fc:
+            normalized_peformance.append([z, ind/fc])
+    return normalized_peformance
+    
