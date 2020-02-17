@@ -1,0 +1,28 @@
+  
+
+**How to prepare for test**:
+- [ ] install on stage XXX: `bash servers/resources/XXX.scilifelab.se/update-vogue-stage.sh [BRANCHNAME]`
+- [ ] activate stage: `us`
+
+**Frontend**
+- [ ] The view self explanatory
+- [ ] The data is correctly displayed in the plot/plots
+
+**Backend**
+- [ ] Data is correctly loaded into the trending database.
+
+
+**How to test**:
+- [ ] run following command: `cg get coffee`
+
+**Expected test outcome**:
+- [ ] `cg` should be providing you with a progress report of your coffee making. The coffee machine should not be leaking.
+- [ ] Take a screenshot and attach or copy/paste the output.
+
+**Review:**
+- [ ] code approved by
+- [ ] tests executed by
+- [ ] "Merge and deploy" approved by
+Thanks for filling in who performed the code review and the test!
+
+This is patch|minor|major **version bump** because ...
