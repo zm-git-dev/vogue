@@ -5,21 +5,18 @@ Does any of the following questions apply to this PR:
 - [ ] Is the data is correctly displayed in the plot/plots? 
 - [ ] Is the data correctly loaded into the trending database?
 
-
 **How to prepare for test**:
-
-- [ ] install on stage: `bash servers/resources/XXX.scilifelab.se/update-vogue-stage.sh [BRANCHNAME]`
-- [ ] activate stage: `us`
+- [ ] ssh to clinical-db
+- [ ] install on stage of clinical-db:
+`bash servers/resources/clinical-db.sclifelab.se/update-cgweb-stage.sh [THIS-BRANCH-NAME]`
 
 **How to test**:
-- [ ] run following command: `cg get coffee`
+- [ ] login on https://clinical-stage.scilifelab.se/
+- [ ] click on ...
 
 **Expected test outcome**:
-- [ ] `cg` should be providing you with a progress report of your coffee making. The coffee machine should not be leaking.
+- [ ] check that ...
 - [ ] Take a screenshot and attach or copy/paste the output.
-
-
-
 
 **Review:**
 - [ ] code approved by
@@ -27,4 +24,8 @@ Does any of the following questions apply to this PR:
 - [ ] "Merge and deploy" approved by
 Thanks for filling in who performed the code review and the test!
 
-This is patch|minor|major **version bump** because ...
+
+This [version](https://semver.org/) is a:
+- [ ] **MAJOR** - when you make incompatible API changes
+- [ ] **MINOR** - when you add functionality in a backwards compatible manner
+- [ ] **PATCH** - when you make backwards compatible bug fixes or documentation/instructions
