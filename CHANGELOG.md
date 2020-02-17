@@ -2,7 +2,7 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
-## [x.x.x]
+## [1.0.0]
 First initial release of Vogue according to main am doc 1980:1 and validation am doc 2035:2 
 
 ### Added
