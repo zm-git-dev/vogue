@@ -69,8 +69,13 @@ MASTER_STEPS_UDFS = {
             'size_udf': 'Size (bp)',
             'apptags': ['EXO', 'EFT', 'PAN', 'PAL']}
     },
-    'reagent_labels': ['Bcl Conversion & Demultiplexing (Nova Seq)']
-}
+    'reagent_labels': {
+        'steps': {'bcl': ['Bcl Conversion & Demultiplexing (Nova Seq)'],
+                   'define': ['Define Run Format and Calculate Volumes (Nova Seq)']},
+        'udfs': {'reads' : '# Reads',
+                  'target_reads': 'Reads to sequence (M)'},
+        'exclue_tags': ['EXO','RML','MWX','MET', 'EXT']
+}}
 
 
 INSTRUMENTS ={'D00410':'Sigourney', 

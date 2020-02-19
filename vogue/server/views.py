@@ -336,7 +336,7 @@ def reagent_labels(index_category_url):
 @blueprint.route('/reagent_label/<index_category>/<reagent_label>', methods=['GET', 'POST'])
 def reagent_label(index_category, reagent_label):
     aggregate_result = reagent_label_data(app.adapter, reagent_label)
-    index_categories = list(app.adapter.get_all_index_names_per_category(INDEX_CATEGORIES))
+    index_categories = list(app.adapter.get_all_reagent_label_names_per_category(INDEX_CATEGORIES))
     return render_template('reagent_label.html',
         header = 'Normalized index performance per flowcell', 
         index_category = index_category.replace('_', ' '),

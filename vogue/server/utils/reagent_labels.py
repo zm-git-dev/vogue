@@ -6,7 +6,7 @@ def reagent_category_data(adapter, index_categroy: str) -> dict:
     
     pipe = [{
         '$lookup': {
-            'from': 'index_category', 
+            'from': 'reagent_label_category', 
             'localField': 'index', 
             'foreignField': '_id', 
             'as': 'index_category'}
@@ -15,7 +15,7 @@ def reagent_category_data(adapter, index_categroy: str) -> dict:
             'index_category.category': index_categroy}
         }] + _normalized_performance_pipe()
 
-    aggregate_result = list(adapter.index_aggregate(pipe))
+    aggregate_result = list(adapter.reagent_label_aggregate(pipe))
 
     average_normalized_peformance = []
 
@@ -37,7 +37,7 @@ def reagent_label_data(adapter, index: str) -> list:
             'url': {'$eq': index}}
         }] + _normalized_performance_pipe()
 
-    aggregate_result = list(adapter.index_aggregate(pipe))
+    aggregate_result = list(adapter.reagent_label_aggregate(pipe))
 
     if not aggregate_result:
         return []

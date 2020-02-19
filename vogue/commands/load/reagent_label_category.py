@@ -1,6 +1,6 @@
 import logging
 import click
-from vogue.load.index_category import load_all
+from vogue.load.reagent_label_category import load_all
 from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
 
@@ -8,13 +8,13 @@ from vogue.constants.constants import RUN_TYPES
 
 LOG = logging.getLogger(__name__)
 
-@click.command("index_categories", short_help = "Load indexes into db.")
-@click.option('-a', '--all-indexes', is_flag = True, help = 'Loads all index cathegories from lims.')
+@click.command("reagent_label_categories", short_help = "Load reagent_labels into db.")
+@click.option('-a', '--all-reagent_labels', is_flag = True, help = 'Loads all reagent_label cathegories from lims.')
 
 
 @with_appcontext
-def index_categories(all_indexes):
-    """Read and load index categories from lims"""
+def reagent_label_categories(all_reagent_labels):
+    """Read and load reagent_label categories from lims"""
 
     if not current_app.lims:
         LOG.warning("Lims connection failed.")
