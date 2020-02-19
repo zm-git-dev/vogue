@@ -21,18 +21,18 @@ def get_define_step(lane):
      flowcell_target_reads: the summe of the udf 'Reads to sequence (M)' from all outarts in the step"""
 
     process = lane.parent_process
-    while process.type.name != 'Define Run Format and Calculate Volumes (Nova Seq)':
+    while process.type.name != 'Define Run Format and Calculate Volumes (Nova Seq)': ##########!!!!!!!!!!!
         art = process.all_inputs()[0]
         process = art.parent_process
 
     define_step_outputs = {}
     flowcell_target_reads = 0
     for art in process.all_outputs():
-        flowcell_target_reads += float(art.udf.get('Reads to sequence (M)', 0))
+        flowcell_target_reads += float(art.udf.get('Reads to sequence (M)', 0))  ##########!!!!!!!!!!!
         if len(art.samples) !=1: # ignore pools
             continue
         define_step_outputs[art.samples[0].id] = art
-    return define_step_outputs, process, flowcell_target_reads
+    return define_step_outputs, process, flowcell_target_reads*1000000
 
 
 def index_data(bcl_step):
@@ -56,7 +56,7 @@ def index_data(bcl_step):
         if len(art.samples) != 1:
             continue
 
-        index_reads = art.udf.get('# Reads')
+        index_reads = art.udf.get('# Reads') ############!!!!!!!!!!
 
         if index_reads is None or art.qc_flag == 'FAILED' or index_reads<1000:
             continue
@@ -66,7 +66,7 @@ def index_data(bcl_step):
         sample = art.samples[0]
         application_tag = sample.udf.get('Sequencing Analysis')
 
-        if application_tag[0:3] in ['EXO','RML','MWX','MET', 'EXT']:
+        if application_tag[0:3] in ['EXO','RML','MWX','MET', 'EXT']: ############!!!!!!!!!!
             continue
 
         if not lanes:
@@ -82,7 +82,8 @@ def index_data(bcl_step):
 
         define_step = lanes[lane.id]['define_step']
         lane_input = lanes[lane.id]['lane_input'][sample.id]
-        reads_to_sequence = lane_input.udf.get('Reads to sequence (M)')
+        reads_to_sequence = lane_input.udf.get('Reads to sequence (M)') ############!!!!!!!!!!
+        reads_to_sequence = int(reads_to_sequence)*1000000 if reads_to_sequence.isnumeric() else None
         index = lane_input.reagent_labels[0]
         container, lane = lane.location
 

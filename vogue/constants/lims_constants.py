@@ -68,7 +68,8 @@ MASTER_STEPS_UDFS = {
             'size_step': ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'],
             'size_udf': 'Size (bp)',
             'apptags': ['EXO', 'EFT', 'PAN', 'PAL']}
-    }
+    },
+    'reagent_labels': ['Bcl Conversion & Demultiplexing (Nova Seq)']
 }
 
 
