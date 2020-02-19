@@ -21,5 +21,5 @@ def load_sample(adapter, genotype_sample_string):
     if '_id' not in mongo_sample:
         LOG.error('Not a propper mongo document. Missing _id')
         return 
-        
-    adapter.add_or_update_genotype_analysis(mongo_sample)
+    
+    adapter.add_or_update_document(mongo_sample, adapter.genotype_analysis_collection)

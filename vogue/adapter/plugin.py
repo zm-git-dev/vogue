@@ -5,7 +5,6 @@ from datetime import datetime as dt
 LOG = logging.getLogger(__name__)
 
 
-
 def check_dates(analysis_result, current_document):
     """Function to pop analysysis results from tne new analysis if the results are older than 
     the current results in the database"""
@@ -21,9 +20,8 @@ def check_dates(analysis_result, current_document):
     return analysis_result
 
 
-
-
 class VougeAdapter(MongoAdapter):
+
     def setup(self, db_name: str):
         """Setup connection to a database"""
 
@@ -41,123 +39,29 @@ class VougeAdapter(MongoAdapter):
 
         LOG.info("Use database %s.", db_name)
 
+    def add_or_update_document(self, document_news: dict, collection):
+        """Adds/updates a document in the database"""
 
+        document_id = document_news['_id']
 
-    def add_or_update_sample(self, sample_news: dict):
-        """Adds/updates a sample in the database"""
-
-        lims_id = sample_news['_id']
-        update_result = self.db.sample.update_one({'_id': lims_id},
-                                                  {'$set': sample_news},
-                                                  upsert=True)
-
-        if not update_result.raw_result['updatedExisting']:
-            self.db.sample.update_one({'_id': lims_id},
-                                      {'$set': {
-                                          'added': dt.today()
-                                      }})
-            LOG.info("Added sample %s.", lims_id)
-        elif update_result.modified_count:
-            self.db.sample.update_one({'_id': lims_id},
-                                      {'$set': {
-                                          'updated': dt.today()
-                                      }})
-            LOG.info("Updated sample %s.", lims_id)
-        else:
-            LOG.info("No updates for sample %s.", lims_id)
-
-    def add_or_update_genotype_analysis(self, sample_news: dict):
-        """Adds/updates a sample in the database"""
-
-        lims_id = sample_news['_id']
-        update_result = self.db.genotype_analysis.update_one({'_id': lims_id},
-                                                  {'$set': sample_news},
-                                                  upsert=True)
+        update_result = collection.update_one({'_id': document_id}, 
+                                                         {'$set': document_news}, 
+                                                         upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
-            self.db.genotype_analysis.update_one({'_id': lims_id},
-                                      {'$set': {
-                                          'added': dt.today()
-                                      }})
-            LOG.info("Added sample %s.", lims_id)
-        elif update_result.modified_count:
-            self.db.genotype_analysis.update_one({'_id': lims_id},
-                                      {'$set': {
-                                          'updated': dt.today()
-                                      }})
-            LOG.info("Updated sample %s.", lims_id)
-        else:
-            LOG.info("No updates for sample %s.", lims_id)
-
-    def add_or_update_run(self, run_news: dict):
-        """Adds/updates a flowcell in the database"""
-        lims_id = run_news['_id']
-        update_result = self.db.flowcell.update_one({'_id': lims_id},
-                                                    {'$set': run_news},
-                                                    upsert=True)
-
-        if not update_result.raw_result['updatedExisting']:
-            self.db.flowcell.update_one({'_id': lims_id},
-                                        {'$set': {
-                                            'added': dt.today()
-                                        }})
-            LOG.info("Added flowcell %s.", lims_id)
-        elif update_result.modified_count:
-            self.db.flowcell.update_one({'_id': lims_id},
-                                        {'$set': {
-                                            'updated': dt.today()
-                                        }})
-            LOG.info("Updated flowcell %s.", lims_id)
-        else:
-            LOG.info("No updates for flowcell %s.", lims_id)
-
-    def add_or_update_application_tag(self, application_tag_news: dict):
-        """Adds/updates a application_tag in the database"""
-
-        tag = application_tag_news['_id']
-        update_result = self.db.application_tag.update_one(
-            {'_id': tag}, {'$set': application_tag_news}, upsert=True)
-
-        if not update_result.raw_result['updatedExisting']:
-            self.db.application_tag.update_one({'_id': tag},
+            collection.update_one({'_id': document_id},
                                                {'$set': {
                                                    'added': dt.today()
                                                }})
-            LOG.info("Added application_tag %s.", tag)
+            LOG.info("Added document %s.", document_id)
         elif update_result.modified_count:
-            self.db.application_tag.update_one(
-                {'_id': tag}, {'$set': {
+            collection.update_one(
+                {'_id': document_id}, {'$set': {
                     'updated': dt.today()
                 }})
-            LOG.info("Updated application_tag %s.", tag)
+            LOG.info("Updated document %s.", document_id)
         else:
-            LOG.info("No updates for application_tag %s.", tag)
-
-
-    def add_or_update_sample_analysis(self, analysis_result: dict):
-        """Functionality to add or update sample_analysis collection"""
-        lims_id = analysis_result['_id']
-        current_document = self.db.sample_analysis.find_one({'_id': lims_id})
-        analysis_result = check_dates(analysis_result, current_document)
-
-        update_result = self.db.sample_analysis.update_one({'_id': lims_id},
-                                                  {'$set': analysis_result},
-                                                  upsert=True)
-
-        if not update_result.raw_result['updatedExisting']:
-            self.db.sample_analysis.update_one({'_id': lims_id},
-                                      {'$set': {
-                                          'added': dt.today()
-                                      }})
-            LOG.info("Added sample %s.", lims_id)
-        elif update_result.modified_count:
-            self.db.sample_analysis.update_one({'_id': lims_id},
-                                      {'$set': {
-                                          'updated': dt.today()
-                                      }})
-            LOG.info("Updated sample %s.", lims_id)
-        else:
-            LOG.info("No updates for sample %s.", lims_id)
+            LOG.info("No updates for document %s.", document_id)
 
 
     def add_or_update_bioinfo_raw(self, analysis_result: dict):
@@ -245,6 +149,7 @@ class VougeAdapter(MongoAdapter):
         else:
             LOG.info("No updates for sample %s.", lims_id)
 
+
     def sample(self, lims_id):
         return self.sample_collection.find_one({'_id': lims_id})
 
@@ -306,4 +211,3 @@ class VougeAdapter(MongoAdapter):
         tag = self.app_tag_collection.find_one({'_id': app_tag},
                                                {"category": 1})
         return tag.get('category') if tag else None
-
