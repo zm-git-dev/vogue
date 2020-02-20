@@ -163,6 +163,20 @@ class MockSample():
     def __repr__(self):
         return f"Sample:id={self.id},udf={self.udf}"
 
+class MockReagentLabel():
+    def __init__(self, name='IDT_10nt_NXT_109', sequence='TAGGAAGCGG-CCTGGATTGG', 
+                 category='Illumina IDT'):
+        self.name = name
+        self.sequence = sequence
+        self.category = category
+
+    def __repr__(self):
+        return f"ReagentLabel:name={self.name},category={self.category}"
+
+
+@pytest.fixture
+def lims_reagent_label():
+    return MockReagentLabel()
 
 @pytest.fixture
 def lims():
