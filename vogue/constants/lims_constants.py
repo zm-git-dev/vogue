@@ -71,7 +71,8 @@ MASTER_STEPS_UDFS = {
     },
     'reagent_labels': {
         'steps': {'bcl': ['Bcl Conversion & Demultiplexing (Nova Seq)'],
-                   'define': ['Define Run Format and Calculate Volumes (Nova Seq)']},
+                  'define': ['Define Run Format and Calculate Volumes (Nova Seq)'],
+                  'pre_bcl': ['STANDARD Prepare for Sequencing (Nova Seq)']},
         'udfs': {'reads' : '# Reads',
                   'target_reads': 'Reads to sequence (M)'},
         'exclue_tags': ['RM','EX','PA']  

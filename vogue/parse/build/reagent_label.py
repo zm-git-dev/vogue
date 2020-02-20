@@ -28,7 +28,7 @@ def get_define_step_data(bcl_step):
     lanes = {}
     for lane in bcl_step.all_inputs(unique=True):
         process = lane.parent_process
-        
+
         while process.type.name not in MASTER_STEPS_UDFS['reagent_labels']['steps']['define']:
             art = process.all_inputs()[0]
             process = art.parent_process
@@ -80,7 +80,8 @@ def reagent_label_data(lims, bcl_step):
 
 
     for inp, outp in bcl_step.input_output_maps:
-        if inp['parent-process'].type.name != 'STANDARD Prepare for Sequencing (Nova Seq)':
+        pre_bcl_steps = MASTER_STEPS_UDFS['reagent_labels']['steps']['pre_bcl']
+        if inp['parent-process'].type.name not in pre_bcl_steps:
             continue
         
         if outp['output-generation-type'] != 'PerReagentLabel':
