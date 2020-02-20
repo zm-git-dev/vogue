@@ -4,6 +4,9 @@ This change log will document the notable changes to this project in this file a
 
 ## [x.x.x]
 
+### Changed
+- Squashed the load document functions into one general function
+
 ### Added
 - code owners
 - PR template
