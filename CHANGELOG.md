@@ -3,6 +3,15 @@
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
 ## [x.x.x]
+
+### Changed
+- Squashed the load document functions into one general function
+
+### Added
+- code owners
+- PR template
+
+## [1.0.0]
 First initial release of Vogue according to main am doc 1980:1 and validation am doc 2035:2 
 
 ### Added
@@ -22,3 +31,6 @@ First initial release of Vogue according to main am doc 1980:1 and validation am
 - Microbial ST over time
 - Genotype Sample status
 - Genotype Plates
+
+### Changed
+- environment variables for mongo
