@@ -17,8 +17,7 @@ def load_one(adapter, run):
         LOG.warning("Could not get instrument name")
         return
     mongo_run = build_run(run=run, instrument = instrument_name, date=date)
-    adapter.add_or_update_run(mongo_run)
-
+    adapter.add_or_update_document(mongo_run, adapter.flowcell_collection)
 
 def load_all(adapter, lims):
     """Function to load all lims flowcell into the database"""

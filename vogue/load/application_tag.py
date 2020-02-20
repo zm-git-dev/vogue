@@ -16,7 +16,7 @@ def load_aplication_tags(adapter, json_list):
     for application_tag in json_list:
         try:
             mongo_application_tag = build_application_tag(application_tag)
-            adapter.add_or_update_application_tag(mongo_application_tag)
+            adapter.add_or_update_document(mongo_application_tag, adapter.app_tag_collection)
         except MissingApplicationTag:
             LOG.warning('ApplicationTag missing in JSON list')
             

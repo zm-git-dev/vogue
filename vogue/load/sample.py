@@ -11,7 +11,7 @@ def load_one(adapter, lims_sample=None, lims=None):
         return
 
     mongo_sample = build_sample(lims_sample, lims, adapter)
-    adapter.add_or_update_sample(mongo_sample)
+    adapter.add_or_update_document(mongo_sample, adapter.sample_collection)
 
 
 def load_all(adapter, lims, start_sample = None):
