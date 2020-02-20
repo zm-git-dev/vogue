@@ -26,9 +26,9 @@ def get_define_step_data(bcl_step):
 
     LOG.info('Searching Define Steps')
     lanes = {}
-
-    for lane in bcl_step.all_inputs():
+    for lane in bcl_step.all_inputs(unique=True):
         process = lane.parent_process
+        
         while process.type.name not in MASTER_STEPS_UDFS['reagent_labels']['steps']['define']:
             art = process.all_inputs()[0]
             process = art.parent_process
@@ -37,15 +37,30 @@ def get_define_step_data(bcl_step):
         flowcell_target_reads = 0
         
         for art in process.all_outputs():
-            udf = MASTER_STEPS_UDFS['reagent_labels']['udfs']['target_reads']
-            flowcell_target_reads += float(art.udf.get(udf, 0)) 
-            if len(art.samples) !=1: # ignore pools
+            if art.type != 'Analyte':
                 continue
-            define_step_outputs[art.samples[0].id] = art
+
+            udf = MASTER_STEPS_UDFS['reagent_labels']['udfs']['target_reads']
+            flowcell_target_reads += float(art.udf.get(udf, 0))
+
+            if len(art.samples) != 1: # ignore pools
+                continue
+            sample_id = art.samples[0].id
+            define_step_outputs[sample_id] = art
+            
+            
         lanes[lane.id] = {'lane_input': define_step_outputs, 'define_step': process}
-    LOG.info('Done!')
+    LOG.info('Found Define Steps: %s' % ', '.join(lanes.keys()))
     return lanes, flowcell_target_reads*1000000
 
+def _get_target_reads(artifact):
+
+    udf = MASTER_STEPS_UDFS['reagent_labels']['udfs']['target_reads']
+    index_target_reads = artifact.udf.get(udf)
+    if index_target_reads and index_target_reads.isnumeric():
+        return int(index_target_reads)*1000000 
+    else:
+        return None
 
 def reagent_label_data(lims, bcl_step):
     """This function takes as input a bcl conversion and demultiplexing step. From that step it goes
@@ -63,10 +78,16 @@ def reagent_label_data(lims, bcl_step):
     indexes = {}
     flowcell_total_reads = 0
 
-    for art in bcl_step.all_outputs(unique=True):
 
-        if len(art.samples) != 1:
+    for inp, outp in bcl_step.input_output_maps:
+        if inp['parent-process'].type.name != 'STANDARD Prepare for Sequencing (Nova Seq)':
             continue
+        
+        if outp['output-generation-type'] != 'PerReagentLabel':
+            continue
+
+        lane = inp['uri']
+        art = outp['uri']
 
         index_reads = art.udf.get(MASTER_STEPS_UDFS['reagent_labels']['udfs']['reads'])
 
@@ -78,13 +99,12 @@ def reagent_label_data(lims, bcl_step):
         sample = art.samples[0]
         application_tag = sample.udf.get('Sequencing Analysis')
 
-        if application_tag[0:3] in MASTER_STEPS_UDFS['reagent_labels']['exclue_tags']:
+        if application_tag[0:2] in MASTER_STEPS_UDFS['reagent_labels']['exclue_tags']:
             continue
         
         if not lanes:
             lanes, flowcell_target_reads = get_define_step_data(bcl_step)
-
-        lane = art.input_artifact_list()[0]
+        
         if not sample.id in lanes[lane.id]['lane_input']:
             LOG.info('This sample whas put as a pool into the define step: ' + sample.id + ' ' + application_tag)
             continue
@@ -94,8 +114,8 @@ def reagent_label_data(lims, bcl_step):
         container, lane_nr = lane.location
         if index not in indexes:
             define_step = lanes[lane.id]['define_step']
-            index_target_reads = lanes[lane.id]['lane_input'][sample.id].udf.get(MASTER_STEPS_UDFS['reagent_labels']['udfs']['target_reads'])
-            index_target_reads = int(index_target_reads)*1000000 if index_target_reads.isnumeric() else None
+            sample
+            index_target_reads = _get_target_reads(lanes[lane.id]['lane_input'][sample.id])
             indexes[index] = {
                 '_id': '_'.join([index, container.name]),
                 'url': index.replace(' ',''),

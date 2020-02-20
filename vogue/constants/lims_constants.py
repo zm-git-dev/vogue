@@ -74,7 +74,8 @@ MASTER_STEPS_UDFS = {
                    'define': ['Define Run Format and Calculate Volumes (Nova Seq)']},
         'udfs': {'reads' : '# Reads',
                   'target_reads': 'Reads to sequence (M)'},
-        'exclue_tags': ['EXO','RML','MWX','MET', 'EXT']
+        'exclue_tags': ['RM','EX','PA']  
+        ## EX and PA should be included later. Fetching fraction from Poos Samples Twist 1
 }}
 
 
