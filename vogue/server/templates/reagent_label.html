@@ -17,7 +17,7 @@
                                                 <option value="">Select reagent label...</option>
                                                 {% for category in index_categories %}
                                                     <optgroup label="{{ category['_id']['category']}}" >
-                                                    {% for name in category['indexes'] %}
+                                                    {% for name in category['reagent_labels'] %}
                                                     <option value="{{name}},{{category['_id']['category']}}" {{ 'selected' if name.replace(' ', '') == reagent_label }}>
                                                     {{ name}}
                                                     </option>
