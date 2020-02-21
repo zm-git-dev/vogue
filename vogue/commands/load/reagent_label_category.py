@@ -9,16 +9,17 @@ from vogue.constants.constants import RUN_TYPES
 LOG = logging.getLogger(__name__)
 
 @click.command("reagent_label_categories", short_help = "Load reagent_labels into db.")
-@click.option('-a', '--all-reagent_labels', is_flag = True, help = 'Loads all reagent_label cathegories from lims.')
+@click.option('-c', '--categories',multiple=True,  type=str,
+              help = 'Loads all reagent_label cathegories from lims.')
+
 
 
 @with_appcontext
-def reagent_label_categories(all_reagent_labels):
+def reagent_label_categories(categories:list = None):
     """Read and load reagent_label categories from lims"""
 
     if not current_app.lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
-
     lims = current_app.lims
-    load_all(current_app.adapter, lims=lims)
+    load_all(adapter=current_app.adapter, lims=lims, categories=categories)

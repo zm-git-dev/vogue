@@ -25,4 +25,4 @@ def load_recent(adapter, lims, the_date):
     processes = lims.get_processes(type=REAGENT_LABEL_STEPS, last_modified=the_date)
     LOG.info('Loading data from %s processes' % str(len(processes)))
     for step in processes:
-        load_one(adapter, step)
+        load_one(adapter, step, lims)

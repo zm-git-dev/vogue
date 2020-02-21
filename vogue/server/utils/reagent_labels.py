@@ -68,10 +68,10 @@ def _normalized_performance_pipe() -> list:
 
     return [{
         '$match': {
-            'flowcell_target_reads': {'$exists': 'True', '$ne': None}, 
-            'flowcell_total_reads': {'$exists': 'True', '$ne': None}, 
-            'index_target_reads': {'$exists': 'True', '$ne': None}, 
-            'index_total_reads':{'$exists': 'True', '$ne': None}}
+            'flowcell_target_reads': {'$exists': 'True', '$ne': None, '$ne': 0}, 
+            'flowcell_total_reads': {'$exists': 'True', '$ne': None, '$ne': 0}, 
+            'index_target_reads': {'$exists': 'True', '$ne': None, '$ne': 0}, 
+            'index_total_reads':{'$exists': 'True', '$ne': None, '$gt': 1000}}
         },{
         '$project': {
             'flowcell_id': 1, 

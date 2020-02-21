@@ -224,9 +224,16 @@ class VougeAdapter(MongoAdapter):
         """Function to make a aggregation on the maf analysis colleciton"""
         return self.reagent_label_collection.aggregate(pipe)
 
-
-    def get_all_reagent_label_names_per_category(self, categories):
-        pipe = [{'$match': {'category': {'$in': categories}}}, 
-                {'$group': {'_id': {'category': '$category'}, 
-                           'reagent_labels': {'$push': '$name'}}}]
+    def get_all_reagent_label_names_grouped_by_category(self):
+        pipe = [{'$group': {'_id': {'category': '$category'}, 
+                    'reagent_labels': {'$push': '$name'}}}]
         return self.reagent_label_category_collection.aggregate(pipe)
+
+    def get_reagent_label_categories(self):
+        pipe = [{'$project': {'category': 1}
+                 }, {
+                 '$group': {'_id': None, 
+                            'categories': {'$addToSet': '$category'}}
+                 }]
+        reagent_label_categories = self.reagent_label_category_collection.aggregate(pipe)
+        return list(reagent_label_categories)[0]['categories']
