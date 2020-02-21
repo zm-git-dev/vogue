@@ -47,9 +47,9 @@
         text:'<a href="{{ url_for('server.reagent_labels', index_category_url=index_category.replace(' ', '_')) }}">{{index_category}}</a>: {{reagent_label}}'
     },
     subtitle: {
-        text: 'Normalized index performance = (index_total_reads/flowcell_total_reads)/(index_target_reads/flowcell_target_reads)'
-    },
+        text: 'Normalized index performance = (index_total_reads/index_target_reads)/(flowcell_total_reads/flowcell_target_reads).<br> Not showing data from runs with flowcell performance < {{flowcell_performance_treshold}}'},
     xAxis: {
+        title: {text: 'Flowcells'},
         type: 'category',
         labels: {
             rotation: -70,

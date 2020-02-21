@@ -320,8 +320,10 @@ def genotype_plate():
 @blueprint.route('/reagent_labels/<index_category_url>', methods=['GET', 'POST'])
 def reagent_labels(index_category_url):
     index_category=index_category_url.replace('_',' ')
-    aggregate_result = reagent_category_data(app.adapter, index_category)
+    flowcell_performance_treshold = 0.3
+    aggregate_result = reagent_category_data(app.adapter, index_category, flowcell_performance_treshold)
     return render_template('reagent_labels.html',
+        flowcell_performance_treshold = flowcell_performance_treshold,
         header = 'Overall performance per index',
         page_id = 'reagent_labels',
         nr_indexes = len(aggregate_result),
@@ -335,9 +337,11 @@ def reagent_labels(index_category_url):
 
 @blueprint.route('/reagent_label/<index_category>/<reagent_label>', methods=['GET', 'POST'])
 def reagent_label(index_category, reagent_label):
-    aggregate_result = reagent_label_data(app.adapter, reagent_label)
+    flowcell_performance_treshold = 0.3
+    aggregate_result = reagent_label_data(app.adapter, reagent_label, flowcell_performance_treshold)
     index_categories = list(app.adapter.get_all_reagent_label_names_grouped_by_category())
     return render_template('reagent_label.html',
+        flowcell_performance_treshold = flowcell_performance_treshold,
         header = 'Normalized index performance per flowcell', 
         index_category = index_category.replace('_', ' '),
         page_id = 'reagent_label',

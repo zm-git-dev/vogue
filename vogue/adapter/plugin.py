@@ -221,15 +221,18 @@ class VougeAdapter(MongoAdapter):
         return category.get('category') if category else None
 
     def reagent_label_aggregate(self, pipe : list):
-        """Function to make a aggregation on the maf analysis colleciton"""
+        """Function to make a aggregation on the reagent_label analysis colleciton"""
         return self.reagent_label_collection.aggregate(pipe)
 
     def get_all_reagent_label_names_grouped_by_category(self):
+        """Function get all reagent label names grouped by category  
+        from the reagent_label_category colleciton"""
         pipe = [{'$group': {'_id': {'category': '$category'}, 
                     'reagent_labels': {'$push': '$name'}}}]
         return self.reagent_label_category_collection.aggregate(pipe)
 
     def get_reagent_label_categories(self):
+        """Function to get all categories from label_category_collection"""
         pipe = [{'$project': {'category': 1}
                  }, {
                  '$group': {'_id': None, 
