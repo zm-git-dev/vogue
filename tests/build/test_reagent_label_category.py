@@ -1,5 +1,4 @@
 from vogue.build.reagent_label_category import build_reagent_label_category
-from datetime import datetime as dt
 
 
 def test_build_reagent_label_category(lims_reagent_label):
