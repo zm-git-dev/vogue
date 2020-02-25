@@ -4,3 +4,4 @@ pytest>=3.7.1
 pytest-cov
 coveralls
 pylint
+werkzeug<1.0.0              # due to breaking changes in 1.0.0
