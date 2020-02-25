@@ -9,3 +9,4 @@ coloredlogs
 mongo_adapter
 multiqc
 lzstring
+werkzeug<1.0.0              # due to breaking changes in 1.0.0
