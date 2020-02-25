@@ -54,7 +54,7 @@ def get_define_step_data(pool):
 
     LOG.info('Done')
     
-    return define_step_outputs, flowcell_target_reads*1000000, process
+    return define_step_outputs, flowcell_target_reads, process
 
 def _get_target_reads(artifact):
 
