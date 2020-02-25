@@ -6,6 +6,7 @@ This change log will document the notable changes to this project in this file a
 
 ### Changed
 - Squashed the load document functions into one general function
+- setting werkzeug<1.0.0 in requirements.txt
 
 ### Added
 - code owners
