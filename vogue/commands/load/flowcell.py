@@ -5,9 +5,6 @@ from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
 
 
-from genologics.lims import Lims
-from genologics.entities import Process
-from genologics.config import BASEURI,USERNAME,PASSWORD
 from vogue.constants.constants import RUN_TYPES
 
 LOG = logging.getLogger(__name__)

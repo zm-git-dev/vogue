@@ -35,7 +35,7 @@ def database(request, pymongo_client):
 
 
 class MockProcess():
-    def __init__(self, date_str='2018-01-01', process_type=None, pid=None, modified=None):
+    def __init__(self, date_str='2018-01-01', process_type=None, pid=None, modified=None, input_output_maps=[]):
         self.date_run = date_str
         self.type = process_type
         self.udf = {}
@@ -43,6 +43,7 @@ class MockProcess():
         self.id = pid
         self.outputs = []
         self.inputs = []
+        self.input_output_maps = input_output_maps
         self.modified = modified
 
     def all_outputs(self):
@@ -62,14 +63,24 @@ class MockProcessType():
     def __repr__(self):
         return f"ProcessType:name={self.name}"
 
+class MockContainer():
+    def __init__(self, name=''):
+        self.name = name
+
+    def __repr__(self):
+        return f"ProcessType:name={self.name}"
+
 
 class MockArtifact():
-    def __init__(self, parent_process=None, samples=None, id=None):
+    def __init__(self, parent_process=None, samples=None, id=None, location=(), udf={}, qc_flag='UNKNOWN', reagent_labels=[]):
         self.id = id
+        self.location = location
         self.parent_process = parent_process
         self.samples = samples
         self.input_list = []
-        self.udf = {}
+        self.udf = udf
+        self.qc_flag = qc_flag
+        self.reagent_labels = reagent_labels
 
     def input_artifact_list(self):
         return self.input_list
@@ -205,6 +216,29 @@ def run():
         process_type='AUTOMATED - NovaSeq Run',
         pid='24-100451')
     return MockProcess()
+
+@pytest.fixture
+def bcl_step():
+    container = MockContainer(name='hej')
+    sample = MockSample(sample_id='ACC6457A1')
+    process_type = MockProcessType(name='haloo')
+    parent_process = MockProcess(process_type=process_type)
+
+    in_art = MockArtifact(location=(container,1), 
+                          samples=[sample])
+    
+    out_art = MockArtifact(udf={'# Reads':2345678}, 
+                           qc_flag='PASSED',
+                           samples=[sample], 
+                           reagent_labels=['A07-UDI0049'])
+
+    input_output_maps = [
+        ({'uri':in_art, 'parent-process': parent_process}, {'uri':out_art})]
+    step = MockProcess(
+        input_output_maps = input_output_maps,
+        pid='24-100451')
+
+    return step
 
 
 @pytest.fixture

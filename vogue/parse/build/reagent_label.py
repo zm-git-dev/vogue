@@ -65,7 +65,7 @@ def _get_target_reads(artifact):
     else:
         return None
 
-def reagent_label_data(lims, bcl_step):
+def reagent_label_data(bcl_step):
     """This function takes as input a bcl conversion and demultiplexing step. From that step it goes
     back in artifact history to the prevoius Define step. Both step types exist in the Nova Seq 
     workflow. 
@@ -142,3 +142,4 @@ def reagent_label_data(lims, bcl_step):
         indexes[index] = filter_none(data)
 
     return indexes
+    
