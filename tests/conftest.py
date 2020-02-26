@@ -140,8 +140,8 @@ class MockLims():
         LOG.info(str(processes))
         return processes
 
-    def _add_artifact(self, parent_process=None, samples=[], id=None):
-        artifact = MockArtifact(parent_process, samples, id)
+    def _add_artifact(self, parent_process=None, samples=[], id=None, udf={}):
+        artifact = MockArtifact(parent_process=parent_process, samples=samples, id=id, udf=udf)
         self.artifacts.append(artifact)
         return artifact
 
