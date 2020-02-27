@@ -63,7 +63,7 @@ class MockProcessType():
     def __repr__(self):
         return f"ProcessType:name={self.name}"
 
-class MockContainer():
+class MockContainerType():
     def __init__(self, name=''):
         self.name = name
 
@@ -71,8 +71,19 @@ class MockContainer():
         return f"ProcessType:name={self.name}"
 
 
+class MockContainer():
+    def __init__(self, name='', type=MockContainerType()):
+        self.name = name
+        self.type = type
+
+    def __repr__(self):
+        return f"ProcessType:name={self.name}"
+
+
+
 class MockArtifact():
-    def __init__(self, parent_process=None, samples=None, id=None, location=(), udf={}, qc_flag='UNKNOWN', reagent_labels=[]):
+    def __init__(self, parent_process=None, samples=None, id=None, location=(), udf={}, 
+                 qc_flag='UNKNOWN', reagent_labels=[], type=None):
         self.id = id
         self.location = location
         self.parent_process = parent_process
@@ -81,6 +92,7 @@ class MockArtifact():
         self.udf = udf
         self.qc_flag = qc_flag
         self.reagent_labels = reagent_labels
+        self.type = type
 
     def input_artifact_list(self):
         return self.input_list
@@ -217,28 +229,58 @@ def run():
         pid='24-100451')
     return MockProcess()
 
-@pytest.fixture
-def bcl_step():
-    container = MockContainer(name='hej')
-    sample = MockSample(sample_id='ACC6457A1')
-    process_type = MockProcessType(name='haloo')
-    parent_process = MockProcess(process_type=process_type)
-
-    in_art = MockArtifact(location=(container,1), 
-                          samples=[sample])
+@pytest.fixture(scope='function')
+def build_bcl_step():
+    def create(index='A07-UDI0049',
+            bcl_step_id= '24-100451',
+            flowcell_id= 'hej',
+            index_target_reads= '25',
+            index_total_reads = [{1: {'# Reads': 5000000}, 2: {'# Reads': 5000000}, 
+                                 3: {'# Reads': 5000000}, 4: {'# Reads': 5000000}}],
+            sample='ACC6457A1',
+            flowcell_type= 'S4', 
+            define_step_udfs= {}):
+        sample = MockSample(sample_id='ACC6457A1', udfs= {'Sequencing Analysis':'ABC'})
     
-    out_art = MockArtifact(udf={'# Reads':2345678}, 
+        define = MockProcessType(name='Define Run Format and Calculate Volumes (Nova Seq)')
+        define_process = MockProcess(process_type=define)
+        define_art = MockArtifact(udf={'Reads to sequence (M)':index_target_reads}, 
+                           samples=[sample], 
+                           reagent_labels=[index],
+                           id='define_output',
+                           type='Analyte',
+                           parent_process=define_process)
+        define_process.outputs=[define_art]
+
+        prepare = MockProcessType(name='STANDARD Prepare for Sequencing (Nova Seq)')
+        prepare_process = MockProcess(process_type=prepare)
+        prepare_process.inputs=[define_art]
+
+        
+
+
+        input_output_maps=[]
+        for nr, index_reads in index_total_reads.items():
+            bcl_art = MockArtifact(udf=index_reads, 
                            qc_flag='PASSED',
                            samples=[sample], 
-                           reagent_labels=['A07-UDI0049'])
+                           reagent_labels=[index],
+                           id='bcl_output')
+            lane = MockArtifact(location=(MockContainer(name=flowcell_id), nr), 
+                                samples=[sample], 
+                                parent_process=prepare_process, 
+                                id='prepare_output')
+            prepare_process.outputs.append(lane)
+            input_output_maps.append(({'uri':lane, 'parent-process': prepare_process}, 
+                                  {'uri':bcl_art, 'output-generation-type':'PerReagentLabel'}))
 
-    input_output_maps = [
-        ({'uri':in_art, 'parent-process': parent_process}, {'uri':out_art})]
-    step = MockProcess(
-        input_output_maps = input_output_maps,
-        pid='24-100451')
+        bcl_process = MockProcess(
+            pid = bcl_step_id,
+            input_output_maps = input_output_maps 
+            )
 
-    return step
+        return bcl_process
+    return create
 
 
 @pytest.fixture
