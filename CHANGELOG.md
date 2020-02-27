@@ -10,6 +10,11 @@ This change log will document the notable changes to this project in this file a
 ### Added
 - code owners
 - PR template
+- A new index collection to the database
+- A new index category collection to the database
+- CLI for loading index data from lims into the index collection
+- CLI for loading index category data from lims into the index category collection
+- Two front end views for visualization of index data
 
 ## [1.0.0]
 First initial release of Vogue according to main am doc 1980:1 and validation am doc 2035:2 
