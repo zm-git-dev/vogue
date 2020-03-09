@@ -342,11 +342,9 @@ def test_get_microbial_library_concentration(lims):
     A2 = lims._add_artifact(parent_process = P2, samples = [S1])
     A3 = lims._add_artifact(parent_process = P3, samples = [S1])
 
-    A4 = lims._add_artifact(samples = [S1])
-    A4.udf[concentration_udf] = 12
+    A4 = lims._add_artifact(samples = [S1], udf={concentration_udf: 12})
 
-    A5 = lims._add_artifact(samples = [S2])
-    A5.udf[concentration_udf] = 210
+    A5 = lims._add_artifact(samples = [S2], udf={concentration_udf: 210})
 
     A3.input_list = [A4, A5]
 
@@ -371,11 +369,8 @@ def test_get_library_size_pre(lims, lims_sample):
     P2 = lims._add_process(date2, process_type)
     P3 = lims._add_process(date3, process_type)
     A1 = lims._add_artifact(P1, samples = [lims_sample])
-    A2 = lims._add_artifact(P2, samples = [lims_sample])
-    A3 = lims._add_artifact(P3)
-    A2.udf['Size (bp)'] = 500
-    A3.udf['Size (bp)'] = 300
-
+    A2 = lims._add_artifact(P2, samples = [lims_sample], udf={'Size (bp)': 500})
+    A3 = lims._add_artifact(P3, udf={'Size (bp)': 300})
 
     # WHEN running get_library_size_pre_hyb
     size = get_library_size(application_tag, lims_sample.id, lims, 'SureSelect', 'library_size_pre_hyb') 
@@ -399,12 +394,12 @@ def test_get_library_size_post(lims, lims_sample):
     P2 = lims._add_process(date2, process_type)
     P3 = lims._add_process(date3, process_type)
     A1 = lims._add_artifact(P1, samples = [lims_sample])
-    A2 = lims._add_artifact(P2, samples = [lims_sample])
-    A3 = lims._add_artifact(P3)
-    A2.udf['Size (bp)'] = 500
-    A3.udf['Size (bp)'] = 300
+    A2 = lims._add_artifact(P2, samples = [lims_sample], udf={'Size (bp)': 500})
+    A3 = lims._add_artifact(P3, udf={'Size (bp)': 300})
 
-
+    for art in lims.artifacts:
+        print(art.parent_process.date_run)
+        print(art.udf)
     # WHEN running get_library_size_post_hyb
     size = get_library_size(application_tag, lims_sample.id, lims, 'SureSelect', 'library_size_post_hyb') 
 

@@ -35,7 +35,7 @@ def database(request, pymongo_client):
 
 
 class MockProcess():
-    def __init__(self, date_str='2018-01-01', process_type=None, pid=None, modified=None):
+    def __init__(self, date_str='2018-01-01', process_type=None, pid=None, modified=None, input_output_maps=[]):
         self.date_run = date_str
         self.type = process_type
         self.udf = {}
@@ -43,6 +43,7 @@ class MockProcess():
         self.id = pid
         self.outputs = []
         self.inputs = []
+        self.input_output_maps = input_output_maps
         self.modified = modified
 
     def all_outputs(self):
@@ -62,14 +63,36 @@ class MockProcessType():
     def __repr__(self):
         return f"ProcessType:name={self.name}"
 
+class MockContainerType():
+    def __init__(self, name=''):
+        self.name = name
+
+    def __repr__(self):
+        return f"ProcessType:name={self.name}"
+
+
+class MockContainer():
+    def __init__(self, name='', type=MockContainerType()):
+        self.name = name
+        self.type = type
+
+    def __repr__(self):
+        return f"ProcessType:name={self.name}"
+
+
 
 class MockArtifact():
-    def __init__(self, parent_process=None, samples=None, id=None):
+    def __init__(self, parent_process=None, samples=None, id=None, location=(), udf={}, 
+                 qc_flag='UNKNOWN', reagent_labels=[], type=None):
         self.id = id
+        self.location = location
         self.parent_process = parent_process
         self.samples = samples
         self.input_list = []
-        self.udf = {}
+        self.udf = udf
+        self.qc_flag = qc_flag
+        self.reagent_labels = reagent_labels
+        self.type = type
 
     def input_artifact_list(self):
         return self.input_list
@@ -129,8 +152,8 @@ class MockLims():
         LOG.info(str(processes))
         return processes
 
-    def _add_artifact(self, parent_process=None, samples=[], id=None):
-        artifact = MockArtifact(parent_process, samples, id)
+    def _add_artifact(self, parent_process=None, samples=[], id=None, udf={}):
+        artifact = MockArtifact(parent_process=parent_process, samples=samples, id=id, udf=udf)
         self.artifacts.append(artifact)
         return artifact
 
@@ -163,6 +186,20 @@ class MockSample():
     def __repr__(self):
         return f"Sample:id={self.id},udf={self.udf}"
 
+class MockReagentLabel():
+    def __init__(self, name='IDT_10nt_NXT_109', sequence='TAGGAAGCGG-CCTGGATTGG', 
+                 category='Illumina IDT'):
+        self.name = name
+        self.sequence = sequence
+        self.category = category
+
+    def __repr__(self):
+        return f"ReagentLabel:name={self.name},category={self.category}"
+
+
+@pytest.fixture
+def lims_reagent_label():
+    return MockReagentLabel()
 
 @pytest.fixture
 def lims():
@@ -191,6 +228,59 @@ def run():
         process_type='AUTOMATED - NovaSeq Run',
         pid='24-100451')
     return MockProcess()
+
+@pytest.fixture(scope='function')
+def build_bcl_step():
+    def create(index='A07-UDI0049',
+            bcl_step_id= '24-100451',
+            flowcell_id= 'hej',
+            index_target_reads= '25',
+            index_total_reads = [{1: {'# Reads': 5000000}, 2: {'# Reads': 5000000}, 
+                                 3: {'# Reads': 5000000}, 4: {'# Reads': 5000000}}],
+            sample='ACC6457A1',
+            flowcell_type= 'S4', 
+            define_step_udfs= {}):
+        sample = MockSample(sample_id='ACC6457A1', udfs= {'Sequencing Analysis':'ABC'})
+    
+        define = MockProcessType(name='Define Run Format and Calculate Volumes (Nova Seq)')
+        define_process = MockProcess(process_type=define)
+        define_art = MockArtifact(udf={'Reads to sequence (M)':index_target_reads}, 
+                           samples=[sample], 
+                           reagent_labels=[index],
+                           id='define_output',
+                           type='Analyte',
+                           parent_process=define_process)
+        define_process.outputs=[define_art]
+
+        prepare = MockProcessType(name='STANDARD Prepare for Sequencing (Nova Seq)')
+        prepare_process = MockProcess(process_type=prepare)
+        prepare_process.inputs=[define_art]
+
+        
+
+
+        input_output_maps=[]
+        for nr, index_reads in index_total_reads.items():
+            bcl_art = MockArtifact(udf=index_reads, 
+                           qc_flag='PASSED',
+                           samples=[sample], 
+                           reagent_labels=[index],
+                           id='bcl_output')
+            lane = MockArtifact(location=(MockContainer(name=flowcell_id), nr), 
+                                samples=[sample], 
+                                parent_process=prepare_process, 
+                                id='prepare_output')
+            prepare_process.outputs.append(lane)
+            input_output_maps.append(({'uri':lane, 'parent-process': prepare_process}, 
+                                  {'uri':bcl_art, 'output-generation-type':'PerReagentLabel'}))
+
+        bcl_process = MockProcess(
+            pid = bcl_step_id,
+            input_output_maps = input_output_maps 
+            )
+
+        return bcl_process
+    return create
 
 
 @pytest.fixture

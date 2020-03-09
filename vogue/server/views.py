@@ -12,9 +12,8 @@ blueprint = Blueprint('server', __name__ )
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
-
     year = request.form.get('year', str(THIS_YEAR))
-    
+
     if request.form.get('page') == 'turn_around_times':
         return redirect(url_for('server.turn_around_times', year=year))
     if request.form.get('page') == 'samples':
@@ -43,6 +42,12 @@ def index():
         return redirect(url_for('server.microsalt_st_time', year=year))
     if request.form.get('page') == 'genotype_plate':
         return redirect(url_for('server.genotype_plate'))
+    if request.form.get('page') == 'reagent_labels':
+        index_category_url = request.form.get('index_category').replace(' ','_')
+        return redirect(url_for('server.reagent_labels', index_category_url=index_category_url))
+    if request.form.get('page') == 'reagent_label':
+        name, category = request.form.get('reagent_label').split(',')
+        return redirect(url_for('server.reagent_label', reagent_label=name.replace(' ', ''), index_category=category))
 
     month = int(request.form.get('month', 0))
     sample_series, cathegories =  home_samples(app.adapter, int(year), month)
@@ -51,6 +56,7 @@ def index():
         'index.html',
         version = __version__,
         sample_series = sample_series,
+        reagent_label = reagent_label,
         cathegories = cathegories ,
         customers = customers,
         page_id = 'index',
@@ -311,3 +317,37 @@ def genotype_plate():
         plate_id = plot_data['plate_id'],
         plates = plot_data['plates'])
 
+@blueprint.route('/reagent_labels/<index_category_url>', methods=['GET', 'POST'])
+def reagent_labels(index_category_url):
+    index_category=index_category_url.replace('_',' ')
+    flowcell_performance_treshold = 0.3
+    aggregate_result = reagent_category_data(app.adapter, index_category, flowcell_performance_treshold)
+    return render_template('reagent_labels.html',
+        flowcell_performance_treshold = flowcell_performance_treshold,
+        header = 'Overall performance per index',
+        page_id = 'reagent_labels',
+        nr_indexes = len(aggregate_result),
+        index_category = index_category,
+        index_categories = app.adapter.get_reagent_label_categories(),
+        year_of_interest = THIS_YEAR,
+        results = aggregate_result,
+        version = __version__
+        )
+
+
+@blueprint.route('/reagent_label/<index_category>/<reagent_label>', methods=['GET', 'POST'])
+def reagent_label(index_category, reagent_label):
+    flowcell_performance_treshold = 0.3
+    aggregate_result = reagent_label_data(app.adapter, reagent_label, flowcell_performance_treshold)
+    index_categories = list(app.adapter.get_all_reagent_label_names_grouped_by_category())
+    return render_template('reagent_label.html',
+        flowcell_performance_treshold = flowcell_performance_treshold,
+        header = 'Normalized index performance per flowcell', 
+        index_category = index_category.replace('_', ' '),
+        page_id = 'reagent_label',
+        year_of_interest = THIS_YEAR,
+        reagent_label = reagent_label,
+        index_categories = index_categories,
+        results = aggregate_result,
+        version = __version__
+        )

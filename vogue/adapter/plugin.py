@@ -35,6 +35,8 @@ class VougeAdapter(MongoAdapter):
         self.bioinfo_samples_collection = self.db.bioinfo_samples
         self.app_tag_collection = self.db.application_tag
         self.flowcell_collection = self.db.flowcell
+        self.reagent_label_collection = self.db.reagent_label
+        self.reagent_label_category_collection = self.db.reagent_label_category
         self.genotype_analysis_collection = self.db.genotype_analysis
 
         LOG.info("Use database %s.", db_name)
@@ -211,3 +213,30 @@ class VougeAdapter(MongoAdapter):
         tag = self.app_tag_collection.find_one({'_id': app_tag},
                                                {"category": 1})
         return tag.get('category') if tag else None
+
+    def get_reagent_label_category(self, reagent_label):
+        """Function get category based on application tag from the application tag collection"""
+        category = self.app_tag_collection.find_one({'name': reagent_label},
+                                                    {"category": 1})
+        return category.get('category') if category else None
+
+    def reagent_label_aggregate(self, pipe : list):
+        """Function to make a aggregation on the reagent_label analysis colleciton"""
+        return self.reagent_label_collection.aggregate(pipe)
+
+    def get_all_reagent_label_names_grouped_by_category(self):
+        """Function get all reagent label names grouped by category  
+        from the reagent_label_category colleciton"""
+        pipe = [{'$group': {'_id': {'category': '$category'}, 
+                    'reagent_labels': {'$push': '$name'}}}]
+        return self.reagent_label_category_collection.aggregate(pipe)
+
+    def get_reagent_label_categories(self):
+        """Function to get all categories from label_category_collection"""
+        pipe = [{'$project': {'category': 1}
+                 }, {
+                 '$group': {'_id': None, 
+                            'categories': {'$addToSet': '$category'}}
+                 }]
+        reagent_label_categories = self.reagent_label_category_collection.aggregate(pipe)
+        return list(reagent_label_categories)[0]['categories']

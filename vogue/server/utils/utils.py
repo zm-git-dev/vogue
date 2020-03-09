@@ -660,4 +660,6 @@ def get_genotype_plate(adapter,  plate_id : str)-> dict:
             'y_labels': y_labels, 
             'plates': plates, 
             'plate_id' : plate_id}
-            
+
+
+    

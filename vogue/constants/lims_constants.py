@@ -68,8 +68,16 @@ MASTER_STEPS_UDFS = {
             'size_step': ['CG002 - Amplify Captured Libraries to Add Index Tags (SS XT)'],
             'size_udf': 'Size (bp)',
             'apptags': ['EXO', 'EFT', 'PAN', 'PAL']}
-    }
-}
+    },
+    'reagent_labels': {
+        'steps': {'bcl': ['Bcl Conversion & Demultiplexing (Nova Seq)'],
+                  'define': ['Define Run Format and Calculate Volumes (Nova Seq)'],
+                  'pre_bcl': ['STANDARD Prepare for Sequencing (Nova Seq)']},
+        'udfs': {'reads' : '# Reads',
+                  'target_reads': 'Reads to sequence (M)'},
+        'exclue_tags': ['RM','EX','PA']  
+        ## EX and PA should be included later. Fetching fraction from Poos Samples Twist 1
+}}
 
 
 INSTRUMENTS ={'D00410':'Sigourney', 

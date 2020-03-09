@@ -2,7 +2,6 @@ import logging
 from vogue.build.sample import build_sample
 LOG = logging.getLogger(__name__)
 from vogue.constants.constants import TEST_SAMPLES
-from datetime import date, timedelta
 
 def load_one(adapter, lims_sample=None, lims=None):
     """Function to load one lims sample into the database"""
