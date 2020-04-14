@@ -1,11 +1,11 @@
 
 from vogue.commands.load.application_tag import application_tags
-from vogue.server import create_app
+from vogue.server import create_app, configure_app
 from vogue.commands.base import cli
 from vogue.adapter.plugin import VougeAdapter
 
 
-app = create_app()
+app = create_app(test=True)
 
 
 def test_application_tag(database):

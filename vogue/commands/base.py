@@ -3,6 +3,8 @@ import logging
 
 import click
 import coloredlogs
+import ruamel.yaml
+
 
 from flask.cli import FlaskGroup, with_appcontext
 from flask import current_app
@@ -23,14 +25,27 @@ LOG = logging.getLogger(__name__)
 @click.version_option(__version__)
 @click.group(cls=FlaskGroup,
              create_app=create_app,
-             add_default_commands=True,
+             add_default_commands=True, 
              invoke_without_command=False,
              add_version_option=False)
 @click.option("-c", "--config", type=click.File(), help="path to config file")
+@click.option("-u", "--db-uri", type=str, default='mongodb://localhost:27030')
+@click.option("-n", "--db-name", type=str, default='vogue-stage')
+@click.option("-d", "--debug", type=int, help="0/1", default=1)
+@click.option("-s", "--secret-key", type=str, default='hej')
 @with_appcontext
-def cli(config):
+def cli(config, db_uri, db_name, debug, secret_key):
     """ Main entry point """
-    configure_app(current_app, config)
+    if current_app.test:
+        return
+    if config:
+        configure_app(current_app, ruamel.yaml.safe_load(config))
+    else:
+        configure_app(current_app, {'DB_URI': db_uri,
+                                    'DB_NAME': db_name,
+                                    'DEBUG': debug, 
+                                    'SECRET_KEY': secret_key}
+                        )
     pass
 
 

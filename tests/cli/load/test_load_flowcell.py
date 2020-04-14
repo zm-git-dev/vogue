@@ -4,7 +4,7 @@ from vogue.adapter.plugin import VougeAdapter
 from vogue.constants.constants import RUN_TYPES, INSTRUMENTS
 from datetime import date, timedelta
 
-app = create_app()
+app = create_app(test= True)
 
 def test_flowcell(database, lims):
     # GIVEN a app context with a mock lims with a process of correct type and udf 
