@@ -22,22 +22,21 @@ def create_app(test=False):
     app.test = test
     return app
 
-def configure_app(app, config=None):
-    if config:
-        try:
-            app.lims = Lims(BASEURI,USERNAME,PASSWORD)
-        except:
-            app.lims = None
-        app.config = {**app.config, **config}
-        client = MongoClient(app.config['DB_URI'])
-        db_name = app.config['DB_NAME']
-        app.client = client
-        app.db = client[db_name]
-        app.adapter = VougeAdapter(client, db_name = db_name)
-        app.register_blueprint(blueprint)
+def configure_app(app, config):
+    try:
+        app.lims = Lims(BASEURI,USERNAME,PASSWORD)
+    except:
+        app.lims = None
+    app.config = {**app.config, **config}
+    client = MongoClient(app.config['DB_URI'])
+    db_name = app.config['DB_NAME']
+    app.client = client
+    app.db = client[db_name]
+    app.adapter = VougeAdapter(client, db_name = db_name)
+    app.register_blueprint(blueprint)
 
-        if app.config['DEBUG']==1:
-            from flask_debugtoolbar import DebugToolbarExtension
-            toolbar = DebugToolbarExtension(app)
+    if app.config['DEBUG']==1:
+        from flask_debugtoolbar import DebugToolbarExtension
+        toolbar = DebugToolbarExtension(app)
 
     return app
