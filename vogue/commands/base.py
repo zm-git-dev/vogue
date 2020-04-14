@@ -28,11 +28,11 @@ LOG = logging.getLogger(__name__)
              add_default_commands=True, 
              invoke_without_command=False,
              add_version_option=False)
-@click.option("-c", "--config", type=click.File(), help="path to config file")
-@click.option("-u", "--db-uri", type=str, default='mongodb://localhost:27030')
-@click.option("-n", "--db-name", type=str, default='vogue-stage')
-@click.option("-d", "--debug", type=int, help="0/1", default=1)
-@click.option("-s", "--secret-key", type=str, default='hej')
+@click.option("-c", "--config", type=click.File(), help="Path to config file")
+@click.option("-u", "--db-uri", type=str, default='mongodb://localhost:27030', help="If no config")
+@click.option("-n", "--db-name", type=str, default='vogue-stage', help="If no config")
+@click.option("-d", "--debug", type=int, help="0/1", default=1, help="If no config")
+@click.option("-s", "--secret-key", type=str, default='hej', help="If no config")
 @with_appcontext
 def cli(config, db_uri, db_name, debug, secret_key):
     """ Main entry point """
