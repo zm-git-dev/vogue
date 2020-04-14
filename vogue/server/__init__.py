@@ -22,15 +22,13 @@ def create_app():
     return Flask(__name__)
 
 def configure_app(app, config, test = False):
-    data = ruamel.yaml.safe_load(config)
-    print(dir(app.config))
     if not test:
         try:
             app.lims = Lims(BASEURI,USERNAME,PASSWORD)
         except:
             app.lims = None
-
-        app.config.from_pyfile(config)
+        configurations = ruamel.yaml.safe_load(config)
+        app.config = {**app.config, **configurations}
         client = MongoClient(app.config['DB_URI'])
         db_name = app.config['DB_NAME']
         app.client = client
