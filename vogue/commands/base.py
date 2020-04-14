@@ -9,7 +9,7 @@ from flask import current_app
 
 # commands
 from vogue.commands.load import load as load_command
-from vogue.server import create_app
+from vogue.server import create_app, configure_app
 from .load import load
 
 # Get version and doc decorator
@@ -26,8 +26,11 @@ LOG = logging.getLogger(__name__)
              add_default_commands=True,
              invoke_without_command=False,
              add_version_option=False)
-def cli(**_):
+@click.option("-c", "--config", type=click.File(), help="path to config file")
+@with_appcontext
+def cli(config):
     """ Main entry point """
+    configure_app(current_app, config)
     pass
 
 

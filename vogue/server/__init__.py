@@ -1,6 +1,7 @@
 
 import os
 import logging
+import ruamel.yaml
 
 from flask import Flask
 from pymongo import MongoClient
@@ -15,15 +16,21 @@ logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
 
 
-def create_app(test = False):
-    app = Flask(__name__, instance_relative_config=True)
+
+
+def create_app():
+    return Flask(__name__)
+
+def configure_app(app, config, test = False):
+    data = ruamel.yaml.safe_load(config)
+    print(dir(app.config))
     if not test:
         try:
             app.lims = Lims(BASEURI,USERNAME,PASSWORD)
         except:
             app.lims = None
 
-        app.config.from_object(f"{__name__}.config")
+        app.config.from_pyfile(config)
         client = MongoClient(app.config['DB_URI'])
         db_name = app.config['DB_NAME']
         app.client = client
