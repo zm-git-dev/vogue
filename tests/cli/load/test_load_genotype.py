@@ -2,7 +2,7 @@ from vogue.server import create_app
 from vogue.commands.base import cli
 from vogue.adapter.plugin import VougeAdapter
 
-app = create_app(test= True)
+app = create_app()
 
 def test_genotype(database):
     # GIVEN a database and a sample_doc formated in the correct way

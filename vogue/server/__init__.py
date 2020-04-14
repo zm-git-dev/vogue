@@ -21,23 +21,22 @@ LOG = logging.getLogger(__name__)
 def create_app():
     return Flask(__name__)
 
-def configure_app(app, config, test = False):
-    if not test:
-        try:
-            app.lims = Lims(BASEURI,USERNAME,PASSWORD)
-        except:
-            app.lims = None
-        configurations = ruamel.yaml.safe_load(config)
-        app.config = {**app.config, **configurations}
-        client = MongoClient(app.config['DB_URI'])
-        db_name = app.config['DB_NAME']
-        app.client = client
-        app.db = client[db_name]
-        app.adapter = VougeAdapter(client, db_name = db_name)
-        app.register_blueprint(blueprint)
+def configure_app(app, config):
+    try:
+        app.lims = Lims(BASEURI,USERNAME,PASSWORD)
+    except:
+        app.lims = None
+    configurations = ruamel.yaml.safe_load(config)
+    app.config = {**app.config, **configurations}
+    client = MongoClient(app.config['DB_URI'])
+    db_name = app.config['DB_NAME']
+    app.client = client
+    app.db = client[db_name]
+    app.adapter = VougeAdapter(client, db_name = db_name)
+    app.register_blueprint(blueprint)
 
-        if app.config['DEBUG']==1:
-            from flask_debugtoolbar import DebugToolbarExtension
-            toolbar = DebugToolbarExtension(app)
+    if app.config['DEBUG']==1:
+        from flask_debugtoolbar import DebugToolbarExtension
+        toolbar = DebugToolbarExtension(app)
 
     return app

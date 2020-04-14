@@ -5,7 +5,7 @@ from vogue.adapter.plugin import VougeAdapter
 from datetime import datetime
 
 
-app = create_app(test= True)
+app = create_app()
 
 
 def test_find_concentration_amount(database):

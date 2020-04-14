@@ -3,7 +3,7 @@ from vogue.commands.base import cli
 from vogue.adapter.plugin import VougeAdapter
 from datetime import date, timedelta
 
-app = create_app(test= True)
+app = create_app()
 
 def test_sample_days(database, lims):
     # GIVEN a app context with a mock lims with a process 

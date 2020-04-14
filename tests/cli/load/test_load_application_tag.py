@@ -5,7 +5,7 @@ from vogue.commands.base import cli
 from vogue.adapter.plugin import VougeAdapter
 
 
-app = create_app(test= True)
+app = create_app()
 
 
 def test_application_tag(database):
