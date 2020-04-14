@@ -1,6 +1,6 @@
 flask_debugtoolbar
 pytest-flask
-pytest>=3.7.1
+pytest>=5.2
 pytest-cov
 coveralls
 pylint
