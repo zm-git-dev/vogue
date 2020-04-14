@@ -26,7 +26,7 @@ def configure_app(app, config):
         app.lims = Lims(BASEURI,USERNAME,PASSWORD)
     except:
         app.lims = None
-    configurations = ruamel.yaml.safe_load(config)
+    configurations = ruamel.yaml.safe_load(config) if config else {}
     app.config = {**app.config, **configurations}
     client = MongoClient(app.config['DB_URI'])
     db_name = app.config['DB_NAME']
