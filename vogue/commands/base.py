@@ -34,7 +34,7 @@ LOG = logging.getLogger(__name__)
 @click.option("-d", "--flask-debug", type=click.Choice(["0", "1"]), default="1", help="Debug mode for Flask")
 @click.option("-s", "--secret-key", type=str, default='hej', help="If no config")
 @with_appcontext
-def cli(config, db_uri, db_name, debug, secret_key):
+def cli(config, db_uri, db_name, flask_debug, secret_key):
     """ Main entry point """
     if current_app.test:
         return
