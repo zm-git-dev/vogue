@@ -43,7 +43,7 @@ def cli(config, db_uri, db_name, flask_debug, secret_key):
     else:
         configure_app(current_app, {'DB_URI': db_uri,
                                     'DB_NAME': db_name,
-                                    'DEBUG': debug, 
+                                    'DEBUG': flask_debug, 
                                     'SECRET_KEY': secret_key}
                         )
     pass
