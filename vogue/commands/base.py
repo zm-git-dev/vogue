@@ -31,8 +31,8 @@ LOG = logging.getLogger(__name__)
 @click.option("-c", "--config", type=click.File(), help="Path to config file")
 @click.option("-u", "--db-uri", type=str, default='mongodb://localhost:27030', help="Set db uri if no config is provided")
 @click.option("-n", "--db-name", type=str, default='vogue-stage', help="Set db name to connect if no config is provided.")
-@click.option("-d", "--flask-debug", type=click.Choice(["0", "1"]), default="1", help="Debug mode for Flask")
-@click.option("-s", "--secret-key", type=str, default='hej', help="If no config")
+@click.option("-d", "--flask-debug", type=click.Choice(["0", "1"]), default="1", help="Debug mode for Flask if no config is provided.")
+@click.option("-s", "--secret-key", type=str, default='hej', help="Secret key for the flask application if no config is provided.")
 @with_appcontext
 def cli(config, db_uri, db_name, flask_debug, secret_key):
     """ Main entry point """
