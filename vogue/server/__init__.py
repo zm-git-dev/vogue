@@ -23,11 +23,12 @@ def create_app(test=False):
     app.test = test
     try:
         app.config.from_envvar('VOGUE_CONFIG')
+        configure_app(app)
     except:
         pass
     return app
 
-def configure_app(app, config):
+def configure_app(app, config=None):
     try:
         app.lims = Lims(BASEURI,USERNAME,PASSWORD)
     except:
