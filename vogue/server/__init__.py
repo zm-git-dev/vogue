@@ -22,12 +22,15 @@ def create_app(test=False):
     app.test = test
     return app
 
-def configure_app(app, config):
+def configure_app(app, config=None):
     try:
         app.lims = Lims(BASEURI,USERNAME,PASSWORD)
     except:
         app.lims = None
-    app.config = {**app.config, **config}
+    if config:
+        app.config = {**app.config, **config}
+    else:
+         app.config.from_envvar('VOGUE_CONFIG')
     client = MongoClient(app.config['DB_URI'])
     db_name = app.config['DB_NAME']
     app.client = client
