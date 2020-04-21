@@ -21,6 +21,10 @@ LOG = logging.getLogger(__name__)
 def create_app(test=False):
     app = Flask(__name__)
     app.test = test
+    try:
+        app.config.from_envvar('VOGUE_CONFIG')
+    except:
+        pass
     return app
 
 def configure_app(app, config):
@@ -31,12 +35,7 @@ def configure_app(app, config):
 
     if config:
         app.config = {**app.config, **yaml.safe_load(config)}
-    else:
-        try:
-            app.config.from_envvar('VOGUE_CONFIG')
-        except:
-            pass
-
+        
     client = MongoClient(app.config['DB_URI'])
     db_name = app.config['DB_NAME']
     app.client = client
