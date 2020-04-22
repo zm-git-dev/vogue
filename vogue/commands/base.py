@@ -3,7 +3,6 @@ import logging
 
 import click
 import coloredlogs
-import yaml
 
 
 from flask.cli import FlaskGroup, with_appcontext
@@ -29,23 +28,12 @@ LOG = logging.getLogger(__name__)
              invoke_without_command=False,
              add_version_option=False)
 @click.option("-c", "--config", type=click.File(), help="Path to config file")
-@click.option("-u", "--db-uri", type=str, default='mongodb://localhost:27030', help="Set db uri if no config is provided")
-@click.option("-n", "--db-name", type=str, default='vogue-stage', help="Set db name to connect if no config is provided.")
-@click.option("-d", "--flask-debug", type=click.Choice(["0", "1"]), default="1", help="Debug mode for Flask if no config is provided.")
-@click.option("-s", "--secret-key", type=str, default='hej', help="Secret key for the flask application if no config is provided.")
 @with_appcontext
-def cli(config, db_uri, db_name, flask_debug, secret_key):
+def cli(config):
     """ Main entry point """
     if current_app.test:
         return
-    if config:
-        configure_app(current_app, yaml.safe_load(config))
-    else:
-        configure_app(current_app, {'DB_URI': db_uri,
-                                    'DB_NAME': db_name,
-                                    'DEBUG': flask_debug, 
-                                    'SECRET_KEY': secret_key}
-                        )
+    configure_app(current_app, config)
     pass
 
 

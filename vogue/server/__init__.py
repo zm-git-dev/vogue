@@ -4,6 +4,7 @@ import logging
 
 from flask import Flask
 from pymongo import MongoClient
+import yaml
 
 from vogue.adapter.plugin import VougeAdapter
 from vogue.server.views import blueprint
@@ -15,19 +16,29 @@ logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
 
 
-
-
 def create_app(test=False):
     app = Flask(__name__)
     app.test = test
+    if test:
+        return app
+
+    try:
+        app.config.from_envvar('VOGUE_CONFIG')
+        configure_app(app)
+    except:
+        pass
+
     return app
 
-def configure_app(app, config):
+def configure_app(app, config=None):
     try:
         app.lims = Lims(BASEURI,USERNAME,PASSWORD)
     except:
         app.lims = None
-    app.config = {**app.config, **config}
+
+    if config:
+        app.config = {**app.config, **yaml.safe_load(config)}
+
     client = MongoClient(app.config['DB_URI'])
     db_name = app.config['DB_NAME']
     app.client = client
