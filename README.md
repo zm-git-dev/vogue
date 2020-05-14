@@ -1,4 +1,4 @@
-# vogue (**version** = 1.1.0) [![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/vogue/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/vogue?branch=master) [![Build Status](https://travis-ci.org/Clinical-Genomics/vogue.svg?branch=master)](https://travis-ci.org/Clinical-Genomics/vogue)
+# vogue [![Coverage Status](https://coveralls.io/repos/github/Clinical-Genomics/vogue/badge.svg?branch=master)](https://coveralls.io/github/Clinical-Genomics/vogue?branch=master) [![Build Status](https://travis-ci.org/Clinical-Genomics/vogue.svg?branch=master)](https://travis-ci.org/Clinical-Genomics/vogue) ![Latest Release](https://img.shields.io/github/v/release/clinical-genomics/vogue)
 
 Vogue is Clinical Genomics solution for capturing data from various places in the data flow and to trend the data over a longer period of time.
 
@@ -12,7 +12,29 @@ pip install -e .
 ```
 
 ## Contributing
-Vogue is using git flow branching model as described in our [development manual](http://www.clinicalgenomics.se/development/dev/gitflow/).
+### Release model
+Vogue development is organised on a flexible Git "Release Flow" branching system. This more or less means that we make releases in release branches which corresponds to stable versions of Vogue.
+
+#### Steps to make a new release:
+
+1) Create a release branch from master named `version_X.X.X` 
+2) Update change log with the new version.
+3) Update vogue/__init__.py with the new version.
+4) Make a PR to master, 
+	- Name PR `release version X.X.X`
+	- Justify if its a patch/minor/major version bump
+	- Paste the latest changelog to the text body
+	- get it approved and merge to master. **Dont delete the release branch!**
+5) Make a [new release](https://github.com/Clinical-Genomics/vogue/releases/new).
+	- Name tag version as `vX.X.X`
+	- Set target to the release branch
+	- Make descriptive title
+	- Paste latest changelog to the text body
+	- Release!
+
+
+
+
 
 ## Front End
 All views in vogue should be self-explanatory. There should be no further documentation needed to be able to interpret the content of the web page.
