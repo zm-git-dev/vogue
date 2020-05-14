@@ -2,7 +2,7 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
-## [x.x.x]
+## [1.1.0]
 
 ### Changed
 - Added posibility to run vogue with config as environment vareable
