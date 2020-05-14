@@ -9,6 +9,7 @@ This change log will document the notable changes to this project in this file a
 - Removing environment vareable dependency and instead adding option for config in cli.
 - Squashed the load document functions into one general function
 - setting werkzeug<1.0.0 in requirements.txt
+- Update genologic to 0.4.6
 
 ### Added
 - code owners

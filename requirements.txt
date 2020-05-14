@@ -2,7 +2,7 @@ click
 bumpversion
 pyyaml
 pymongo
-genologics
+genologics>=0.4.6
 yapf
 flask
 coloredlogs
