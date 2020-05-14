@@ -11,11 +11,10 @@ cd vogue
 pip install -e .
 ```
 
-## Contributing
-### Release model
+## Release model
 Vogue development is organised on a flexible Git "Release Flow" branching system. This more or less means that we make releases in release branches which corresponds to stable versions of Vogue.
 
-#### Steps to make a new release:
+### Steps to make a new release:
 
 1) Create a release branch from master named `version_X.X.X` 
 2) Update change log with the new version.
@@ -32,8 +31,9 @@ Vogue development is organised on a flexible Git "Release Flow" branching system
 	- Paste latest changelog to the text body
 	- Release!
 
+### Deploying to production
 
-
+Use `update-vogue-prod.sh` script to update production both on Hasta and Clinical-db. **Please follow the development guide and `servers` repo when doing so. It is also important to keep those involved informed.**
 
 
 ## Front End
