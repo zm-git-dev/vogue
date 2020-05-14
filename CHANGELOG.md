@@ -2,6 +2,16 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+
+## [X.X.X]
+
+### Changed
+- Updating release info in README
+
+### Added
+- 
+
+
 ## [1.1.0]
 
 ### Changed
