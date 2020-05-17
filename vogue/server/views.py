@@ -47,7 +47,7 @@ def index():
         return redirect(url_for('server.reagent_labels', index_category_url=index_category_url))
     if request.form.get('page') == 'reagent_label':
         name, category = request.form.get('reagent_label').split(',')
-        return redirect(url_for('server.reagent_label', reagent_label = name.replace(' ', ''), index_category=category))
+        return redirect(url_for('server.reagent_label', reagent_label=name.replace(' ', ''), index_category=category))
 
     month = int(request.form.get('month', 0))
     sample_series, cathegories =  home_samples(app.adapter, int(year), month)
