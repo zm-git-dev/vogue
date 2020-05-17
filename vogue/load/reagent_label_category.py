@@ -7,7 +7,6 @@ def load_all(adapter, lims, categories):
 
     LOG.info('Fetching all reagent types from lims...')
     lims_reagent_labels = lims.get_reagent_types()
-
     LOG.info('Loading reagent types into the reagent_label_cathegory colleciton.')
     for lims_reagent_label in lims_reagent_labels:
         if lims_reagent_label.category not in categories:

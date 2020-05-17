@@ -11,6 +11,10 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     category = adapter.get_category(application_tag) 
     
     mongo_sample = {'_id' : sample.id}
+    sequenced_at = sample.udf.get('Sequencing Finished')
+    received_at = sample.udf.get('Received at')
+    prepared_at = sample.udf.get('Library Prep Finished')
+    delivered_at = sample.udf.get('Delivered at')
     mongo_sample['family'] = sample.udf.get('Family')
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
@@ -30,11 +34,6 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     mongo_sample['nr_defrosts'] = concentration_and_nr_defrosts.get('nr_defrosts')
     mongo_sample['nr_defrosts-concentration'] = concentration_and_nr_defrosts.get('concentration')
     mongo_sample['lotnr'] = concentration_and_nr_defrosts.get('lotnr')
-
-    sequenced_at = get_sequenced_date(sample, lims)
-    received_at = get_received_date(sample, lims)
-    prepared_at = get_prepared_date(sample, lims)
-    delivered_at = get_delivery_date(sample, lims)
 
     mongo_sample['sequenced_date'] = sequenced_at
     mongo_sample['received_date'] = received_at
