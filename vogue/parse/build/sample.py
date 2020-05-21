@@ -8,10 +8,18 @@ LOG = logging.getLogger(__name__)
 
 
 def str_to_datetime(date: str)-> dt:
+    """Convert str to datetime"""
     if date is None:
         return None
     return dt.strptime(date, '%Y-%m-%d')
 
+
+def datetime2date(date: dt) -> dt.date:
+    """Convert datetime.datetime to datetime.date"""
+
+    if date is None:
+        return None
+    return dt(date.year, date.month, date.day)
 
 def get_number_of_days(first_date: dt, second_date : dt) -> int:
     """Get number of days between different time stamps."""
@@ -177,7 +185,6 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
         return concentration_art.udf.get(concentration_udf)
     else:
         return None
-
 
 
 def get_library_size(app_tag: str, lims_id: str, lims: Lims, workflow: str, hyb_type: str) -> int:
