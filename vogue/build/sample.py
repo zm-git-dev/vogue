@@ -4,13 +4,25 @@ from datetime import datetime as dt
 
 from vogue.parse.build.sample import *
 
-
 def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
-    """Parse lims sample"""
+    """Build lims sample"""
+
     application_tag = sample.udf.get('Sequencing Analysis')
     category = adapter.get_category(application_tag) 
-    
+    received_at = datetime2date(sample.udf.get('Received at'))
+    delivered_at = datetime2date(sample.udf.get('Delivered at'))
+    sequenced_at = datetime2date(sample.udf.get('Sequencing Finished'))
+    prepared_at = datetime2date(sample.udf.get('Library Prep Finished'))
+
     mongo_sample = {'_id' : sample.id}
+    mongo_sample['sequenced_date'] = sequenced_at
+    mongo_sample['received_date'] = received_at
+    mongo_sample['prepared_date'] = prepared_at
+    mongo_sample['delivery_date'] = delivered_at
+    mongo_sample['sequenced_to_delivered'] = get_number_of_days(sequenced_at, delivered_at)
+    mongo_sample['prepped_to_sequenced'] = get_number_of_days(prepared_at, sequenced_at)
+    mongo_sample['received_to_prepped'] = get_number_of_days(received_at, prepared_at)
+    mongo_sample['received_to_delivered'] = get_number_of_days(received_at, delivered_at)
     mongo_sample['family'] = sample.udf.get('Family')
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
@@ -30,20 +42,6 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     mongo_sample['nr_defrosts'] = concentration_and_nr_defrosts.get('nr_defrosts')
     mongo_sample['nr_defrosts-concentration'] = concentration_and_nr_defrosts.get('concentration')
     mongo_sample['lotnr'] = concentration_and_nr_defrosts.get('lotnr')
-
-    sequenced_at = get_sequenced_date(sample, lims)
-    received_at = get_received_date(sample, lims)
-    prepared_at = get_prepared_date(sample, lims)
-    delivered_at = get_delivery_date(sample, lims)
-
-    mongo_sample['sequenced_date'] = sequenced_at
-    mongo_sample['received_date'] = received_at
-    mongo_sample['prepared_date'] = prepared_at
-    mongo_sample['delivery_date'] = delivered_at
-    mongo_sample['sequenced_to_delivered'] = get_number_of_days(sequenced_at, delivered_at)
-    mongo_sample['prepped_to_sequenced'] = get_number_of_days(prepared_at, sequenced_at)
-    mongo_sample['received_to_prepped'] = get_number_of_days(received_at, prepared_at)
-    mongo_sample['received_to_delivered'] = get_number_of_days(received_at, delivered_at)
 
     mongo_sample['microbial_library_concentration'] = get_microbial_library_concentration(application_tag, sample.id, lims)
     

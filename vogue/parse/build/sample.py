@@ -8,95 +8,18 @@ LOG = logging.getLogger(__name__)
 
 
 def str_to_datetime(date: str)-> dt:
+    """Convert str to datetime"""
     if date is None:
         return None
     return dt.strptime(date, '%Y-%m-%d')
 
 
-def get_sequenced_date(sample: Sample, lims: Lims)-> dt:
-    """Get the date when a sample passed sequencing.
-    
-    This will return the last time that the sample passed sequencing.
-    """
+def datetime2date(date: dt) -> dt.date:
+    """Convert datetime.datetime to datetime.date"""
 
-    process_types = MASTER_STEPS_UDFS['sequenced']['steps']
-    date_udf = MASTER_STEPS_UDFS['sequenced']['date_udf']
-
-    sample_udfs = sample.udf.get( 'Passed Sequencing QC')
-    if not sample_udfs:
+    if date is None:
         return None
-    final_date = None
-    # Get the last atrtifact
-    artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=True)
-    if artifact:
-        final_date = artifact.parent_process.udf.get(date_udf)
-        if final_date:
-            final_date = dt.combine(final_date, time.min)
-        else:
-            final_date = str_to_datetime(artifact.parent_process.date_run)
-        
-
-    return final_date
-    
-
-def get_received_date(sample: Sample, lims: Lims)-> dt:
-    """Get the date when a sample was received.
-    """
-
-    process_types = MASTER_STEPS_UDFS['received']['steps']
-    udf = MASTER_STEPS_UDFS['received']['date_udf']
-    processes = lims.get_processes(type=process_types, inputartifactlimsid=sample.artifact.id)
-    if not processes:
-        return None
-    first_process = processes[0]
-    for process in processes:
-        if process.date_run < first_process.date_run:
-            first_process=processes
-    date_arrived = first_process.udf.get(udf)
-    if date_arrived:
-        # We need to convert datetime.date to datetime.datetime
-        datetime_arrived = str_to_datetime(date_arrived.isoformat())
-    else:
-        date_arrived = first_process.date_run
-        datetime_arrived = str_to_datetime(date_arrived)
-
-    return datetime_arrived 
-
-def get_prepared_date(sample: Sample, lims: Lims)-> dt:
-    """Get the first date when a sample was prepared in the lab.
-    """
-    process_types = MASTER_STEPS_UDFS['prepared']['steps']
-
-    artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
-
-    prepared_date = None
-    if artifact:
-        prepared_date = str_to_datetime(artifact.parent_process.date_run)
-
-    return prepared_date
-
-def get_delivery_date(sample: Sample, lims: Lims)-> dt:
-    """Get delivery date for a sample.
-    
-    This will return the first time a sample was delivered
-    """
-
-    process_types = MASTER_STEPS_UDFS['delivery']['steps']
-    udf = MASTER_STEPS_UDFS['delivery']['date_udf']
-    
-    artifact = get_output_artifact(process_types=process_types, lims_id=sample.id, lims=lims, last=False)
-    delivery_date = None
-    
-    art_date = None
-    if artifact:
-        art_date = artifact.parent_process.udf.get(udf)
-    
-    if art_date:
-        # We need to convert datetime.date to datetime.datetime
-        delivery_date = str_to_datetime(art_date.isoformat())
-
-    return delivery_date
-
+    return dt(date.year, date.month, date.day)
 
 def get_number_of_days(first_date: dt, second_date : dt) -> int:
     """Get number of days between different time stamps."""
@@ -114,7 +37,6 @@ def get_output_artifact(process_types: list, lims_id: str, lims: Lims, last: boo
     If last = False return the first artifact
     """
     artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_types)
-    
     artifact = None
     date = None
     for art in artifacts:
@@ -263,7 +185,6 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str, lims
         return concentration_art.udf.get(concentration_udf)
     else:
         return None
-
 
 
 def get_library_size(app_tag: str, lims_id: str, lims: Lims, workflow: str, hyb_type: str) -> int:
