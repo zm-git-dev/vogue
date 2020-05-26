@@ -3,13 +3,14 @@
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
 
-## [X.X.X]
+## [1.1.1]
 
 ### Changed
 - Updating release info in README
+- Picking up dates from sample udf level instaed of process udf.
 
-### Added
-- 
+### Removed
+- Removed datefunctions from vogue/vogue/parse/build/sample.py
 
 
 ## [1.1.0]
