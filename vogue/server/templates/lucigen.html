@@ -10,14 +10,22 @@
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-body">
+                            {% if amount.data != [] %}
                             <div id="amount"></div>
+                            {% else %}
+                            <div class="alert alert-warning" role="alert">No data for {{year_of_interest}}. Try another year!</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-body">
+                            {% if amount_concentration_time != {} %}
                             <div id="amount_concentration_time"></div>
+                            {% else %}
+                            <div class="alert alert-warning" role="alert">No data for {{year_of_interest}}. Try another year!</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -68,7 +76,7 @@
             type: 'scatter',
             data: {{ amount.data | tojson }}
         }]
-});
+    });
 </script>
 
 
@@ -106,6 +114,5 @@
             marker: { symbol: 'circle' }
         }] 
 });
-
 </script>
 {% endblock %}
