@@ -2,7 +2,7 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
-## [X.X.X]
+## [1.1.2]
 
 ### Changed
 - Fixes broken links from reagentlabels to reagent label in bar plot
