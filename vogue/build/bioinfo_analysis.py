@@ -175,58 +175,42 @@ def build_mongo_case(analysis_dict: dict, case_analysis: dict,
 
 def update_mongo_doc_case(mongo_doc: dict,
                           analysis_dict: dict,
-                          new_analysis: dict,
-                          processed=False):
+                          new_analysis: dict):
     '''
+    Args:
+        mongo_doc: an existing analysis retrieved from MongoDB 
+        analysis_dict: a dictionary parsed from CLI
+        new_analysis: new analysis dictionary to be loaded to MongoDB
+
+    Returns:
+        mongo_doc: an updated mongo_doc from Args
+
     Add or update mongo document for case data
     Adds or updates within processed or raw bioinfo collection
     '''
 
     analysis_samples = analysis_dict['sample']
     analysis_case = analysis_dict['case']
-    case_analysis_type = analysis_dict['case_analysis_type']
-    analysis_workflow = analysis_dict['workflow']
+    analysis_type = analysis_dict['case_analysis_type']
+    analysis_workflow_type = analysis_dict['workflow']
     workflow_version = analysis_dict['workflow_version']
 
-    if not processed:
-        if analysis_workflow in mongo_doc[
-                'workflows'] and case_analysis_type in mongo_doc[
-                    'case_analysis_types']:
-            # 1.a. case exists and workflow exists
-            mongo_doc[analysis_workflow][case_analysis_type].extend(
-                new_analysis[analysis_workflow][case_analysis_type])
-        elif analysis_workflow in mongo_doc[
-                'workflows'] and case_analysis_type not in mongo_doc[
-                    'case_analysis_types']:
-            # 1.b. case exists and workflow exists
-            mongo_doc[analysis_workflow][case_analysis_type] = copy.deepcopy(
-                new_analysis[analysis_workflow][case_analysis_type])
-            mongo_doc['case_analysis_types'].append(case_analysis_type)
-        else:
-            # 1.c case exists but workflow doesn't
-            mongo_doc['workflows'].append(analysis_workflow)
-            mongo_doc[analysis_workflow] = new_analysis[analysis_workflow]
+    
+    if analysis_workflow_type not in mongo_doc:
+        mongo_doc[analysis_workflow_type] = {} 
+
+    if analysis_type not in mongo_doc[analysis_workflow_type]:
+        mongo_doc[analysis_workflow_type][analysis_type] = new_analysis[analysis_workflow_type][analysis_type]
     else:
-        if analysis_workflow in mongo_doc['workflows']:
-            mongo_doc[analysis_workflow] = {
-                **mongo_doc[analysis_workflow],
-                **new_analysis[analysis_workflow]
-            }
-        else:
-            mongo_doc[analysis_workflow][case_analysis_type] = new_analysis[
-                analysis_workflow][case_analysis_type]
+        mongo_doc[analysis_workflow_type] = {**new_analysis[analysis_workflow_type],
+                                             **mongo_doc[analysis_workflow_type]}
+            
+    if analysis_workflow_type not in mongo_doc['workflows']:
+        mongo_doc['workflows'].append(analysis_workflow_type)
 
-        if case_analysis_type not in mongo_doc['case_analysis_types']:
-            mongo_doc['case_analysis_types'].append(case_analysis_type)
-
-
-#        if case_analysis_type in mongo_doc['case_analysis_types']:
-#             # 1.a. case exists and workflow exists
-#             mongo_doc[case_analysis_type].extend(new_analysis[case_analysis_type])
-#        else:
-#            # 1.b. case exists and workflow exists
-#            mongo_doc[case_analysis_type] = copy.deepcopy(new_analysis[case_analysis_type])
-#            mongo_doc['case_analysis_types'].append(case_analysis_type)
+    if analysis_type not in mongo_doc['case_analysis_types']:
+        LOG.info("A new analysis type %s is added to the case %s", analysis_type, analysis_case)
+        mongo_doc['case_analysis_types'].append(analysis_type)
 
     for sample in analysis_samples:
         if sample not in mongo_doc['samples']:
@@ -281,8 +265,7 @@ def build_analysis(analysis_dict: dict,
 
         mongo_doc = update_mongo_doc_case(mongo_doc=mongo_doc,
                                           analysis_dict=analysis_dict,
-                                          new_analysis=analysis,
-                                          processed=process_case)
+                                          new_analysis=analysis)
 
     return mongo_doc
 

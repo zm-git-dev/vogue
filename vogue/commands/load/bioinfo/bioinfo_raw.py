@@ -101,6 +101,12 @@ def bioinfo_raw(dry, analysis_result, analysis_type, analysis_case,
 
     analysis_dict = dict_replace_dot(analysis_dict)
 
+    if case_analysis_type == "multiqc":
+        LOG.info("--case-analysis-type set to multiqc, taking only report_saved_raw_data key")
+        report_saved_raw_data = analysis_dict["report_saved_raw_data"]
+        analysis_dict.clear()
+        analysis_dict["report_saved_raw_data"] = copy.deepcopy(report_saved_raw_data)
+
     # Get current sample if any
     old_keys = list(analysis_dict.keys())
     analysis_dict[case_analysis_type] = copy.deepcopy(analysis_dict)
