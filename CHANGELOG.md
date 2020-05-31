@@ -2,6 +2,11 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [1.1.3]
+
+### Fixed
+- Fixed an issue with loading too much data into MongoDB and crashing it
+
 ## [1.1.2]
 
 ### Changed
