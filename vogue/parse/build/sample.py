@@ -66,9 +66,8 @@ def get_output_artifact(process_types: list, lims_id: str, lims: Lims, last: boo
 
 def get_latest_input_artifact(process_type: str, lims_id: str, lims: Lims) -> Artifact:
     """Returns the input artifact related to lims_id and the step that was latest run."""
-
     latest_input_artifact = None
-    artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type) 
+    artifacts = lims.get_artifacts(samplelimsid = lims_id, process_type = process_type)
     # Make a list of tuples (<date the artifact was generated>, <artifact>): 
     date_art_list = list(set([(a.parent_process.date_run, a) for a in artifacts]))
     if date_art_list:
@@ -101,7 +100,7 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
     if not application_tag[0:6] in MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['apptags']:
         return {}
 
-    lot_nr_step = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['lot_nr_step']
+    lot_nr_steps = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['lot_nr_step']
     concentration_step = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['concentration_step']
     lot_nr_udf = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['lot_nr_udf']
     concentration_udf = MASTER_STEPS_UDFS['concentration_and_nr_defrosts']['concentration_udf']
@@ -115,7 +114,9 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str, lims: 
 
         # Ignore if multiple lot numbers:
         if lotnr and len(lotnr.split(',')) == 1 and len(lotnr.split(' ')) == 1:
-            all_defrosts = lims.get_processes(type = lot_nr_step, udf = {lot_nr_udf : lotnr})
+            all_defrosts = []
+            for step in lot_nr_steps:
+                all_defrosts += lims.get_processes(type = step, udf = {lot_nr_udf : lotnr})
             defrosts_before_this_process = []
 
             # Find the dates for all processes where the lotnr was used (all_defrosts),
@@ -149,14 +150,17 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
     amount_step = MASTER_STEPS_UDFS['final_conc_and_amount_dna']['amount_step']
 
     concentration_art = get_latest_input_artifact(concentration_step, lims_id, lims)
+
     if concentration_art:
         amount_art = None
         step = concentration_art.parent_process
         # Go back in history untill we get to an output artifact from the amount_step
         while step and not amount_art:
             art = get_latest_input_artifact(step.type.name, lims_id, lims)
-            if amount_step in [p.type.name for p in lims.get_processes(inputartifactlimsid=art.id)]:
-                amount_art = art
+            processes = [p.type.name for p in lims.get_processes(inputartifactlimsid=art.id)]
+            for step in amount_step:
+                if step in processes:
+                    amount_art = art
             step = art.parent_process
         
         amount = amount_art.udf.get(amount_udf) if amount_art else None
