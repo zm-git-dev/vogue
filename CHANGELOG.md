@@ -2,6 +2,11 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [1.1.4]
+
+### Fixed
+- New lims steps were not reflected in the lims_config and therefor sample data was not being picked up. Fixed now.
+
 ## [1.1.3]
 
 ### Fixed
