@@ -5,6 +5,11 @@ This change log will document the notable changes to this project in this file a
 ## [1.1.3]
 
 ### Fixed
+- New lims steps were not reflected in the lims_config and therefor sample data was not being picked up. Fixed now.
+
+## [1.1.3]
+
+### Fixed
 - Fixed an issue with loading too much data into MongoDB and crashing it
 
 ## [1.1.2]
