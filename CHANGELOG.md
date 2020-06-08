@@ -2,6 +2,11 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [1.1.5]
+
+### Fixed
+- Bug-fix for load reagent_labels with -d flagg
+
 ## [1.1.4]
 
 ### Fixed
