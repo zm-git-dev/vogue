@@ -161,6 +161,7 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str, lims: Lims
             for step in amount_step:
                 if step in processes:
                     amount_art = art
+                    break
             step = art.parent_process
         
         amount = amount_art.udf.get(amount_udf) if amount_art else None
