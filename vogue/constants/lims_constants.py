@@ -29,8 +29,10 @@ MASTER_STEPS_UDFS = {
         'q30r2_udf': '% Bases >=Q30 R2'
     },
     'concentration_and_nr_defrosts' : {
-        'lot_nr_step': 'CG002 - End repair Size selection A-tailing and Adapter ligation (TruSeq PCR-free DNA)',
-        'concentration_step': 'CG002 - Aggregate QC (Library Validation)',
+        'lot_nr_step': ['CG002 - End repair Size selection A-tailing and Adapter ligation (TruSeq PCR-free DNA)', 
+                        'End repair Size selection A-tailing and Adapter ligation (TruSeq PCR-free DNA)'],
+        'concentration_step': ['CG002 - Aggregate QC (Library Validation)',
+                               'Aggregate QC (Library Validation)'],
         'lot_nr_udf': 'Lot no: TruSeq DNA PCR-Free Sample Prep Kit',
         'concentration_udf': 'Concentration (nM)',
         'apptags': ['WGSPCF', 'WGTPCF', 'WGLPCF']
@@ -38,8 +40,9 @@ MASTER_STEPS_UDFS = {
     'final_conc_and_amount_dna': {
         'amount_udf': 'Amount (ng)',
         'concentration_udf': 'Concentration (nM)',
-        'concentration_step': 'CG002 - Aggregate QC (Library Validation)',
-        'amount_step': 'CG002 - Aggregate QC (DNA)',
+        'concentration_step': ['CG002 - Aggregate QC (Library Validation)',
+                                'Aggregate QC (Library Validation)'],
+        'amount_step': ['CG002 - Aggregate QC (DNA)', 'Aggregate QC (DNA)'],
         'apptags': ['WGSLIF', 'WGTLIF', 'WGLLIF']
     },
     'microbial_library_concentration': {
