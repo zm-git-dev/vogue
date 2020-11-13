@@ -5,8 +5,10 @@ pymongo
 genologics>=0.4.6
 yapf
 flask
+Flask-DebugToolbar
 coloredlogs
 mongo_adapter
 multiqc
 lzstring
+gunicorn
 werkzeug<1.0.0              # due to breaking changes in 1.0.0
