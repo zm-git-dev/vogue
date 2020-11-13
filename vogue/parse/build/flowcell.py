@@ -3,6 +3,7 @@ import numpy as np
 import datetime as dt
 import math
 
+
 def filter_none(mongo_dict):
     """Function to filter out Nones and NaN from a dict."""
     for key in list(mongo_dict.keys()):
@@ -31,19 +32,18 @@ def run_data(run):
     lane_data = {}
     avg_data = {}
     if run.type.name in MASTER_STEPS_UDFS['sequenced']['nova_seq']:
-        lanes=run.all_outputs()
+        lanes = run.all_outputs()
     else:
-        lanes=run.all_inputs()
+        lanes = run.all_inputs()
     for lane in lanes:
         if not lane.location:
             continue
         if run.type.name in MASTER_STEPS_UDFS['sequenced']['nova_seq']:
-            name=lane.name
+            name = lane.name
             if not 'Lane' in name.split():
                 continue
         else:
             name = lane.location[1]
-
 
         lane_data[name] = {}
         for udf in LANE_UDFS:
@@ -56,13 +56,13 @@ def run_data(run):
         lane_data[name] = filter_none(lane_data[name])
 
     for udf, values in avg_data.items():
-        avg_data[udf]= round(np.mean(values),2)
+        avg_data[udf] = round(np.mean(values), 2)
 
     q30_r1 = MASTER_STEPS_UDFS['sequenced']['q30r1_udf']
     q30_r2 = MASTER_STEPS_UDFS['sequenced']['q30r2_udf']
-    if q30_r1 in avg_data.keys() and  q30_r2 in avg_data.keys():
-        Q30 = np.mean([avg_data[q30_r1],avg_data[q30_r2]])
+    if q30_r1 in avg_data.keys() and q30_r2 in avg_data.keys():
+        Q30 = np.mean([avg_data[q30_r1], avg_data[q30_r2]])
         avg_data['% Bases >=Q30'] = Q30
-    avg_data = filter_none(avg_data)    
+    avg_data = filter_none(avg_data)
 
     return lane_data, avg_data

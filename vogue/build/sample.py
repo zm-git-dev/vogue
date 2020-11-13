@@ -4,25 +4,30 @@ from datetime import datetime as dt
 
 from vogue.parse.build.sample import *
 
-def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
+
+def build_sample(sample: Sample, lims: Lims, adapter) -> dict:
     """Build lims sample"""
 
     application_tag = sample.udf.get('Sequencing Analysis')
-    category = adapter.get_category(application_tag) 
+    category = adapter.get_category(application_tag)
     received_at = datetime2date(sample.udf.get('Received at'))
     delivered_at = datetime2date(sample.udf.get('Delivered at'))
     sequenced_at = datetime2date(sample.udf.get('Sequencing Finished'))
     prepared_at = datetime2date(sample.udf.get('Library Prep Finished'))
 
-    mongo_sample = {'_id' : sample.id}
+    mongo_sample = {'_id': sample.id}
     mongo_sample['sequenced_date'] = sequenced_at
     mongo_sample['received_date'] = received_at
     mongo_sample['prepared_date'] = prepared_at
     mongo_sample['delivery_date'] = delivered_at
-    mongo_sample['sequenced_to_delivered'] = get_number_of_days(sequenced_at, delivered_at)
-    mongo_sample['prepped_to_sequenced'] = get_number_of_days(prepared_at, sequenced_at)
-    mongo_sample['received_to_prepped'] = get_number_of_days(received_at, prepared_at)
-    mongo_sample['received_to_delivered'] = get_number_of_days(received_at, delivered_at)
+    mongo_sample['sequenced_to_delivered'] = get_number_of_days(
+        sequenced_at, delivered_at)
+    mongo_sample['prepped_to_sequenced'] = get_number_of_days(
+        prepared_at, sequenced_at)
+    mongo_sample['received_to_prepped'] = get_number_of_days(
+        received_at, prepared_at)
+    mongo_sample['received_to_delivered'] = get_number_of_days(
+        received_at, delivered_at)
     mongo_sample['family'] = sample.udf.get('Family')
     mongo_sample['strain'] = sample.udf.get('Strain')
     mongo_sample['source'] = sample.udf.get('Source')
@@ -34,27 +39,36 @@ def build_sample(sample: Sample, lims: Lims, adapter)-> dict:
     mongo_sample['application_tag'] = application_tag
     mongo_sample['category'] = category
 
-    conc_and_amount = get_final_conc_and_amount_dna(application_tag, sample.id, lims)
+    conc_and_amount = get_final_conc_and_amount_dna(application_tag, sample.id,
+                                                    lims)
     mongo_sample['amount'] = conc_and_amount.get('amount')
     mongo_sample['amount-concentration'] = conc_and_amount.get('concentration')
 
-    concentration_and_nr_defrosts = get_concentration_and_nr_defrosts(application_tag, sample.id, lims)
-    mongo_sample['nr_defrosts'] = concentration_and_nr_defrosts.get('nr_defrosts')
-    mongo_sample['nr_defrosts-concentration'] = concentration_and_nr_defrosts.get('concentration')
+    concentration_and_nr_defrosts = get_concentration_and_nr_defrosts(
+        application_tag, sample.id, lims)
+    mongo_sample['nr_defrosts'] = concentration_and_nr_defrosts.get(
+        'nr_defrosts')
+    mongo_sample[
+        'nr_defrosts-concentration'] = concentration_and_nr_defrosts.get(
+            'concentration')
     mongo_sample['lotnr'] = concentration_and_nr_defrosts.get('lotnr')
 
-    mongo_sample['microbial_library_concentration'] = get_microbial_library_concentration(application_tag, sample.id, lims)
-    
-    mongo_sample['library_size_pre_hyb'] = get_library_size(application_tag, sample.id, lims, 
-                                                            'TWIST', 'library_size_pre_hyb')
-    mongo_sample['library_size_post_hyb'] = get_library_size(application_tag, sample.id, lims, 
-                                                            'TWIST', 'library_size_post_hyb')
+    mongo_sample[
+        'microbial_library_concentration'] = get_microbial_library_concentration(
+            application_tag, sample.id, lims)
+
+    mongo_sample['library_size_pre_hyb'] = get_library_size(
+        application_tag, sample.id, lims, 'TWIST', 'library_size_pre_hyb')
+    mongo_sample['library_size_post_hyb'] = get_library_size(
+        application_tag, sample.id, lims, 'TWIST', 'library_size_post_hyb')
     if not mongo_sample['library_size_post_hyb']:
         if not received_at or received_at < dt(2019, 1, 1):
-            mongo_sample['library_size_pre_hyb'] = get_library_size(application_tag, sample.id, lims, 
-                                                                'SureSelect', 'library_size_pre_hyb')
-            mongo_sample['library_size_post_hyb'] = get_library_size(application_tag, sample.id, lims, 
-                                                                'SureSelect', 'library_size_post_hyb')
+            mongo_sample['library_size_pre_hyb'] = get_library_size(
+                application_tag, sample.id, lims, 'SureSelect',
+                'library_size_pre_hyb')
+            mongo_sample['library_size_post_hyb'] = get_library_size(
+                application_tag, sample.id, lims, 'SureSelect',
+                'library_size_post_hyb')
 
     for key in list(mongo_sample.keys()):
         if mongo_sample[key] is None:

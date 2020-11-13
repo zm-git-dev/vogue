@@ -14,9 +14,13 @@ def test_build_reagent_label_category(lims_reagent_label):
     # WHEN running build_reagent_label_category:
     mongo_reagent_label = build_reagent_label_category(lims_reagent_label)
 
-    # THEN assert 
-    assert mongo_reagent_label ==  {'_id': name, 'sequence': sequence, 'category': category,
-                                    'name': name}
+    # THEN assert
+    assert mongo_reagent_label == {
+        '_id': name,
+        'sequence': sequence,
+        'category': category,
+        'name': name
+    }
 
 
 def test_build_reagent_label_category_Nones(lims_reagent_label):
@@ -32,6 +36,10 @@ def test_build_reagent_label_category_Nones(lims_reagent_label):
     # WHEN running build_reagent_label_category:
     mongo_reagent_label = build_reagent_label_category(lims_reagent_label)
 
-    # THEN assert 
-    assert mongo_reagent_label ==  {'_id': name, 'sequence': sequence, 'category': category,
-                                    'name': name}
+    # THEN assert
+    assert mongo_reagent_label == {
+        '_id': name,
+        'sequence': sequence,
+        'category': category,
+        'name': name
+    }

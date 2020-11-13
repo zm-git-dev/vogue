@@ -4,7 +4,6 @@ import logging
 import click
 import coloredlogs
 
-
 from flask.cli import FlaskGroup, with_appcontext
 from flask import current_app
 
@@ -24,7 +23,7 @@ LOG = logging.getLogger(__name__)
 @click.version_option(__version__)
 @click.group(cls=FlaskGroup,
              create_app=create_app,
-             add_default_commands=True, 
+             add_default_commands=True,
              invoke_without_command=False,
              add_version_option=False)
 @click.option("-c", "--config", type=click.File(), help="Path to config file")

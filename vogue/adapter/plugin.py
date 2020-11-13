@@ -9,9 +9,11 @@ def check_dates(analysis_result, current_document):
     """Function to pop analysysis results from tne new analysis if the results are older than 
     the current results in the database"""
 
-    if current_document and current_document.get('mip') and analysis_result.get('mip'):
+    if current_document and current_document.get(
+            'mip') and analysis_result.get('mip'):
         try:
-            if current_document['mip']['added'] > analysis_result['mip']['added']:
+            if current_document['mip']['added'] > analysis_result['mip'][
+                    'added']:
                 analysis_result.pop('mip')
         except:
             LOG.error("Invalid or missing mip analysis date. Skiping analysis")
@@ -21,7 +23,6 @@ def check_dates(analysis_result, current_document):
 
 
 class VougeAdapter(MongoAdapter):
-
     def setup(self, db_name: str):
         """Setup connection to a database"""
 
@@ -46,25 +47,24 @@ class VougeAdapter(MongoAdapter):
 
         document_id = document_news['_id']
 
-        update_result = collection.update_one({'_id': document_id}, 
-                                                         {'$set': document_news}, 
-                                                         upsert=True)
+        update_result = collection.update_one({'_id': document_id},
+                                              {'$set': document_news},
+                                              upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
             collection.update_one({'_id': document_id},
-                                               {'$set': {
-                                                   'added': dt.today()
-                                               }})
+                                  {'$set': {
+                                      'added': dt.today()
+                                  }})
             LOG.info("Added document %s.", document_id)
         elif update_result.modified_count:
-            collection.update_one(
-                {'_id': document_id}, {'$set': {
-                    'updated': dt.today()
-                }})
+            collection.update_one({'_id': document_id},
+                                  {'$set': {
+                                      'updated': dt.today()
+                                  }})
             LOG.info("Updated document %s.", document_id)
         else:
             LOG.info("No updates for document %s.", document_id)
-
 
     def add_or_update_bioinfo_raw(self, analysis_result: dict):
         """Functionality to add or update analysis for unprocessed aka raw bioinfo stat"""
@@ -132,25 +132,23 @@ class VougeAdapter(MongoAdapter):
         current_document = self.db.bioinfo_samples.find_one({'_id': lims_id})
         analysis_result = check_dates(analysis_result, current_document)
 
-        update_result = self.db.bioinfo_samples.update_one({'_id': lims_id},
-                                                  {'$set': analysis_result},
-                                                  upsert=True)
+        update_result = self.db.bioinfo_samples.update_one(
+            {'_id': lims_id}, {'$set': analysis_result}, upsert=True)
 
         if not update_result.raw_result['updatedExisting']:
             self.db.bioinfo_samples.update_one({'_id': lims_id},
-                                      {'$set': {
-                                          'added': dt.today()
-                                      }})
+                                               {'$set': {
+                                                   'added': dt.today()
+                                               }})
             LOG.info("Added sample %s.", lims_id)
         elif update_result.modified_count:
-            self.db.bioinfo_samples.update_one({'_id': lims_id},
-                                      {'$set': {
-                                          'updated': dt.today()
-                                      }})
+            self.db.bioinfo_samples.update_one(
+                {'_id': lims_id}, {'$set': {
+                    'updated': dt.today()
+                }})
             LOG.info("Updated sample %s.", lims_id)
         else:
             LOG.info("No updates for sample %s.", lims_id)
-
 
     def sample(self, lims_id):
         return self.sample_collection.find_one({'_id': lims_id})
@@ -189,22 +187,30 @@ class VougeAdapter(MongoAdapter):
         """Function to make a aggregation on the flowcell colleciton"""
         return self.flowcell_collection.aggregate(pipe)
 
-    def bioinfo_samples_aggregate(self, pipe : list):
+    def bioinfo_samples_aggregate(self, pipe: list):
         """Function to make a aggregation on the sample analysis colleciton"""
         return self.bioinfo_samples_collection.aggregate(pipe)
 
     def sample_collection_ids(self):
-        pipe = [{'$project': {'_id': 1}
-                }, {'$group': {'_id': None, 
-                    'ids': {'$addToSet': '$_id'}}}]
+        pipe = [{
+            '$project': {
+                '_id': 1
+            }
+        }, {
+            '$group': {
+                '_id': None,
+                'ids': {
+                    '$addToSet': '$_id'
+                }
+            }
+        }]
         return self.sample_collection.aggregate(pipe)
-        
 
-    def genotype_analysis_aggregate(self, pipe : list):
+    def genotype_analysis_aggregate(self, pipe: list):
         """Function to make a aggregation on the genotype analysis colleciton"""
         return self.genotype_analysis_collection.aggregate(pipe)
 
-    def find_genotype_plate(self, plate_id : str):
+    def find_genotype_plate(self, plate_id: str):
         """find all samples from plate"""
         return self.genotype_analysis_collection.find({'plate': plate_id})
 
@@ -220,23 +226,39 @@ class VougeAdapter(MongoAdapter):
                                                     {"category": 1})
         return category.get('category') if category else None
 
-    def reagent_label_aggregate(self, pipe : list):
+    def reagent_label_aggregate(self, pipe: list):
         """Function to make a aggregation on the reagent_label analysis colleciton"""
         return self.reagent_label_collection.aggregate(pipe)
 
     def get_all_reagent_label_names_grouped_by_category(self):
         """Function get all reagent label names grouped by category  
         from the reagent_label_category colleciton"""
-        pipe = [{'$group': {'_id': {'category': '$category'}, 
-                    'reagent_labels': {'$push': '$name'}}}]
+        pipe = [{
+            '$group': {
+                '_id': {
+                    'category': '$category'
+                },
+                'reagent_labels': {
+                    '$push': '$name'
+                }
+            }
+        }]
         return self.reagent_label_category_collection.aggregate(pipe)
 
     def get_reagent_label_categories(self):
         """Function to get all categories from label_category_collection"""
-        pipe = [{'$project': {'category': 1}
-                 }, {
-                 '$group': {'_id': None, 
-                            'categories': {'$addToSet': '$category'}}
-                 }]
-        reagent_label_categories = self.reagent_label_category_collection.aggregate(pipe)
+        pipe = [{
+            '$project': {
+                'category': 1
+            }
+        }, {
+            '$group': {
+                '_id': None,
+                'categories': {
+                    '$addToSet': '$category'
+                }
+            }
+        }]
+        reagent_label_categories = self.reagent_label_category_collection.aggregate(
+            pipe)
         return list(reagent_label_categories)[0]['categories']

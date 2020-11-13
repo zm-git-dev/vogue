@@ -14,14 +14,13 @@ NOT_FILE = 'tests/fixtures'
 
 
 class Testcase_cli_utils(unittest.TestCase):
-
     def test_add_doc(self):
         @add_doc("doc decorator")
         def my_func():
             pass
 
         self.assertEqual(my_func.__doc__, "doc decorator")
-    
+
     def test_check_file(self):
         with self.assertRaises(FileNotFoundError) as e:
             check_file(NOT_FILE)
@@ -36,7 +35,8 @@ class Testcase_cli_utils(unittest.TestCase):
 
         with self.assertLogs('json_read', level='WARNING') as l:
             logging.getLogger('json_read').warning('Input config is not JSON')
-        self.assertEqual(l.output, ['WARNING:json_read:Input config is not JSON'])
+        self.assertEqual(l.output,
+                         ['WARNING:json_read:Input config is not JSON'])
 
     def test_yaml_read(self):
         self.assertEqual(yaml_read(INVALID_YAML), False)
@@ -45,4 +45,5 @@ class Testcase_cli_utils(unittest.TestCase):
 
         with self.assertLogs('yaml_read', level='WARNING') as l:
             logging.getLogger('yaml_read').warning('Input config is not YAML')
-        self.assertEqual(l.output, ['WARNING:yaml_read:Input config is not YAML'])
+        self.assertEqual(l.output,
+                         ['WARNING:yaml_read:Input config is not YAML'])

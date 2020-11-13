@@ -3,7 +3,9 @@ from vogue.build.bioinfo_analysis import get_common_keys
 
 def test_get_common_keys():
     ## GIVEN a list of valid analysis results
-    test_valid_analysis = ['multiqc_picard_dups', 'new_analysis_type', 'quast_assembly']
+    test_valid_analysis = [
+        'multiqc_picard_dups', 'new_analysis_type', 'quast_assembly'
+    ]
     test_actual_common_keys = ['multiqc_picard_dups']
 
     ## WHEN extracting the valid ones

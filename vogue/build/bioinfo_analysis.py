@@ -9,7 +9,8 @@ from vogue.tools.cli_utils import convert_defaultdict_to_regular_dict
 
 LOG = logging.getLogger(__name__)
 
-def get_common_keys(valid_analysis:list, analysis_type: str):
+
+def get_common_keys(valid_analysis: list, analysis_type: str):
     '''
     Match a list of values with keys from a MODEL dictionary
 
@@ -23,8 +24,9 @@ def get_common_keys(valid_analysis:list, analysis_type: str):
         if my_analysis in list(
                 analysis_model.ANALYSIS_SETS[analysis_type].keys()):
             analysis_common_keys.append(my_analysis)
-    
-    return analysis_common_keys 
+
+    return analysis_common_keys
+
 
 def extract_valid_analysis(analysis_dict: dict, analysis_type: str,
                            valid_analysis: list):
@@ -173,8 +175,7 @@ def build_mongo_case(analysis_dict: dict, case_analysis: dict,
     return analysis
 
 
-def update_mongo_doc_case(mongo_doc: dict,
-                          analysis_dict: dict,
+def update_mongo_doc_case(mongo_doc: dict, analysis_dict: dict,
                           new_analysis: dict):
     '''
     Args:
@@ -195,21 +196,24 @@ def update_mongo_doc_case(mongo_doc: dict,
     analysis_workflow_type = analysis_dict['workflow']
     workflow_version = analysis_dict['workflow_version']
 
-    
     if analysis_workflow_type not in mongo_doc:
-        mongo_doc[analysis_workflow_type] = {} 
+        mongo_doc[analysis_workflow_type] = {}
 
     if analysis_type not in mongo_doc[analysis_workflow_type]:
-        mongo_doc[analysis_workflow_type][analysis_type] = new_analysis[analysis_workflow_type][analysis_type]
+        mongo_doc[analysis_workflow_type][analysis_type] = new_analysis[
+            analysis_workflow_type][analysis_type]
     else:
-        mongo_doc[analysis_workflow_type] = {**new_analysis[analysis_workflow_type],
-                                             **mongo_doc[analysis_workflow_type]}
-            
+        mongo_doc[analysis_workflow_type] = {
+            **new_analysis[analysis_workflow_type],
+            **mongo_doc[analysis_workflow_type]
+        }
+
     if analysis_workflow_type not in mongo_doc['workflows']:
         mongo_doc['workflows'].append(analysis_workflow_type)
 
     if analysis_type not in mongo_doc['case_analysis_types']:
-        LOG.info("A new analysis type %s is added to the case %s", analysis_type, analysis_case)
+        LOG.info("A new analysis type %s is added to the case %s",
+                 analysis_type, analysis_case)
         mongo_doc['case_analysis_types'].append(analysis_type)
 
     for sample in analysis_samples:

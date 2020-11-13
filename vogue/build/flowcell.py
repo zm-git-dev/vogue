@@ -4,12 +4,15 @@ from genologics.lims import Lims
 from vogue.parse.build.flowcell import run_data, filter_none
 import datetime as dt
 
-def build_run(run: Process, instrument:str, date:str)-> dict:
+
+def build_run(run: Process, instrument: str, date: str) -> dict:
     """Build flowcell document from lims data."""
-        
-    mongo_run = {'_id' : run.udf.get('Run ID'), 
-                'instrument' : instrument, 
-                'date': dt.datetime.strptime(date, '%y%m%d')}
+
+    mongo_run = {
+        '_id': run.udf.get('Run ID'),
+        'instrument': instrument,
+        'date': dt.datetime.strptime(date, '%y%m%d')
+    }
 
     for key, val in run.udf.items():
         if isinstance(val, dt.date):

@@ -1,46 +1,62 @@
 from statistics import mean
 
 
-def reagent_category_data(
-    adapter, index_category: str, flowcell_performance_treshold: float
-) -> dict:
+def reagent_category_data(adapter, index_category: str,
+                          flowcell_performance_treshold: float) -> dict:
     """Preraring data for index performance view grouped on reagent label category"""
 
-    pipe = ([
-            {"$lookup": {
-                    "from": "reagent_label_category",
-                    "localField": "index",
-                    "foreignField": "_id",
-                    "as": "index_category"}},
-            {"$match": {"index_category.category": index_category}}]
-        + _normalized_performance_pipe(flowcell_performance_treshold) + [
-            {"$project": {
-                    "_id": "$_id.index",
-                    "avg_performance": {"$avg": "$normalized_index_performance"},
-                    "nr_runs": {"$size": "$normalized_index_performance"}}}
-        ]
-    )
+    pipe = ([{
+        "$lookup": {
+            "from": "reagent_label_category",
+            "localField": "index",
+            "foreignField": "_id",
+            "as": "index_category"
+        }
+    }, {
+        "$match": {
+            "index_category.category": index_category
+        }
+    }] + _normalized_performance_pipe(flowcell_performance_treshold) + [{
+        "$project": {
+            "_id": "$_id.index",
+            "avg_performance": {
+                "$avg": "$normalized_index_performance"
+            },
+            "nr_runs": {
+                "$size": "$normalized_index_performance"
+            }
+        }
+    }])
 
     aggregate_result = adapter.reagent_label_aggregate(pipe)
 
     average_normalized_peformance = []
 
     for data in aggregate_result:
-        average_normalized_peformance.append(
-            {
-                "name": data["_id"],
-                "y": data["avg_performance"],
-                "nr_runs": data["nr_runs"],
-                "url": data["_id"].replace(" ", ""),
-            }
-        )
+        average_normalized_peformance.append({
+            "name":
+            data["_id"],
+            "y":
+            data["avg_performance"],
+            "nr_runs":
+            data["nr_runs"],
+            "url":
+            data["_id"].replace(" ", ""),
+        })
     return average_normalized_peformance
 
 
-def reagent_label_data(adapter, index: str, flowcell_performance_treshold: float) -> list:
+def reagent_label_data(adapter, index: str,
+                       flowcell_performance_treshold: float) -> list:
     """Preraring data for index performance view grouped on reagent label"""
 
-    pipe = [{"$match": {"url": {"$eq": index}}}] + _normalized_performance_pipe(flowcell_performance_treshold)
+    pipe = [{
+        "$match": {
+            "url": {
+                "$eq": index
+            }
+        }
+    }] + _normalized_performance_pipe(flowcell_performance_treshold)
 
     aggregate_result = list(adapter.reagent_label_aggregate(pipe))
 
@@ -50,7 +66,8 @@ def reagent_label_data(adapter, index: str, flowcell_performance_treshold: float
     performance = aggregate_result[0]["normalized_index_performance"]
     flowcells = aggregate_result[0]["flowcell_id"]
 
-    normalized_peformance = list(map(lambda x, y: [x, y], flowcells, performance))
+    normalized_peformance = list(
+        map(lambda x, y: [x, y], flowcells, performance))
     return normalized_peformance
 
 
@@ -60,11 +77,29 @@ def _normalized_performance_pipe(flowcell_performance_treshold) -> list:
     return [
         {
             "$match": {
-                "flowcell_target_reads": {"$exists": "True", "$ne": None, "$gt": 0},
-                "flowcell_total_reads": {"$exists": "True", "$ne": None, "$gt": 0},
-                "index_target_reads": {"$exists": "True", "$ne": None, "$gt": 0},
-                "index_total_reads": {"$exists": "True", "$ne": None, "$gt": 1000},
-                "flowcell_id": {"$exists": "True"},
+                "flowcell_target_reads": {
+                    "$exists": "True",
+                    "$ne": None,
+                    "$gt": 0
+                },
+                "flowcell_total_reads": {
+                    "$exists": "True",
+                    "$ne": None,
+                    "$gt": 0
+                },
+                "index_target_reads": {
+                    "$exists": "True",
+                    "$ne": None,
+                    "$gt": 0
+                },
+                "index_total_reads": {
+                    "$exists": "True",
+                    "$ne": None,
+                    "$gt": 1000
+                },
+                "flowcell_id": {
+                    "$exists": "True"
+                },
             }
         },
         {
@@ -74,7 +109,8 @@ def _normalized_performance_pipe(flowcell_performance_treshold) -> list:
                     "$divide": ["$index_total_reads", "$index_target_reads"]
                 },
                 "flowcell_performance": {
-                    "$divide": ["$flowcell_total_reads", "$flowcell_target_reads"]
+                    "$divide":
+                    ["$flowcell_total_reads", "$flowcell_target_reads"]
                 },
                 "index": 1,
             }
@@ -89,15 +125,27 @@ def _normalized_performance_pipe(flowcell_performance_treshold) -> list:
                 "index": 1,
             }
         },
-        {"$match": {"flowcell_performance": {"$gt": flowcell_performance_treshold}}},
+        {
+            "$match": {
+                "flowcell_performance": {
+                    "$gt": flowcell_performance_treshold
+                }
+            }
+        },
         {
             "$group": {
-                "_id": {"index": "$index"},
+                "_id": {
+                    "index": "$index"
+                },
                 "normalized_index_performance": {
                     "$push": "$normalized_index_performance"
                 },
-                "flowcell_performance": {"$push": "$flowcell_performance"},
-                "flowcell_id": {"$push": "$flowcell_id"},
+                "flowcell_performance": {
+                    "$push": "$flowcell_performance"
+                },
+                "flowcell_id": {
+                    "$push": "$flowcell_id"
+                },
             }
         },
     ]

@@ -8,14 +8,16 @@ from vogue.constants.constants import RUN_TYPES
 
 LOG = logging.getLogger(__name__)
 
-@click.command("reagent_label_categories", short_help = "Load reagent_labels into db.")
-@click.option('-c', '--categories',multiple=True,  type=str,
-              help = 'Loads all reagent_label cathegories from lims.')
 
-
-
+@click.command("reagent_label_categories",
+               short_help="Load reagent_labels into db.")
+@click.option('-c',
+              '--categories',
+              multiple=True,
+              type=str,
+              help='Loads all reagent_label cathegories from lims.')
 @with_appcontext
-def reagent_label_categories(categories:list = None):
+def reagent_label_categories(categories: list = None):
     """Read and load reagent_label categories from lims"""
 
     if not current_app.lims:

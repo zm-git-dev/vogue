@@ -13,8 +13,8 @@ from vogue.commands.load.bioinfo.bioinfo_sample import bioinfo_sample as bioinfo
 from vogue import __version__
 from vogue.tools.cli_utils import add_doc as doc
 
-
 LOG = logging.getLogger(__name__)
+
 
 @click.group()
 @click.version_option(version=__version__)
@@ -23,6 +23,7 @@ def bioinfo():
     """Main entry point of load commands"""
 
     pass
+
 
 bioinfo.add_command(bioinfo_raw_command)
 bioinfo.add_command(bioinfo_process_command)

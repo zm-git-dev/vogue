@@ -22,7 +22,10 @@ LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
 LOG = logging.getLogger(__name__)
 
 
-@click.command("raw", short_help="Read files from analysis workflows and laods in bioinfo_raw collection.")
+@click.command(
+    "raw",
+    short_help=
+    "Read files from analysis workflows and laods in bioinfo_raw collection.")
 @click.option('--sample-list',
               help='''Input list of comma separated sample names. Or specify it
 within input results file under "samples" key.''')
@@ -102,10 +105,13 @@ def bioinfo_raw(dry, analysis_result, analysis_type, analysis_case,
     analysis_dict = dict_replace_dot(analysis_dict)
 
     if case_analysis_type == "multiqc":
-        LOG.info("--case-analysis-type set to multiqc, taking only report_saved_raw_data key")
+        LOG.info(
+            "--case-analysis-type set to multiqc, taking only report_saved_raw_data key"
+        )
         report_saved_raw_data = analysis_dict["report_saved_raw_data"]
         analysis_dict.clear()
-        analysis_dict["report_saved_raw_data"] = copy.deepcopy(report_saved_raw_data)
+        analysis_dict["report_saved_raw_data"] = copy.deepcopy(
+            report_saved_raw_data)
 
     # Get current sample if any
     old_keys = list(analysis_dict.keys())

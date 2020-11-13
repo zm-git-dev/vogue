@@ -23,7 +23,9 @@ LOG = logging.getLogger(__name__)
 
 @click.command(
     "process",
-    short_help='''Process stats and result from bioinfo raw and load into the bioinfo_processed collection. ''')
+    short_help=
+    '''Process stats and result from bioinfo raw and load into the bioinfo_processed collection. '''
+)
 @click.option(
     '-t',
     '--analysis-type',

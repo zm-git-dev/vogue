@@ -1,4 +1,3 @@
-
 import os
 import logging
 
@@ -10,7 +9,7 @@ from vogue.adapter.plugin import VougeAdapter
 from vogue.server.views import blueprint
 
 from genologics.lims import Lims
-from genologics.config import BASEURI,USERNAME,PASSWORD
+from genologics.config import BASEURI, USERNAME, PASSWORD
 
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger(__name__)
@@ -30,9 +29,10 @@ def create_app(test=False):
 
     return app
 
+
 def configure_app(app, config=None):
     try:
-        app.lims = Lims(BASEURI,USERNAME,PASSWORD)
+        app.lims = Lims(BASEURI, USERNAME, PASSWORD)
     except:
         app.lims = None
 
@@ -43,10 +43,10 @@ def configure_app(app, config=None):
     db_name = app.config['DB_NAME']
     app.client = client
     app.db = client[db_name]
-    app.adapter = VougeAdapter(client, db_name = db_name)
+    app.adapter = VougeAdapter(client, db_name=db_name)
     app.register_blueprint(blueprint)
 
-    if app.config['DEBUG']==1:
+    if app.config['DEBUG'] == 1:
         from flask_debugtoolbar import DebugToolbarExtension
         toolbar = DebugToolbarExtension(app)
 

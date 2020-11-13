@@ -101,6 +101,7 @@ def concat_dict_keys(my_dict: dict, key_name="", out_key_list=list()):
 
     return out_key_list
 
+
 def recursive_default_dict():
     '''
     Recursivly create defaultdict.
