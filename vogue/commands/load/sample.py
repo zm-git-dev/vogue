@@ -45,8 +45,9 @@ def sample(sample_lims_id, all_samples, load_from, days, dry):
                 load_recent(current_app.adapter, lims, the_date)
                 break
             except:
+                LOG.info('Retrying')
                 sleep(600)
-                LOG.warning('Timed Out - Retrying')
+                LOG.warning('Timed Out')
                 continue
 
     elif all_samples:
