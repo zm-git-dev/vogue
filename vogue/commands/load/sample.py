@@ -46,6 +46,7 @@ def sample(sample_lims_id, all_samples, load_from, days, dry):
                 break
             except:
                 sleep(600)
+                LOG.warning('Timed Out - Retrying')
                 continue
 
     elif all_samples:
