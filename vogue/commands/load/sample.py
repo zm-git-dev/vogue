@@ -1,5 +1,6 @@
 import logging
 import click
+from time import sleep
 from vogue.load.sample import load_one, load_all, load_recent, load_one_dry, load_all_dry
 from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
@@ -39,7 +40,14 @@ def sample(sample_lims_id, all_samples, load_from, days, dry):
     if days:
         some_days_ago = date.today() - timedelta(days=days)
         the_date = some_days_ago.strftime("%Y-%m-%dT00:00:00Z")
-        load_recent(current_app.adapter, lims, the_date)
+        for _ in range(10):
+            try:
+                load_recent(current_app.adapter, lims, the_date)
+                break
+            except:
+                sleep(600)
+                continue
+
     elif all_samples:
         if dry:
             load_all_dry()
