@@ -1,3 +1,5 @@
+import logging
+
 from vogue.server import create_app
 from vogue.commands.base import cli
 from vogue.adapter.plugin import VougeAdapter
@@ -136,11 +138,11 @@ def test_sample_dry_all(database, lims, caplog):
     app.adapter = adapter
     app.db = database
     app.lims = lims
+    with caplog.at_level(logging.INFO):
+        # WHEN runing load all with dry
+        runner = app.test_cli_runner()
+        result = runner.invoke(cli, ['load', 'sample', '-a', '--dry'])
 
-    # WHEN runing load all with dry
-    runner = app.test_cli_runner()
-    result = runner.invoke(cli, ['load', 'sample', '-a', '--dry'])
-
-    # THEN the program will log, and do nothig
-    assert "Will load all lims samples." in caplog.text
-    assert app.adapter.sample_collection.estimated_document_count() == 0
+        # THEN the program will log, and do nothig
+        assert "Will load all lims samples." in caplog.text
+        assert app.adapter.sample_collection.estimated_document_count() == 0

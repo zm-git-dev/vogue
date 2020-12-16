@@ -24,4 +24,5 @@ ENV PATH="/home/vogue/.local/bin:${PATH}"
 RUN cd /home/vogue/vogue && pip install --no-cache-dir -r requirements.txt
 RUN cd /home/vogue/vogue && pip install --no-cache-dir -e .
 
+# Expose port for vogue
 EXPOSE 5000
