@@ -661,7 +661,6 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str) -> dict:
         result['_id']['month']: result[metric]
         for result in aggregate_result
     }
-    print(intermediate)
     box_plots = []
     labels = []
     means = []
