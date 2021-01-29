@@ -255,8 +255,10 @@ def balsamic(year):
 @blueprint.route('/Bioinfo/Microbial/strain_st/<year>',
                  methods=['GET', 'POST'])
 def microsalt_strain_st(year):
-    strain = request.form.get('strain', '')
     results = microsalt_get_strain_st(app.adapter, year)
+    strain = request.form.get('strain', '')
+    if results and not strain:
+        strain = list(results.keys())[0]
 
     return render_template('microsalt_strain_st.html',
                            data=results.get(strain, {}),
@@ -306,8 +308,10 @@ def microsalt_untyped(year):
 
 @blueprint.route('/Bioinfo/Microbial/st_time/<year>', methods=['GET', 'POST'])
 def microsalt_st_time(year):
-    strain = request.form.get('strain', 'E.coli')
+    strain = request.form.get('strain', '')
     results_all = microsalt_get_st_time(app.adapter, year)
+    if results_all['data'] and not strain:
+        strain = list(results_all['data'].keys())[0]
     strain_results = results_all['data'].get(strain, {})
 
     return render_template('microsalt_st_time.html',
