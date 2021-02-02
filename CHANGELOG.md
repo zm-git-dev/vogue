@@ -2,6 +2,12 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [1.1.6]
+
+### Fixed
+- Bug-fix Microbial QC data over time was not showing up because the data sometimes conained empty strings. Solving by filtering.
+- Auto select strain if not selected. When you enter the view you will see data directly. Not have to select strain first.
+
 ## [1.1.5]
 
 ### Fixed
