@@ -575,7 +575,8 @@ def microsalt_get_strain_st(adapter, year: int) -> dict:
                 '$exists': 'True'
             },
             '_id.sequence_type': {
-                '$exists': 'True'
+                '$exists': 'True',
+                '$ne': ''
             }
         }
     }, {
