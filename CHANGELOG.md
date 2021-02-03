@@ -2,6 +2,12 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [x.x.x]
+
+### Fixed
+- Bug - ST-total - Samples with missing sequence type showed up as a bar without name.
+- Adding new lims development wf
+
 ## [1.1.6]
 
 ### Fixed
