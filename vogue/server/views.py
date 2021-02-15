@@ -13,7 +13,6 @@ blueprint = Blueprint('server', __name__)
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
     year = request.form.get('year', str(THIS_YEAR))
-
     if request.form.get('page') == 'turn_around_times':
         return redirect(url_for('server.turn_around_times', year=year))
     if request.form.get('page') == 'samples':
@@ -40,6 +39,10 @@ def index():
         return redirect(url_for('server.microsalt_untyped', year=year))
     if request.form.get('page') == 'microsalt_st_time':
         return redirect(url_for('server.microsalt_st_time', year=year))
+    if request.form.get('page') == 'microsalt_cov_qc_time':
+        return redirect(url_for('covid.microsalt_qc_time', year=year))
+    if request.form.get('page') == 'cov_qc_scatter':
+        return redirect(url_for('covid.qc_scatter', year=year))
     if request.form.get('page') == 'genotype_plate':
         return redirect(url_for('server.genotype_plate'))
     if request.form.get('page') == 'reagent_labels':
@@ -252,6 +255,7 @@ def balsamic(year):
                            years=YEARS)
 
 
+
 @blueprint.route('/Bioinfo/Microbial/strain_st/<year>',
                  methods=['GET', 'POST'])
 def microsalt_strain_st(year):
@@ -275,7 +279,7 @@ def microsalt_strain_st(year):
 def microsalt_qc_time(year):
     metric_path = request.form.get('qc_metric',
                                    'picard_markduplicate.insert_size')
-    results = microsalt_get_qc_time(app.adapter, year, metric_path)
+    results = microsalt_get_qc_time(app.adapter, year=year, metric_path=metric_path, category='mic')
 
     return render_template('microsalt_qc_time.html',
                            results=results['data'],
@@ -284,11 +288,15 @@ def microsalt_qc_time(year):
                            selected_group=metric_path.split('.')[0],
                            selected_metric=metric_path.split('.')[1],
                            header='Microsalt',
+                           page_url='server.microsalt_qc_time',
                            page_id='microsalt_qc_time',
                            version=__version__,
                            year_of_interest=year,
                            MICROSALT=MICROSALT,
                            years=YEARS)
+
+
+
 
 
 @blueprint.route('/Bioinfo/Microbial/untyped/<year>', methods=['GET', 'POST'])

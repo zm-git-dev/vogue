@@ -398,7 +398,6 @@ def instrument_info(adapter, year: int, metric: str) -> dict:
     }]
 
     aggregate_result = adapter.flowcells_aggregate(pipe)
-
     for result in aggregate_result:
         group = result['_id']['instrument']
         for plot_name in LANE_UDFS:
@@ -411,7 +410,7 @@ def instrument_info(adapter, year: int, metric: str) -> dict:
                     data.append([date, value, run_id])
             if data:
                 instruments['data'][plot_name][group] = {'data': data}
-
+    print(instruments)
     return instruments
 
 
@@ -602,7 +601,7 @@ def microsalt_get_strain_st(adapter, year: int) -> dict:
     return plot_data
 
 
-def microsalt_get_qc_time(adapter, year: int, metric_path: str) -> dict:
+def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -> dict:
     """Build aggregation pipeline to get information for microsalt qc data over time.
     """
     metric = metric_path.split('.')[1]
@@ -625,6 +624,7 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str) -> dict:
         }
     }, {
         '$match': {
+            'sample_info.category': {'$eq': category},
             'sample_info.received_date': {
                 '$exists': 'True'
             }
