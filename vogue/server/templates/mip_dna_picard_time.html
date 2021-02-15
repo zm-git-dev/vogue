@@ -10,13 +10,13 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="btn mb-2 mb-md-0">
-                            <form action="{{ url_for('server.mip_picard_time' , year=year_of_interest) }}"
+                            <form action="{{ url_for('server.mip_dna_picard_time' , year=year_of_interest) }}"
                                 method="POST">
                                 <select name="picard_metric" class="form-control form-control-sm"
                                     placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                    {% for group in MIP_PICARD %}
+                                    {% for group in MIP_DNA_PICARD %}
                                         <optgroup label="{{group}}" >
-                                        {% for metric in MIP_PICARD[group] %}
+                                        {% for metric in MIP_DNA_PICARD[group] %}
                                             <option value="{{group}} {{metric}}" {{ 'selected' if metric == selcted_metric }}>
                                                 {{ metric.lower().capitalize().replace('_', ' ')}}
                                             </option>
@@ -44,8 +44,8 @@
 
 <script>
     var data = []
-    {% if mip_results.data[selcted_metric] is defined %}
-        {% for result in mip_results.data[selcted_metric] %}
+    {% if mip_dna_results.data[selcted_metric] is defined %}
+        {% for result in mip_dna_results.data[selcted_metric] %}
             // in this context january is 0, february 1,..., december 11 thereby result.x-1
             data.push({'name': {{result.name| tojson}}, 'x': {{result.x-1}}, 'y': {{result.y}}} )
         {% endfor %}

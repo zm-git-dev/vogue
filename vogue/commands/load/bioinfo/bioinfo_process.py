@@ -39,7 +39,7 @@ LOG = logging.getLogger(__name__)
         It can be specified multiple times.''')
 @click.option('-w',
               '--analysis-workflow',
-              type=click.Choice(['mip', 'balsamic', 'microsalt']),
+              type=click.Choice(['mip-dna', 'balsamic', 'microsalt']),
               required=True,
               help='Analysis workflow used.')
 @click.option('--workflow-version',

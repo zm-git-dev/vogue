@@ -3,7 +3,7 @@
 from mongo_adapter import get_client
 from datetime import datetime as dt
 import numpy as np
-from vogue.constants.constants import (MONTHS, TEST_SAMPLES, MIP_PICARD,
+from vogue.constants.constants import (MONTHS, TEST_SAMPLES, MIP_DNA_PICARD,
                                        LANE_UDFS)
 from statistics import mean
 
@@ -415,7 +415,7 @@ def instrument_info(adapter, year: int, metric: str) -> dict:
     return instruments
 
 
-def mip_picard_time_plot(adapter, year: int) -> dict:
+def mip_dna_picard_time_plot(adapter, year: int) -> dict:
     """Prepares data for the MIP picard over time plot."""
 
     pipe = [{
@@ -437,7 +437,7 @@ def mip_picard_time_plot(adapter, year: int) -> dict:
         }
     }, {
         '$project': {
-            'mip': 1,
+            'mip-dna': 1,
             'received_date': '$sample_info.received_date'
         }
     }, {
@@ -454,7 +454,7 @@ def mip_picard_time_plot(adapter, year: int) -> dict:
             'year': {
                 '$year': '$received_date'
             },
-            'mip': 1
+            'mip-dna': 1
         }
     }, {
         '$match': {
@@ -465,17 +465,17 @@ def mip_picard_time_plot(adapter, year: int) -> dict:
     }]
     aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
     final_data = {}
-    for data in MIP_PICARD.values():
+    for data in MIP_DNA_PICARD.values():
         for key in data:
             final_data[key] = []
 
     for sample in aggregate_result:
         sample_id = sample['_id']
-        mip_analysis = sample.get('mip')
-        if mip_analysis:
-            multiqc_picard_insertSize = mip_analysis.get(
+        mip_dna_analysis = sample.get('mip-dna')
+        if mip_dna_analysis:
+            multiqc_picard_insertSize = mip_dna_analysis.get(
                 'multiqc_picard_insertSize')
-            multiqc_picard_HsMetrics = mip_analysis.get(
+            multiqc_picard_HsMetrics = mip_dna_analysis.get(
                 'multiqc_picard_HsMetrics')
             for key, val in multiqc_picard_insertSize.items():
                 if key in final_data.keys():
@@ -497,7 +497,7 @@ def mip_picard_time_plot(adapter, year: int) -> dict:
     return (plot_data)
 
 
-def mip_picard_plot(adapter, year: int) -> dict:
+def mip_dna_picard_plot(adapter, year: int) -> dict:
     """Prepares data for the MIP picard plot."""
 
     all_samples = adapter.bioinfo_samples_collection.find()
@@ -505,11 +505,11 @@ def mip_picard_plot(adapter, year: int) -> dict:
 
     for sample in all_samples:
         sample_id = sample['_id']
-        mip_analysis = sample.get('mip')
-        if mip_analysis:
-            multiqc_picard_insertSize = mip_analysis.get(
+        mip_dna_analysis = sample.get('mip-dna')
+        if mip_dna_analysis:
+            multiqc_picard_insertSize = mip_dna_analysis.get(
                 'multiqc_picard_insertSize')
-            multiqc_picard_HsMetrics = mip_analysis.get(
+            multiqc_picard_HsMetrics = mip_dna_analysis.get(
                 'multiqc_picard_HsMetrics')
             merged = multiqc_picard_insertSize.copy()
             merged.update(multiqc_picard_HsMetrics)

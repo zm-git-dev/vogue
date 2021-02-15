@@ -10,13 +10,13 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="btn mb-3 mb-md-0">
-                            <form action="{{ url_for('server.mip_picard' , year=year_of_interest) }}" method="POST">
+                            <form action="{{ url_for('server.mip_dna_picard' , year=year_of_interest) }}" method="POST">
                                 <label class="form-text text-muted" for="X_axis">Select X axis metric:</label>
                                 <select id="X_axis" name="X_axis" class="form-control form-control-sm"
                                     placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                    {% for group in MIP_PICARD %}
+                                    {% for group in MIP_DNA_PICARD %}
                                         <optgroup label="{{group}}" >
-                                        {% for metric in MIP_PICARD[group] %}
+                                        {% for metric in MIP_DNA_PICARD[group] %}
                                             <option value="{{group}} {{metric}}" {{ 'selected' if metric == X_axis }}>
                                                 {{ metric.lower().capitalize().replace('_', ' ')}}
                                             </option>
@@ -28,9 +28,9 @@
                             <label class="form-text text-muted" for="Y_axis">Select Y axis metric:</label>
                             <select id="Y_axis" name="Y_axis" class="form-control form-control-sm"
                                 placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                {% for group in MIP_PICARD %}
+                                {% for group in MIP_DNA_PICARD %}
                                         <optgroup label="{{group}}" >
-                                        {% for metric in MIP_PICARD[group] %}
+                                        {% for metric in MIP_DNA_PICARD[group] %}
                                             <option value="{{group}} {{metric}}" {{ 'selected' if metric == Y_axis }}>
                                                 {{ metric.lower().capitalize().replace('_', ' ')}}
                                             </option>
@@ -61,7 +61,7 @@
 
 <script>
     var data = []
-    {% for sample in mip_results.final_data %}
+    {% for sample in mip_dna_results.final_data %}
     data.push({ 'x': {{ sample[X_axis]}}, 'y': {{ sample[Y_axis]}}, 'name': {{ sample['_id']| tojson }}})
     {% endfor %}
 

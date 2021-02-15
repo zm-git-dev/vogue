@@ -10,14 +10,14 @@ def check_dates(analysis_result, current_document):
     the current results in the database"""
 
     if current_document and current_document.get(
-            'mip') and analysis_result.get('mip'):
+            'mip_dna') and analysis_result.get('mip_dna'):
         try:
-            if current_document['mip']['added'] > analysis_result['mip'][
+            if current_document['mip_dna']['added'] > analysis_result['mip_dna'][
                     'added']:
-                analysis_result.pop('mip')
+                analysis_result.pop('mip_dna')
         except:
-            LOG.error("Invalid or missing mip analysis date. Skiping analysis")
-            analysis_result.pop('mip')
+            LOG.error("Invalid or missing mip_dna analysis date. Skiping analysis")
+            analysis_result.pop('mip_dna')
 
     return analysis_result
 

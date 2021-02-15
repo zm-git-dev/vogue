@@ -28,10 +28,10 @@ def index():
         return redirect(url_for('server.target_enrichment', year=year))
     if request.form.get('page') == 'runs':
         return redirect(url_for('server.runs', year=year))
-    if request.form.get('page') == 'mip_picard_time':
-        return redirect(url_for('server.mip_picard_time', year=year))
-    if request.form.get('page') == 'mip_picard':
-        return redirect(url_for('server.mip_picard', year=year))
+    if request.form.get('page') == 'mip_dna_picard_time':
+        return redirect(url_for('server.mip_dna_picard_time', year=year))
+    if request.form.get('page') == 'mip_dna_picard':
+        return redirect(url_for('server.mip_dna_picard', year=year))
     if request.form.get('page') == 'strain_st':
         return redirect(url_for('server.microsalt_strain_st', year=year))
     if request.form.get('page') == 'microsalt_qc_time':
@@ -201,19 +201,19 @@ def runs(year):
 
 @blueprint.route('/Bioinfo/Rare_Disease/picard_time/<year>',
                  methods=['GET', 'POST'])
-def mip_picard_time(year):
-    mip_results = mip_picard_time_plot(app.adapter, year)
+def mip_dna_picard_time(year):
+    mip_dna_results = mip_dna_picard_time_plot(app.adapter, year)
     selected_group, selcted_metric = request.form.get(
         'picard_metric', 'PICARD_INSERT_SIZE MEAN_INSERT_SIZE').split()
-    return render_template('mip_picard_time.html',
+    return render_template('mip_dna_picard_time.html',
                            selected_group=selected_group,
                            selcted_metric=selcted_metric,
-                           mip_results=mip_results,
-                           MIP_PICARD=MIP_PICARD,
+                           mip_dna_results=mip_dna_results,
+                           MIP_DNA_PICARD=MIP_DNA_PICARD,
                            help_urls=BIOINFO_HELP_URLS,
                            months=[m[1] for m in MONTHS],
                            header='MIP',
-                           page_id='mip_picard_time',
+                           page_id='mip_dna_picard_time',
                            version=__version__,
                            year_of_interest=year,
                            years=YEARS)
@@ -221,21 +221,21 @@ def mip_picard_time(year):
 
 @blueprint.route('/Bioinfo/Rare_Disease/picard/<year>',
                  methods=['GET', 'POST'])
-def mip_picard(year):
-    mip_results = mip_picard_plot(app.adapter, year)
+def mip_dna_picard(year):
+    mip_dna_results = mip_dna_picard_plot(app.adapter, year)
     Y_group, Y_axis = request.form.get(
         'Y_axis', 'PICARD_INSERT_SIZE MEAN_INSERT_SIZE').split()
     X_group, X_axis = request.form.get(
         'X_axis', 'PICARD_INSERT_SIZE MEAN_INSERT_SIZE').split()
-    return render_template('mip_picard.html',
+    return render_template('mip_dna_picard.html',
                            Y_axis=Y_axis,
                            X_axis=X_axis,
                            groups=list(set([Y_group, X_group])),
-                           mip_results=mip_results,
-                           MIP_PICARD=MIP_PICARD,
+                           mip_dna_results=mip_dna_results,
+                           MIP_DNA_PICARD=MIP_DNA_PICARD,
                            help_urls=BIOINFO_HELP_URLS,
                            header='MIP',
-                           page_id='mip_picard',
+                           page_id='mip_dna_picard',
                            version=__version__,
                            year_of_interest=year,
                            years=YEARS)

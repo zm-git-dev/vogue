@@ -49,13 +49,13 @@ class uSalt():
         }
 
 
-class Mip():
+class Mip_dna():
     """Class to prepare mip case_analysis results 
-    for mip results in the sample_analysis collection"""
+    for mip_dna results in the sample_analysis collection"""
 
     def __init__(self, case):
         self.case = case
-        self.mip_analysis = get_latest_analysis(case, 'mip')
+        self.mip_dna_analysis = get_latest_analysis(case, 'mip-dna')
         self.added = None
         self.report_saved_raw_data = {}
         self.multiqc_picard_insertSize = {}
@@ -63,16 +63,16 @@ class Mip():
         self._set_init()
 
     def _set_init(self):
-        if self.mip_analysis:
-            self.added = self.mip_analysis.get('added')
-            self.report_saved_raw_data = self.mip_analysis['multiqc'][
+        if self.mip_dna_analysis:
+            self.added = self.mip_dna_analysis.get('added')
+            self.report_saved_raw_data = self.mip_dna_analysis['multiqc'][
                 'report_saved_raw_data']
             self.multiqc_picard_insertSize = reduce_keys(
                 self.report_saved_raw_data['multiqc_picard_insertSize'])
             self.multiqc_picard_HsMetrics = reduce_keys(
                 self.report_saved_raw_data['multiqc_picard_HsMetrics'])
 
-    def build_mip_sample(self, sample_id):
+    def build_mip_dna_sample(self, sample_id):
         """Bulding the mip analysis for one sample. 
         Returns {} if the date 'added' is empty."""
 

@@ -55,10 +55,10 @@
             <a href="#" data-toggle="dropdown" class="dropdown-toggle">Rare Disease</a>
             <ul class="dropdown-menu">
               <li class="dropdown-item btn-sm">
-                <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.mip_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
+                <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.mip_dna_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
               </li>
               <li class="dropdown-item btn-sm">
-                <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.mip_picard' , year=year_of_interest) }}">Picard QC</a>
+                <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.mip_dna_picard' , year=year_of_interest) }}">Picard QC</a>
               </li>
             </ul>
           </li>
