@@ -681,8 +681,8 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -
             q2 = round(np.median(values), 2)
             q3 = round(np.percentile(values, 75), 2)
             iqr = q3 - q1
-            maximum = q3 + iqr * 0.5
-            minimum = q1 - iqr * 0.5
+            maximum = q3 + iqr * 1.5
+            minimum = q1 - iqr * 1.5
             outliers.extend([{'x': m[0] - 1, 'y': s[metric], 'name': s['id']} for s in samples if
                              minimum > s[metric] or s[metric] > maximum])
             means.append(np.mean(values))
