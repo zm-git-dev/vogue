@@ -7,6 +7,7 @@ import yaml
 
 from vogue.adapter.plugin import VougeAdapter
 from vogue.server.views import blueprint
+from vogue.server.endpoints.covid import covid_blueprint
 
 from genologics.lims import Lims
 from genologics.config import BASEURI, USERNAME, PASSWORD
@@ -45,6 +46,7 @@ def configure_app(app, config=None):
     app.db = client[db_name]
     app.adapter = VougeAdapter(client, db_name=db_name)
     app.register_blueprint(blueprint)
+    app.register_blueprint(covid_blueprint)
 
     if app.config['DEBUG'] == 1:
         from flask_debugtoolbar import DebugToolbarExtension

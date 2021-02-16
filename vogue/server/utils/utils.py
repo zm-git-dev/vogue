@@ -398,7 +398,6 @@ def instrument_info(adapter, year: int, metric: str) -> dict:
     }]
 
     aggregate_result = adapter.flowcells_aggregate(pipe)
-
     for result in aggregate_result:
         group = result['_id']['instrument']
         for plot_name in LANE_UDFS:
@@ -411,7 +410,6 @@ def instrument_info(adapter, year: int, metric: str) -> dict:
                     data.append([date, value, run_id])
             if data:
                 instruments['data'][plot_name][group] = {'data': data}
-
     return instruments
 
 
@@ -602,7 +600,7 @@ def microsalt_get_strain_st(adapter, year: int) -> dict:
     return plot_data
 
 
-def microsalt_get_qc_time(adapter, year: int, metric_path: str) -> dict:
+def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -> dict:
     """Build aggregation pipeline to get information for microsalt qc data over time.
     """
     metric = metric_path.split('.')[1]
@@ -625,6 +623,7 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str) -> dict:
         }
     }, {
         '$match': {
+            'sample_info.category': {'$eq': category},
             'sample_info.received_date': {
                 '$exists': 'True'
             }
@@ -644,7 +643,7 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str) -> dict:
             'year': {
                 '$eq': int(year)
             },
-            metric: {'$not' :{'$type': 2}}
+            metric: {'$not': {'$type': 2}}
         }
     }, {
         '$group': {
@@ -652,39 +651,50 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str) -> dict:
                 'month': '$month'
             },
             metric: {
-                '$push': '$' + metric
+                '$push': f"${metric}"
+            },
+            'samples': {
+                '$push': {
+                    'insert_size': '$insert_size',
+                    'id': '$_id'
+                }
             }
         }
     }]
 
     aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
     intermediate = {
-        result['_id']['month']: result[metric]
+        result['_id']['month']: {metric: result[metric], 'samples': result['samples']}
         for result in aggregate_result
     }
     box_plots = []
     labels = []
     means = []
+    outliers = []
     for m in MONTHS:
-        values = intermediate.get(m[0], [])
-        if values:
-            minimum = round(min(values), 2)
-            low = round(np.percentile(values, 25), 2)
-            med = round(np.median(values), 2)
-            high = round(np.percentile(values, 75), 2)
-            maximum = round(max(values), 2)
+        data = intermediate.get(m[0], [])
+        if data:
+            values = data[metric]
+            samples = data['samples']
+            q1 = round(np.percentile(values, 25), 2)
+            q2 = round(np.median(values), 2)
+            q3 = round(np.percentile(values, 75), 2)
+            iqr = q3 - q1
+            maximum = q3 + iqr * 1.5
+            minimum = q1 - iqr * 1.5
+            outliers.extend([{'x': m[0] - 1, 'y': s[metric], 'name': s['id']} for s in samples if
+                             minimum > s[metric] or s[metric] > maximum])
             means.append(np.mean(values))
-            box_plots.append([minimum, low, med, high, maximum])
+            box_plots.append([minimum, q1, q2, q3, maximum])
         else:
             box_plots.append([])
         labels.append(m[1])
-
     plot_data = {
+        'outliers': outliers,
         'data': box_plots,
         'labels': labels,
         'mean': round(np.mean(means), 2)
     }
-
     return plot_data
 
 

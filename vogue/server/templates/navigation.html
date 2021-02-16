@@ -87,6 +87,17 @@
                   </li>
                 </ul>
               </li>
+            <li class="dropdown-item btn-sm dropdown-submenu">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Covid</a>
+                <ul class="dropdown-menu">
+                  <li class="dropdown-item btn-sm">
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('covid.microsalt_qc_time' , year=year_of_interest) }}">QC over time - Box plot</a>
+                  </li>
+                    <li class="dropdown-item btn-sm">
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('covid.qc_scatter' , year=year_of_interest) }}">QC over time - Scatter plot</a>
+                  </li>
+                </ul>
+              </li>
         </ul>
       </li>
       <li class="nav-item dropright">
