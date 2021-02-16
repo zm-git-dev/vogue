@@ -283,6 +283,7 @@ def microsalt_qc_time(year):
 
     return render_template('microsalt_qc_time.html',
                            results=results['data'],
+                           outliers = results['outliers'],
                            categories=results['labels'],
                            mean=results['mean'],
                            selected_group=metric_path.split('.')[0],

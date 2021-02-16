@@ -21,6 +21,7 @@ def microsalt_qc_time(year):
     results = microsalt_get_qc_time(app.adapter, year=year, metric_path=metric_path, category='cov')
     return render_template('microsalt_qc_time.html',
                            results=results['data'],
+                           outliers=results['outliers'],
                            categories=results['labels'],
                            mean=results['mean'],
                            selected_group=metric_path.split('.')[0],
