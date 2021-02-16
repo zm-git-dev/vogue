@@ -410,7 +410,6 @@ def instrument_info(adapter, year: int, metric: str) -> dict:
                     data.append([date, value, run_id])
             if data:
                 instruments['data'][plot_name][group] = {'data': data}
-    print(instruments)
     return instruments
 
 
