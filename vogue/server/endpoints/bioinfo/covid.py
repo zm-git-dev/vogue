@@ -3,8 +3,8 @@
 from flask import render_template, request, Blueprint, current_app
 
 from vogue.constants.constants import MICROSALT, YEARS
-from vogue.server.utils import microsalt_get_qc_time
-from vogue.server.utils.covid import get_qc
+from vogue.server.utils.bioinfo.micro import microsalt_get_qc_time
+from vogue.server.utils.bioinfo.covid import get_qc
 from vogue import __version__
 
 app = current_app

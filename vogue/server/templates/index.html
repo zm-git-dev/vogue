@@ -32,7 +32,7 @@
               <div class="card-body">
                 <div class="text-right mb-3">
                   <div class="btn mb-2 mb-md-0">
-                    <form action="{{ url_for('server.index')}}" method="POST">
+                    <form action="{{ url_for('home.index')}}" method="POST">
                       <input type="hidden" name="page" value="{{page_id}}">
                       <select name="year" class="form-control" required onchange="this.form.submit()">
                         {% for year in years %}
@@ -42,7 +42,7 @@
                     </form>
                   </div>
                   <div class="btn mb-2 mb-md-0">
-                    <form action="{{ url_for('server.index')}}" method="POST">
+                    <form action="{{ url_for('home.index')}}" method="POST">
                       <input type="hidden" name="page" value="{{page_id}}">
                       <input type="hidden" name="year" value="{{year_of_interest}}">
                       <select name="month" class="form-control" required onchange="this.form.submit()">
