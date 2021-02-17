@@ -2,6 +2,14 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [x.x.x]
+
+### Added
+- Adding new tab for covid plots
+- Separating covid samples from micro samples (covid sampkles are no longer part of micro plots. Micro samples are not part of covid plots)
+- Made a new scatter plot for covid samples grouped by prep method
+- Added outliers to the micro_qc over time plot.
+
 ## [1.2.0]
 
 ### Fixed
