@@ -10,9 +10,8 @@ app = current_app
 index_blueprint = Blueprint('index', __name__)
 
 
-
 @index_blueprint.route('/reagent_labels/<index_category_url>',
-                 methods=['GET', 'POST'])
+                       methods=['GET', 'POST'])
 def reagent_labels(index_category_url):
     index_category = index_category_url.replace('_', ' ')
     flowcell_performance_treshold = 0.3
@@ -32,7 +31,7 @@ def reagent_labels(index_category_url):
 
 
 @index_blueprint.route('/reagent_label/<index_category>/<reagent_label>',
-                 methods=['GET', 'POST'])
+                       methods=['GET', 'POST'])
 def reagent_label(index_category, reagent_label):
     flowcell_performance_treshold = 0.3
     aggregate_result = reagent_label_data(app.adapter, reagent_label,

@@ -3,18 +3,16 @@
 from flask import render_template, request, Blueprint, current_app
 
 from vogue.constants.constants import YEARS, MICROSALT
-from vogue.server.utils.bioinfo.micro import microsalt_get_untyped, microsalt_get_st_time, microsalt_get_qc_time, microsalt_get_strain_st
+from vogue.server.utils.bioinfo.micro import microsalt_get_untyped, microsalt_get_st_time, microsalt_get_qc_time, \
+    microsalt_get_strain_st
 from vogue import __version__
 
 app = current_app
 micro_blueprint = Blueprint('micro', __name__)
 
 
-
-
-
 @micro_blueprint.route('/Bioinfo/Microbial/strain_st/<year>',
-                 methods=['GET', 'POST'])
+                       methods=['GET', 'POST'])
 def strain_st(year):
     results = microsalt_get_strain_st(app.adapter, year)
     strain = request.form.get('strain', '')
@@ -40,7 +38,7 @@ def qc_time(year):
 
     return render_template('microsalt_qc_time.html',
                            results=results['data'],
-                           outliers = results['outliers'],
+                           outliers=results['outliers'],
                            categories=results['labels'],
                            mean=results['mean'],
                            selected_group=metric_path.split('.')[0],
@@ -52,9 +50,6 @@ def qc_time(year):
                            year_of_interest=year,
                            MICROSALT=MICROSALT,
                            years=YEARS)
-
-
-
 
 
 @micro_blueprint.route('/Bioinfo/Microbial/untyped/<year>', methods=['GET', 'POST'])

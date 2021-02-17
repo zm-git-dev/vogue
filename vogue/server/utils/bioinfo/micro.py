@@ -344,4 +344,3 @@ def microsalt_get_st_time(adapter, year: int) -> dict:
             final_results[strain][st][month - 1] = count
 
     return {'data': final_results, 'labels': [m[1] for m in MONTHS]}
-

@@ -11,10 +11,8 @@ app = current_app
 mip_blueprint = Blueprint('mip', __name__)
 
 
-
-
 @mip_blueprint.route('/Bioinfo/Rare_Disease/picard_time/<year>',
-                 methods=['GET', 'POST'])
+                     methods=['GET', 'POST'])
 def dna_picard_time(year):
     mip_dna_results = mip_dna_picard_time_plot(app.adapter, year)
     selected_group, selcted_metric = request.form.get(
@@ -34,7 +32,7 @@ def dna_picard_time(year):
 
 
 @mip_blueprint.route('/Bioinfo/Rare_Disease/picard/<year>',
-                 methods=['GET', 'POST'])
+                     methods=['GET', 'POST'])
 def dna_picard(year):
     mip_dna_results = mip_dna_picard_plot(app.adapter, year)
     Y_group, Y_axis = request.form.get(

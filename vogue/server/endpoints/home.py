@@ -9,6 +9,7 @@ from vogue import __version__
 app = current_app
 home_blueprint = Blueprint('home', __name__)
 
+
 @home_blueprint.route('/', methods=['GET', 'POST'])
 def index():
     year = request.form.get('year', str(THIS_YEAR))
