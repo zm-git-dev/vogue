@@ -1,98 +1,101 @@
 {% extends 'layout.html' %}
 {% block body %}
-{% include 'header.html' %}
-<div class="container-fluid">
-    <div class="row">
-        {% include 'navigation.html' %}
-        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-            {% include 'header_section.html' %}
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="btn mb-2 mb-md-0">
-                            <form action="{{ url_for(page_url , year=year_of_interest) }}"
-                                method="POST">
-                                <select name="qc_metric" class="form-control form-control-sm"
-                                    placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                    {% for group in MICROSALT %}
-                                    <optgroup label="{{group.capitalize().replace('_', ' ')}}">
-                                        {% for metric in MICROSALT[group] %}
-                                        <option value="{{group}}.{{ metric }}"
-                                            {{ 'selected' if metric == selected_metric }}>
-                                            {{ metric.capitalize().replace('_', ' ')}}
-                                        </option>
+    {% include 'header.html' %}
+    <div class="container-fluid">
+        <div class="row">
+            {% include 'navigation.html' %}
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                {% include 'header_section.html' %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="btn mb-2 mb-md-0">
+                                <form action="{{ url_for(endpoint , year=year_of_interest) }}"
+                                      method="POST">
+                                    <select name="qc_metric" class="form-control form-control-sm"
+                                            placeholder=".form-control-sm" required onchange="this.form.submit()">
+                                        {% for group in MICROSALT %}
+                                            <optgroup label="{{ group.capitalize().replace('_', ' ') }}">
+                                            {% for metric in MICROSALT[group] %}
+                                                <option value="{{ group }}.{{ metric }}"
+                                                        {{ 'selected' if metric == selected_metric }}>
+                                                    {{ metric.capitalize().replace('_', ' ') }}
+                                                </option>
+                                            {% endfor %}
                                         {% endfor %}
-                                        {% endfor %}
-                                </select>
-                            </form>
+                                    </select>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div id="qc_time"></div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div id="qc_time"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
-</div>
-</div>
+    </div>
 
 
 
-<script>
-    var data = []
-    {% if results is defined %}
-    var data = {{ results| tojson}}
-    {% endif %}
+    <script>
+        var data = []
+        {% if results is defined %}
+            var data = {{ results| tojson}}
+        {% endif %}
 
-    Highcharts.chart('qc_time', {
-        chart: { type: 'boxplot' },
-        subtitle: { text: '{{MICROSALT[selected_group][selected_metric]}}' },
-        title: { text: '{{selected_metric.capitalize().replace('_', ' ')}} over time.' },
-        xAxis: {
-            title: { text: 'Date recived' },
-            categories: {{ categories| tojson }}},
-        yAxis: {
-        title: { text: 'Average {{selected_metric.capitalize().replace('_', ' ')}}' },
-        plotLines: [{
-            value: {{ mean }},
-        color: 'red',
-        width: 1,
-        label: {
-        text: 'Mean: {{mean}}',
-        align: 'center',
-        style: {
-            color: 'gray'
-        }
-    }
-    }] },
-        legend: { enabled: false },
-        plotOptions: {
-        series: {
-            stickyTracking: false
-        }
-    },
-        series: [{
-            name: '{{selected_metric}}',
-            data: data},
-        {
-        name: 'Outliers',
-        color: Highcharts.getOptions().colors[0],
-        type: 'scatter',
-        data: {{ outliers |tojson}},
-        marker: {
-            radius: 2,
-            fillColor: 'white',
-            lineWidth: 1,
-            lineColor: Highcharts.getOptions().colors[0]
-        },
-        tooltip: {
-            pointFormat: 'Sample: {point.name} <br/> Value: {point.y}'
-        }
-    }]
-});
+        Highcharts.chart('qc_time', {
+            chart: {type: 'boxplot'},
+            subtitle: {text: '{{MICROSALT[selected_group][selected_metric]}}'},
+            title: {text: '{{selected_metric.capitalize().replace('_', ' ')}} over time.'},
+            xAxis: {
+                title: {text: 'Date recived'},
+                categories: {{ categories| tojson }}
+            },
+            yAxis: {
+                title: {text: 'Average {{selected_metric.capitalize().replace('_', ' ')}}'},
+                plotLines: [{
+                    value: {{ mean }},
+                    color: 'red',
+                    width: 1,
+                    label: {
+                        text: 'Mean: {{mean}}',
+                        align: 'center',
+                        style: {
+                            color: 'gray'
+                        }
+                    }
+                }]
+            },
+            legend: {enabled: false},
+            plotOptions: {
+                series: {
+                    stickyTracking: false
+                }
+            },
+            series: [{
+                name: '{{selected_metric}}',
+                data: data
+            },
+                {
+                    name: 'Outliers',
+                    color: Highcharts.getOptions().colors[0],
+                    type: 'scatter',
+                    data: {{ outliers |tojson}},
+                    marker: {
+                        radius: 2,
+                        fillColor: 'white',
+                        lineWidth: 1,
+                        lineColor: Highcharts.getOptions().colors[0]
+                    },
+                    tooltip: {
+                        pointFormat: 'Sample: {point.name} <br/> Value: {point.y}'
+                    }
+                }]
+        });
 
-</script>
+    </script>
 {% endblock %}

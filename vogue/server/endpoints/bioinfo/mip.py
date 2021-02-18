@@ -25,7 +25,7 @@ def dna_picard_time(year):
                            help_urls=BIOINFO_HELP_URLS,
                            months=[m[1] for m in MONTHS],
                            header='MIP',
-                           page_id='mip_dna_picard_time',
+                           endpoint=request.endpoint,
                            version=__version__,
                            year_of_interest=year,
                            years=YEARS)
@@ -47,7 +47,7 @@ def dna_picard(year):
                            MIP_DNA_PICARD=MIP_DNA_PICARD,
                            help_urls=BIOINFO_HELP_URLS,
                            header='MIP',
-                           page_id='mip_dna_picard',
+                           endpoint=request.endpoint,
                            version=__version__,
                            year_of_interest=year,
                            years=YEARS)

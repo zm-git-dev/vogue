@@ -17,6 +17,7 @@ def runs(year):
 
     return render_template('runs.html',
                            header='Sequencing Instruments',
+                           endpoint=request.endpoint,
                            page_id='runs',
                            metric=selcted_metric,
                            metrices=LANE_UDFS,
