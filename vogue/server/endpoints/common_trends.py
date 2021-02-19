@@ -20,7 +20,7 @@ def turn_around_times(year: int):
     results_grouped_by_cat = {}
     for y_val in y_vals:
         results_grouped_by_prio[y_val] = value_per_month(
-            app.adapter, year, y_val, "priority")
+            adapter=app.adapter, year=year,y_axis= y_val, x_axis="priority")
         results_grouped_by_cat[y_val] = value_per_month(
             app.adapter, year, y_val, "category")
 
