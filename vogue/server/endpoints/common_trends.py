@@ -11,7 +11,7 @@ common_trends_blueprint = Blueprint('common_trends', __name__)
 
 
 @common_trends_blueprint.route('/common/turn_around_times/<year>')
-def turn_around_times(year):
+def turn_around_times(year: int):
     y_vals = [
         'received_to_delivered', 'received_to_prepped', 'prepped_to_sequenced',
         'sequenced_to_delivered'
@@ -50,4 +50,3 @@ def common_samples(year):
                            version=__version__,
                            year_of_interest=year,
                            years=YEARS)
-
