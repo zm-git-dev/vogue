@@ -55,7 +55,7 @@ def configure_app(app, config=None):
     app.register_blueprint(genotype_blueprint)
     app.register_blueprint(index_blueprint)
 
-    if app.config['DEBUG'] == 1:
+    if app.config['DEBUG']:
         from flask_debugtoolbar import DebugToolbarExtension
         toolbar = DebugToolbarExtension(app)
 
