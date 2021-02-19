@@ -4,7 +4,6 @@ from flask import render_template, request, Blueprint, current_app
 
 from vogue.constants.constants import YEARS, BIOINFO_HELP_URLS, MIP_DNA_PICARD, MONTHS
 from vogue.server.utils.bioinfo.mip import mip_dna_picard_plot, mip_dna_picard_time_plot
-from vogue.server.utils import *
 from vogue import __version__
 
 app = current_app
@@ -13,7 +12,7 @@ mip_blueprint = Blueprint('mip', __name__)
 
 @mip_blueprint.route('/Bioinfo/Rare_Disease/picard_time/<year>',
                      methods=['GET', 'POST'])
-def dna_picard_time(year):
+def dna_picard_time(year: int):
     mip_dna_results = mip_dna_picard_time_plot(app.adapter, year)
     selected_group, selcted_metric = request.form.get(
         'picard_metric', 'PICARD_INSERT_SIZE MEAN_INSERT_SIZE').split()
@@ -33,7 +32,7 @@ def dna_picard_time(year):
 
 @mip_blueprint.route('/Bioinfo/Rare_Disease/picard/<year>',
                      methods=['GET', 'POST'])
-def dna_picard(year):
+def dna_picard(year: int):
     mip_dna_results = mip_dna_picard_plot(app.adapter, year)
     Y_group, Y_axis = request.form.get(
         'Y_axis', 'PICARD_INSERT_SIZE MEAN_INSERT_SIZE').split()

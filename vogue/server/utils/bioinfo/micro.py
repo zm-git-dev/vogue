@@ -5,6 +5,8 @@ from vogue.constants.constants import MONTHS
 
 
 def microsalt_get_strain_st(adapter, year: int) -> dict:
+    """Build aggregation pipeline to get information for microsalt sequence type vs strain data."""
+
     pipe = [{
         '$match': {
             'microsalt': {
@@ -88,6 +90,7 @@ def microsalt_get_strain_st(adapter, year: int) -> dict:
 def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -> dict:
     """Build aggregation pipeline to get information for microsalt qc data over time.
     """
+
     metric = metric_path.split('.')[1]
     pipe = [{
         '$match': {
@@ -161,16 +164,12 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -
         if data:
             values = data[metric]
             samples = data['samples']
-            q1 = round(np.percentile(values, 25), 2)
-            q2 = round(np.median(values), 2)
-            q3 = round(np.percentile(values, 75), 2)
-            iqr = q3 - q1
-            maximum = q3 + iqr * 1.5
-            minimum = q1 - iqr * 1.5
-            outliers.extend([{'x': m[0] - 1, 'y': s[metric], 'name': s['id']} for s in samples if
-                             minimum > s[metric] or s[metric] > maximum])
+            box_points = calculate_box_points(values)
+            outliers_this_month = get_outliers(month=m[0] - 1, metric=metric, samples=samples, minimum=box_points[0],
+                                               maximum=box_points[-1])
+            outliers.extend(outliers_this_month)
             means.append(np.mean(values))
-            box_plots.append([minimum, q1, q2, q3, maximum])
+            box_plots.append(box_points)
         else:
             box_plots.append([])
         labels.append(m[1])
@@ -181,6 +180,29 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -
         'mean': round(np.mean(means), 2)
     }
     return plot_data
+
+
+def get_outliers(month: int, metric: str, samples: list, minimum: float, maximum: float) -> list:
+    """building scatter plot data for outlier samples a specific month. <metric> is what will be shown on the y axis"""
+
+    outliers = []
+    for sample in samples:
+        if minimum > sample[metric] or sample[metric] > maximum:
+            sample_data = {'x': month, 'y': sample[metric], 'name': sample['id']}
+            outliers.append(sample_data)
+    return outliers
+
+
+def calculate_box_points(values: list) -> list:
+    """calculate box points and outliers from a list of values"""
+
+    first_quartile = round(np.percentile(values, 25), 2)
+    second_quartile = round(np.percentile(values, 50), 2)
+    third_quartile = round(np.percentile(values, 75), 2)
+    inter_quartile_range = third_quartile - first_quartile
+    maximum = third_quartile + inter_quartile_range * 1.5
+    minimum = first_quartile - inter_quartile_range * 1.5
+    return [minimum, first_quartile, second_quartile, third_quartile, maximum]
 
 
 def microsalt_get_untyped(adapter, year: int) -> dict:
@@ -241,10 +263,12 @@ def microsalt_get_untyped(adapter, year: int) -> dict:
     for result in aggregate_result:
         untyped = 0
         typed = 0
-        for st in result['ST']:
+        untyped_lower_threshold = -9
+        untyped_upper_threshold = -1
+        for sequence_type in result['ST']:
             try:
-                st = int(st)
-                if -9 < st < -1:
+                sequence_type = int(sequence_type)
+                if untyped_lower_threshold < sequence_type < untyped_upper_threshold:
                     untyped += 1
                 else:
                     typed += 1

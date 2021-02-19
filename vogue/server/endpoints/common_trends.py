@@ -20,9 +20,9 @@ def turn_around_times(year: int):
     results_grouped_by_cat = {}
     for y_val in y_vals:
         results_grouped_by_prio[y_val] = value_per_month(
-            adapter=app.adapter, year=year,y_axis= y_val, x_axis="priority")
+            adapter=app.adapter, year=year,y_val= y_val, group_key="priority")
         results_grouped_by_cat[y_val] = value_per_month(
-            app.adapter, year, y_val, "category")
+            adapter=app.adapter, year=year, y_val=y_val, group_key="category")
 
     return render_template('turn_around_times.html',
                            endpoint=request.endpoint,
@@ -37,9 +37,9 @@ def turn_around_times(year: int):
 
 
 @common_trends_blueprint.route('/common/samples/<year>')
-def common_samples(year):
-    data_cat = value_per_month(app.adapter, year, 'count', 'category')
-    data_prio = value_per_month(app.adapter, year, 'count', 'priority')
+def common_samples(year: int):
+    data_cat = value_per_month(adapter=app.adapter, year=year, y_val='count', group_key='category')
+    data_prio = value_per_month(adapter=app.adapter, year=year, y_val='count', group_key='priority')
     return render_template('samples.html',
                            endpoint=request.endpoint,
                            header='Samples',

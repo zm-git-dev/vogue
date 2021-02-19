@@ -10,7 +10,7 @@ cancer_blueprint = Blueprint('cancer', __name__)
 
 
 @cancer_blueprint.route('/Bioinfo/Cancer/<year>')
-def balsamic(year):
+def balsamic(year: int):
 
     return render_template('balsamic.html',
                            header='Balsamic',

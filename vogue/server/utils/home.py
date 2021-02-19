@@ -44,11 +44,11 @@ def home_samples(adapter, year, month):
         cathegories.append(cat)
         prio = result['_id'].get('priority', 'missing')
         count = result.get('count', 0)
-        if prio not in samples:
-            samples[prio] = {cat: count}
-            samples_output[prio] = []
-        else:
+        if prio in samples:
             samples[prio][cat] = count
+            continue
+        samples[prio] = {cat: count}
+        samples_output[prio] = []
 
     cathegories = list(set(cathegories))
     for prio, data in samples.items():

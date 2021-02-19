@@ -1,146 +1,152 @@
 {% extends 'layout.html' %}
 {% block body %}
-<!doctype html>
-<html lang="en">
+    <!doctype html>
+    <html lang="en">
 
-<body>
-  {% include 'header.html' %}
+    <body>
+    {% include 'header.html' %}
 
-  <div class="container-fluid">
-    <div class="row">
-      {% include 'navigation.html' %}
-    </div>
-    <div>
-      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-          <h1 class="h2">Welcome</h1>
-        </div>
-        <p>Welcome to Clinical Genomics site for trending. This site aims to capture all kinds of trends
-          going on att Clinical Genomics. Please feel fre to contribute. Visit Vogue
-          on <a href="https://github.com/Clinical-Genomics/vogue" target="_blank" data-v-04c1a7ec="">github</a>.
-        </p>
-        <h6>Feature requests</h6>
-        <p>Write your feature request <a href="https://github.com/Clinical-Genomics/vogue/issues/new/choose"
-            target="_blank" data-v-04c1a7ec="">here</a>.
-        </p>
-
-        <h6>Contributors</h6>
-        <p>We who are working on this project right now are Maya and Hassan.</p>
+    <div class="container-fluid">
         <div class="row">
-          <div class="col-lg-12">
-            <div class="card">
-              <div class="card-body">
-                <div class="text-right mb-3">
-                  <div class="btn mb-2 mb-md-0">
-                    <form action="{{ url_for('home.index')}}" method="POST">
-                      <input type="hidden" name="page" value="{{page_id}}">
-                      <select name="year" class="form-control" required onchange="this.form.submit()">
-                        {% for year in years %}
-                        <option value={{year}} {{ 'selected' if year == year_of_interest }}>Year {{year}} </option>
-                        {% endfor %}
-                      </select>
-                    </form>
-                  </div>
-                  <div class="btn mb-2 mb-md-0">
-                    <form action="{{ url_for('home.index')}}" method="POST">
-                      <input type="hidden" name="page" value="{{page_id}}">
-                      <input type="hidden" name="year" value="{{year_of_interest}}">
-                      <select name="month" class="form-control" required onchange="this.form.submit()">
-                        <option value=0 {{ 'selected' if month_of_interest==0 }}>All year </option>
-                        {% for month in months %}
-                        <option value={{month[0]}} {{ 'selected' if month[0] == month_of_interest }}>{{month[1]}}
-                        </option>
-                        {% endfor %}
-                      </select>
-                    </form>
-                  </div>
+            {% include 'navigation.html' %}
+        </div>
+        <div>
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Welcome</h1>
                 </div>
-                <div class="row">
-                  <div id="container" class="col-lg-6"></div>
-                  <div id="container2" class="col-lg-6"></div>
-                </div>
-              </div>
-            </div>
-          </div>
+                <p>Welcome to Clinical Genomics site for trending. This site aims to capture all kinds of trends
+                    going on att Clinical Genomics. Please feel fre to contribute. Visit Vogue
+                    on <a href="https://github.com/Clinical-Genomics/vogue" target="_blank"
+                          data-v-04c1a7ec="">github</a>.
+                </p>
+                <h6>Feature requests</h6>
+                <p>Write your feature request <a href="https://github.com/Clinical-Genomics/vogue/issues/new/choose"
+                                                 target="_blank" data-v-04c1a7ec="">here</a>.
+                </p>
 
+                <h6>Contributors</h6>
+                <p>We who are working on this project right now are Maya and Hassan.</p>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="text-right mb-3">
+                                    <div class="btn mb-2 mb-md-0">
+                                        <form action="{{ url_for(endpoint)}}" method="POST">
+                                            <input type="hidden" name="page" value="{{ page_id }}">
+                                            <select name="year" class="form-control" required
+                                                    onchange="this.form.submit()">
+                                                {% for year in years %}
+                                                    <option value={{ year }} {{ 'selected' if year == year_of_interest }}>
+                                                        Year {{ year }} </option>
+                                                {% endfor %}
+                                            </select>
+                                        </form>
+                                    </div>
+                                    <div class="btn mb-2 mb-md-0">
+                                        <form action="{{ url_for(endpoint)}}" method="POST">
+                                            <input type="hidden" name="page" value="{{ page_id }}">
+                                            <input type="hidden" name="year" value="{{ year_of_interest }}">
+                                            <select name="month" class="form-control" required
+                                                    onchange="this.form.submit()">
+                                                <option value=0 {{ 'selected' if month_of_interest==0 }}>All year
+                                                </option>
+                                                {% for month in months %}
+                                                    <option value={{ month[0] }} {{ 'selected' if month[0] == month_of_interest }}>{{ month[1] }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div id="container" class="col-lg-6"></div>
+                                    <div id="container2" class="col-lg-6"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
         </div>
     </div>
-  </div>
 
 
+    <script>
+        var series = []
+        {% for cust in customers|sort %}
+            series.push({
+                name: "{{cust}}",
+                y: {{ customers[cust]| tojson }}
+            })
+        {% endfor %}
+        Highcharts.chart('container2', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Customers in {{month_name}}{{year_of_interest}}'
+            },
+            tooltip: {
+                pointFormat: 'Nr {series.name}: <b>{point.y}</b>, (<b>{point.percentage:.1f}%</b>)'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: 'Samples',
+                colorByPoint: true,
+                data: series
+            }]
+        });
 
-  <script>
-    var series = []
-    {% for cust in customers|sort %}
-    series.push({
-      name: "{{cust}}",
-      y: {{ customers[cust]| tojson }} })
-    {% endfor %}
-    Highcharts.chart('container2', {
-      chart: {
-        type: 'pie'
-      },
-      title: {
-        text: 'Customers in {{month_name}}{{year_of_interest}}'
-      },
-      tooltip: {
-        pointFormat: 'Nr {series.name}: <b>{point.y}</b>, (<b>{point.percentage:.1f}%</b>)'
-      },
-      plotOptions: {
-        pie: {
-          allowPointSelect: true,
-          cursor: 'pointer',
-          dataLabels: {
-            enabled: false
-          },
-          showInLegend: true
-        }
-      },
-      series: [{
-        name: 'Samples',
-        colorByPoint: true,
-        data: series
-      }]
-    });
+        var series = []
+        {% for group in sample_series %}
+            series.push({
+                name: "{{group}}",
+                data: {{ sample_series[group] | tojson }}
+            })
+        {% endfor %}
 
-    var series = []
-    {% for group in sample_series %}
-    series.push({
-      name: "{{group}}",
-      data: {{ sample_series[group] | tojson }} })
-    {% endfor %}
+        Highcharts.chart('container', {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Samples recieved in {{month_name}}{{year_of_interest}} '
+            },
+            xAxis: {
+                categories: {{ cathegories| tojson}}
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ' Nr Samples'
+                }
+            },
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+            series: series
+        });
+    </script>
 
-    Highcharts.chart('container', {
-      chart: {
-        type: 'bar'
-      },
-      title: {
-        text: 'Samples recieved in {{month_name}}{{year_of_interest}} '
-      },
-      xAxis: {
-        categories: {{ cathegories| tojson}}
-      },
-      yAxis: {
-      min: 0,
-      title: {
-        text: ' Nr Samples'
-      }
-    },
-      legend: {
-      reversed: true
-    },
-      plotOptions: {
-      series: {
-        stacking: 'normal'
-      }
-    },
-      series: series
-    });
-  </script>
+    </body>
 
-</body>
-
-</html>
+    </html>
 
 
 {% endblock %}

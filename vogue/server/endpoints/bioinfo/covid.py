@@ -14,7 +14,7 @@ HEADER = 'Microsalt Covid'
 
 
 @covid_blueprint.route('/Bioinfo/Covid/qc_time/<year>', methods=['GET', 'POST'])
-def microsalt_qc_time(year):
+def microsalt_qc_time(year: int):
     """Box plot with qc data per month"""
 
     metric_path = request.form.get('qc_metric',
@@ -36,7 +36,7 @@ def microsalt_qc_time(year):
 
 
 @covid_blueprint.route('/Bioinfo/Covid/qc_time_scatter/<year>', methods=['GET', 'POST'])
-def qc_scatter(year):
+def qc_scatter(year: int):
     """Scatter plot with qc data over time, grouped by prep method"""
 
     metric_path = request.form.get('qc_metric',

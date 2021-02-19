@@ -11,7 +11,7 @@ sequencing_blueprint = Blueprint('sequencing', __name__)
 
 
 @sequencing_blueprint.route('/sequencing/runs/<year>', methods=['GET', 'POST'])
-def runs(year):
+def runs(year: int):
     selcted_metric = request.form.get('metric', '% Bases >=Q30')
     aggregate_result = instrument_info(app.adapter, year, selcted_metric)
 

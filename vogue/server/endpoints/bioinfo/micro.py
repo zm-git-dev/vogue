@@ -13,7 +13,7 @@ micro_blueprint = Blueprint('micro', __name__)
 
 @micro_blueprint.route('/Bioinfo/Microbial/strain_st/<year>',
                        methods=['GET', 'POST'])
-def strain_st(year):
+def strain_st(year: int):
     results = microsalt_get_strain_st(app.adapter, year)
     strain = request.form.get('strain', '')
     if results and not strain:
@@ -22,6 +22,7 @@ def strain_st(year):
     return render_template('microsalt_strain_st.html',
                            data=results.get(strain, {}),
                            strain=strain,
+                           endpoint=request.endpoint,
                            categories=results.keys(),
                            header='Microsalt',
                            version=__version__,
@@ -30,7 +31,7 @@ def strain_st(year):
 
 
 @micro_blueprint.route('/Bioinfo/Microbial/qc_time/<year>', methods=['GET', 'POST'])
-def qc_time(year):
+def qc_time(year: int):
     metric_path = request.form.get('qc_metric',
                                    'picard_markduplicate.insert_size')
     results = microsalt_get_qc_time(app.adapter, year=year, metric_path=metric_path, category='mic')
@@ -40,6 +41,7 @@ def qc_time(year):
                            outliers=results['outliers'],
                            categories=results['labels'],
                            mean=results['mean'],
+                           endpoint=request.endpoint,
                            selected_group=metric_path.split('.')[0],
                            selected_metric=metric_path.split('.')[1],
                            header='Microsalt',
@@ -50,13 +52,14 @@ def qc_time(year):
 
 
 @micro_blueprint.route('/Bioinfo/Microbial/untyped/<year>', methods=['GET', 'POST'])
-def untyped(year):
+def untyped(year: int):
     results = microsalt_get_untyped(app.adapter, year)
 
     return render_template('microsalt_untyped.html',
                            results=results['data'],
                            categories=results['labels'],
                            header='Microsalt',
+                           endpoint=request.endpoint,
                            version=__version__,
                            year_of_interest=year,
                            MICROSALT=MICROSALT,
@@ -64,7 +67,7 @@ def untyped(year):
 
 
 @micro_blueprint.route('/Bioinfo/Microbial/st_time/<year>', methods=['GET', 'POST'])
-def st_time(year):
+def st_time(year: int):
     strain = request.form.get('strain', '')
     results_all = microsalt_get_st_time(app.adapter, year)
     if results_all['data'] and not strain:
@@ -75,6 +78,7 @@ def st_time(year):
                            results=strain_results,
                            results_sorted_keys=sorted(strain_results.keys()),
                            strain=strain,
+                           endpoint=request.endpoint,
                            strains=results_all['data'].keys(),
                            categories=results_all['labels'],
                            header='Microsalt',
