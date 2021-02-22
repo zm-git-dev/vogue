@@ -33,7 +33,7 @@ Steps to make a new release:
 
 1) Create a release branch from master named ``version_X.X.X`` 
 2) Update change log with the new version.
-3) Update vogue/\ **init**.py with the new version.
+3) Use ``bumpversion`` to change version accordingly: ``bumpversion major`` or ``bumpversion minor`` or ``bumpversion patch``
 4) Make a PR to master, 
 
 .. code-block::
