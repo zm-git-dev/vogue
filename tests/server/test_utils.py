@@ -1,5 +1,7 @@
 from vogue.server import create_app
-from vogue.server.utils import find_concentration_defrosts, find_concentration_amount, value_per_month, instrument_info
+from vogue.server.utils.prepps import find_concentration_defrosts, find_concentration_amount
+from vogue.server.utils.metric_per_month import value_per_month
+from vogue.server.utils.sequencing import instrument_info
 from vogue.adapter.plugin import VougeAdapter
 from datetime import datetime
 

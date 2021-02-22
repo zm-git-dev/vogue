@@ -3,8 +3,8 @@
 from flask import render_template, request, Blueprint, current_app
 
 from vogue.constants.constants import MICROSALT, YEARS
-from vogue.server.utils import microsalt_get_qc_time
-from vogue.server.utils.covid import get_qc
+from vogue.server.utils.bioinfo.micro import microsalt_get_qc_time
+from vogue.server.utils.bioinfo.covid import get_qc
 from vogue import __version__
 
 app = current_app
@@ -14,7 +14,7 @@ HEADER = 'Microsalt Covid'
 
 
 @covid_blueprint.route('/Bioinfo/Covid/qc_time/<year>', methods=['GET', 'POST'])
-def microsalt_qc_time(year):
+def microsalt_qc_time(year: int):
     """Box plot with qc data per month"""
 
     metric_path = request.form.get('qc_metric',
@@ -28,8 +28,7 @@ def microsalt_qc_time(year):
                            selected_group=metric_path.split('.')[0],
                            selected_metric=metric_path.split('.')[1],
                            header=HEADER,
-                           page_id='microsalt_cov_qc_time',
-                           page_url='covid.microsalt_qc_time',
+                           endpoint=request.endpoint,
                            version=__version__,
                            year_of_interest=year,
                            MICROSALT=MICROSALT,
@@ -37,7 +36,7 @@ def microsalt_qc_time(year):
 
 
 @covid_blueprint.route('/Bioinfo/Covid/qc_time_scatter/<year>', methods=['GET', 'POST'])
-def qc_scatter(year):
+def qc_scatter(year: int):
     """Scatter plot with qc data over time, grouped by prep method"""
 
     metric_path = request.form.get('qc_metric',
@@ -50,8 +49,7 @@ def qc_scatter(year):
                            selected_group=metric_path.split('.')[0],
                            metric=metric_path.split('.')[1],
                            header=HEADER,
-                           page_id='cov_qc_scatter',
-                           page_url='covid.qc_scatter',
+                           endpoint=request.endpoint,
                            version=__version__,
                            year_of_interest=year,
                            years=YEARS)

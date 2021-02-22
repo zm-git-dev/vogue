@@ -1,4 +1,3 @@
-import os
 import logging
 
 from flask import Flask
@@ -6,8 +5,8 @@ from pymongo import MongoClient
 import yaml
 
 from vogue.adapter.plugin import VougeAdapter
-from vogue.server.views import blueprint
-from vogue.server.endpoints.covid import covid_blueprint
+from vogue.server.endpoints import covid_blueprint, home_blueprint, common_trends_blueprint, prepps_blueprint, \
+    sequencing_blueprint, mip_blueprint, micro_blueprint, cancer_blueprint, genotype_blueprint, index_blueprint
 
 from genologics.lims import Lims
 from genologics.config import BASEURI, USERNAME, PASSWORD
@@ -45,10 +44,18 @@ def configure_app(app, config=None):
     app.client = client
     app.db = client[db_name]
     app.adapter = VougeAdapter(client, db_name=db_name)
-    app.register_blueprint(blueprint)
     app.register_blueprint(covid_blueprint)
+    app.register_blueprint(home_blueprint)
+    app.register_blueprint(common_trends_blueprint)
+    app.register_blueprint(prepps_blueprint)
+    app.register_blueprint(sequencing_blueprint)
+    app.register_blueprint(mip_blueprint)
+    app.register_blueprint(micro_blueprint)
+    app.register_blueprint(cancer_blueprint)
+    app.register_blueprint(genotype_blueprint)
+    app.register_blueprint(index_blueprint)
 
-    if app.config['DEBUG'] == 1:
+    if app.config['DEBUG']:
         from flask_debugtoolbar import DebugToolbarExtension
         toolbar = DebugToolbarExtension(app)
 

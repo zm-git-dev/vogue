@@ -10,8 +10,8 @@
                 <div class="card-body">
                     <div class="row">
                             <div class="btn mb-2 mb-md-0"> 
-                                    <form action="{{ url_for('server.index')}}" method="POST">
-                                        <input type="hidden" name="page" value="{{page_id}}">
+                                    <form action="{{ url_for('home.index')}}" method="POST">
+                                        <input type="hidden" name="endpoint" value="{{endpoint}}">
                                             <select id="reagent_label" name="reagent_label" class="form-control form-control-sm"
                                                 placeholder=".form-control-sm" required onchange="this.form.submit()">
                                                 <option value="">Select reagent label...</option>
@@ -44,7 +44,7 @@
         type: 'column'
     },
     title: {
-        text:'<a href="{{ url_for('server.reagent_labels', index_category_url=index_category.replace(' ', '_')) }}">{{index_category}}</a>: {{reagent_label}}'
+        text:'<a href="{{ url_for('index.reagent_labels', index_category_url=index_category.replace(' ', '_')) }}">{{index_category}}</a>: {{reagent_label}}'
     },
     subtitle: {
         text: 'Normalized index performance = (index_total_reads/index_target_reads)/(flowcell_total_reads/flowcell_target_reads).<br> Not showing data from runs with flowcell performance < {{flowcell_performance_treshold}}'},

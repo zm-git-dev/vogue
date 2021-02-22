@@ -9,7 +9,7 @@
       <br>
       <br>
       <li class="nav-item dropright">
-        <a class="nav-link " href="{{ url_for('server.index') }}">
+        <a class="nav-link " href="{{ url_for('home.home') }}">
           <span data-feather="home"></span>
           Home <span class="sr-only">(current)</span>
         </a>
@@ -20,9 +20,9 @@
           Common trends
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item btn-sm" href="{{ url_for('server.turn_around_times', year=year_of_interest) }}">Turnaround
+          <a class="dropdown-item btn-sm" href="{{ url_for('common_trends.turn_around_times', year=year_of_interest) }}">Turnaround
             Times</a>
-          <a class="dropdown-item btn-sm" href="{{ url_for('server.common_samples', year=year_of_interest) }}">Samples</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('common_trends.common_samples', year=year_of_interest) }}">Samples</a>
         </div>
       </li>
       <li class="nav-item dropright">
@@ -31,11 +31,11 @@
           Preps
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item btn-sm" href="{{ url_for('server.microbial' , year=year_of_interest) }}">Microbial</a>
-          <a class="dropdown-item btn-sm" href="{{ url_for('server.wgs' , year=year_of_interest) }}">WGS Illumina
+          <a class="dropdown-item btn-sm" href="{{ url_for('prepps.microbial' , year=year_of_interest) }}">Microbial</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('prepps.wgs' , year=year_of_interest) }}">WGS Illumina
             PCR-free</a>
-          <a class="dropdown-item btn-sm" href="{{ url_for('server.lucigen' , year=year_of_interest) }}">Lucigen PCR-free</a>
-          <a class="dropdown-item btn-sm" href="{{ url_for('server.target_enrichment' , year=year_of_interest) }}">Targeted
+          <a class="dropdown-item btn-sm" href="{{ url_for('prepps.lucigen' , year=year_of_interest) }}">Lucigen PCR-free</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('prepps.target_enrichment' , year=year_of_interest) }}">Targeted
             enrichment</a>
         </div>
       </li>
@@ -45,7 +45,7 @@
           Sequencing
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item btn-sm" href="{{ url_for('server.runs' , year=year_of_interest) }}">Instruments</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('sequencing.runs' , year=year_of_interest) }}">Instruments</a>
         </div>
       </li>
       <li class="nav-item dropright">
@@ -55,10 +55,10 @@
             <a href="#" data-toggle="dropdown" class="dropdown-toggle">Rare Disease</a>
             <ul class="dropdown-menu">
               <li class="dropdown-item btn-sm">
-                <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.mip_dna_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
+                <a class="dropdown-toggle-sub-menue" href="{{ url_for('mip.dna_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
               </li>
               <li class="dropdown-item btn-sm">
-                <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.mip_dna_picard' , year=year_of_interest) }}">Picard QC</a>
+                <a class="dropdown-toggle-sub-menue" href="{{ url_for('mip.dna_picard' , year=year_of_interest) }}">Picard QC</a>
               </li>
             </ul>
           </li>
@@ -66,7 +66,7 @@
               <a href="#" data-toggle="dropdown" class="dropdown-toggle">Cancer</a>
               <ul class="dropdown-menu">
                 <li class="dropdown-item btn-sm">
-                  <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.balsamic' , year=year_of_interest) }}">Nothing here yet</a>
+                  <a class="dropdown-toggle-sub-menue" href="{{ url_for('cancer.balsamic' , year=year_of_interest) }}">Nothing here yet</a>
                 </li>
               </ul>
             </li>
@@ -74,16 +74,16 @@
                 <a href="#" data-toggle="dropdown" class="dropdown-toggle">Microbial</a>
                 <ul class="dropdown-menu">
                   <li class="dropdown-item btn-sm">
-                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.microsalt_strain_st' , year=year_of_interest) }}">ST total</a>
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro.strain_st' , year=year_of_interest) }}">ST total</a>
                   </li>
                   <li class="dropdown-item btn-sm">
-                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.microsalt_qc_time' , year=year_of_interest) }}">QC over time</a>
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro.qc_time' , year=year_of_interest) }}">QC over time</a>
                   </li>
                   <li class="dropdown-item btn-sm">
-                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.microsalt_untyped' , year=year_of_interest) }}">Untyped organisms</a>
+                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro.untyped' , year=year_of_interest) }}">Untyped organisms</a>
                   </li>
                   <li class="dropdown-item btn-sm">
-                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('server.microsalt_st_time' , year=year_of_interest) }}">ST over time</a>
+                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro.st_time' , year=year_of_interest) }}">ST over time</a>
                   </li>
                 </ul>
               </li>
@@ -106,7 +106,7 @@
             Genotypes
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item btn-sm" href="{{ url_for('server.genotype_plate') }}">Genotype Plate</a>
+            <a class="dropdown-item btn-sm" href="{{ url_for('genotype.genotype_plate') }}">Genotype Plate</a>
           </div>
         </li>
         <li class="nav-item dropright">
@@ -115,8 +115,8 @@
             Index Performance
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item btn-sm" href="{{ url_for('server.reagent_labels', index_category_url='Illumina_IDT_UD') }}">Average</a>
-            <a class="dropdown-item btn-sm" href="{{ url_for('server.reagent_label', index_category='Illumina_IDT_UD', reagent_label='G09-UDI0071') }}">Per Index</a>
+              <a class="dropdown-item btn-sm" href="{{ url_for('index.reagent_labels', index_category_url='Illumina_IDT_UD') }}">Average</a>
+            <a class="dropdown-item btn-sm" href="{{ url_for('index.reagent_label', index_category='Illumina_IDT_UD', reagent_label='G09-UDI0071') }}">Per Index</a>
           </div>
         </li>
     </ul>
