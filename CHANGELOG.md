@@ -4,6 +4,11 @@ This change log will document the notable changes to this project in this file a
 
 ## [x.x.x]
 
+### Changed
+- Separated server blueprint into several blueprints
+- Restructured the server/utiles to follow the follow the new bluepprint categories.
+- Minor QoL changes
+
 ### Added
 - Adding new tab for covid plots
 - Separating covid samples from micro samples (covid sampkles are no longer part of micro plots. Micro samples are not part of covid plots)
