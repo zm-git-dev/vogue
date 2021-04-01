@@ -52,24 +52,13 @@
         <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Bioinfo</a>
         <ul class="dropdown-menu">
           <li class="dropdown-item btn-sm dropdown-submenu">
-            <a href="#" data-toggle="dropdown" class="dropdown-toggle">Rare Disease</a>
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">WGS, WES, TGA</a>
             <ul class="dropdown-menu">
               <li class="dropdown-item btn-sm">
-                <a class="dropdown-toggle-sub-menue" href="{{ url_for('mip.dna_picard_time' , year=year_of_interest) }}">Picard QC over time</a>
-              </li>
-              <li class="dropdown-item btn-sm">
-                <a class="dropdown-toggle-sub-menue" href="{{ url_for('mip.dna_picard' , year=year_of_interest) }}">Picard QC</a>
+                <a class="dropdown-toggle-sub-menue" href="{{ url_for('qc.qc_dna_picard_time' , year=year_of_interest) }}">QC over time</a>
               </li>
             </ul>
           </li>
-          <li class="dropdown-item  btn-sm dropdown-submenu">
-              <a href="#" data-toggle="dropdown" class="dropdown-toggle">Cancer</a>
-              <ul class="dropdown-menu">
-                <li class="dropdown-item btn-sm">
-                  <a class="dropdown-toggle-sub-menue" href="{{ url_for('cancer.balsamic' , year=year_of_interest) }}">Nothing here yet</a>
-                </li>
-              </ul>
-            </li>
             <li class="dropdown-item btn-sm dropdown-submenu">
                 <a href="#" data-toggle="dropdown" class="dropdown-toggle">Microbial</a>
                 <ul class="dropdown-menu">

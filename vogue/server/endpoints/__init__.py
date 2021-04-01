@@ -2,9 +2,8 @@ from .home import home_blueprint
 from .common_trends import common_trends_blueprint
 from .prepps import prepps_blueprint
 from .sequencing import sequencing_blueprint
-from .bioinfo import mip_blueprint
+from .bioinfo import qc_blueprint
 from .bioinfo import covid_blueprint
 from .bioinfo import micro_blueprint
-from .bioinfo import cancer_blueprint
 from .genootype import genotype_blueprint
 from .index import index_blueprint

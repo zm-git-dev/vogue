@@ -2,6 +2,14 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [X.X.X]
+
+### Changed
+- Coupled cancer and rare disease view into one
+
+### Removed
+- QC compare feature for WGS, WES, and TGS
+
 ## [1.2.2]
 
 ### Changed

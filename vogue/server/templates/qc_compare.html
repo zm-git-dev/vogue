@@ -14,9 +14,9 @@
                                 <label class="form-text text-muted" for="X_axis">Select X axis metric:</label>
                                 <select id="X_axis" name="X_axis" class="form-control form-control-sm"
                                     placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                    {% for group in MIP_DNA_PICARD %}
+                                    {% for group in DNA_PICARD %}
                                         <optgroup label="{{group}}" >
-                                        {% for metric in MIP_DNA_PICARD[group] %}
+                                        {% for metric in DNA_PICARD[group] %}
                                             <option value="{{group}} {{metric}}" {{ 'selected' if metric == X_axis }}>
                                                 {{ metric.lower().capitalize().replace('_', ' ')}}
                                             </option>
@@ -28,9 +28,9 @@
                             <label class="form-text text-muted" for="Y_axis">Select Y axis metric:</label>
                             <select id="Y_axis" name="Y_axis" class="form-control form-control-sm"
                                 placeholder=".form-control-sm" required onchange="this.form.submit()">
-                                {% for group in MIP_DNA_PICARD %}
+                                {% for group in DNA_PICARD %}
                                         <optgroup label="{{group}}" >
-                                        {% for metric in MIP_DNA_PICARD[group] %}
+                                        {% for metric in DNA_PICARD[group] %}
                                             <option value="{{group}} {{metric}}" {{ 'selected' if metric == Y_axis }}>
                                                 {{ metric.lower().capitalize().replace('_', ' ')}}
                                             </option>
@@ -41,7 +41,7 @@
                         </div>
                     </div>
                     <hr>
-                    A subset of the picard qc metricses that are being procued by MIP are visualized here. Write a request <a href="https://github.com/Clinical-Genomics/vogue/issues/new/choose">here</a>. if you want to add more data to this plot. <br><br>
+                    A subset of the picard qc metricses that are being procued by workflows are visualized here. Write a request <a href="https://github.com/Clinical-Genomics/vogue/issues/new/choose">here</a>. if you want to add more data to this plot. <br><br>
                     This plot shows data from: <br>
                     {% for group in groups%}
                         <b>{{group.lower().capitalize().replace('_', ' ')}}</b>:  {{help_urls[group]['text']}}. Definitions of each specific metric can be found <a href="{{help_urls[group]['url']}}">here</a>. <br>

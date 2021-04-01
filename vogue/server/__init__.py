@@ -6,7 +6,7 @@ import yaml
 
 from vogue.adapter.plugin import VougeAdapter
 from vogue.server.endpoints import covid_blueprint, home_blueprint, common_trends_blueprint, prepps_blueprint, \
-    sequencing_blueprint, mip_blueprint, micro_blueprint, cancer_blueprint, genotype_blueprint, index_blueprint
+    sequencing_blueprint, qc_blueprint, micro_blueprint, genotype_blueprint, index_blueprint
 
 from genologics.lims import Lims
 from genologics.config import BASEURI, USERNAME, PASSWORD
@@ -49,9 +49,8 @@ def configure_app(app, config=None):
     app.register_blueprint(common_trends_blueprint)
     app.register_blueprint(prepps_blueprint)
     app.register_blueprint(sequencing_blueprint)
-    app.register_blueprint(mip_blueprint)
+    app.register_blueprint(qc_blueprint)
     app.register_blueprint(micro_blueprint)
-    app.register_blueprint(cancer_blueprint)
     app.register_blueprint(genotype_blueprint)
     app.register_blueprint(index_blueprint)
 
