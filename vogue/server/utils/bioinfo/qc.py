@@ -95,12 +95,13 @@ def _append_to_final_data(final_data: dict, raw_data: dict, sample: dict):
 
     for key, val in raw_data.items():
         if key in final_data.keys():
-            category = sample['category']
+            category = f"{sample['category']}_{'_'.join(sample['workflows'])}"
             if category not in final_data[key].keys():
                 final_data[key][category] = []
             final_data[key][category].append({
                 'name': sample['_id'],
                 'application': sample['category'],
+                'workflows': ",".join(sample['workflows']),
                 'x': sample['month'],
                 'y': val
             })

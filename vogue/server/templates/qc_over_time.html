@@ -61,6 +61,7 @@
                 // in this context january is 0, february 1,..., december 11 thereby result.x-1
                 data.push({
                     'application': {{ result.application | tojson }},
+                    'workflows': {{ result.workflows | tojson }},
                     'name': {{result.name | tojson}},
                     'x': {{result.x-1}},
                     'y': {{result.y}}
@@ -92,6 +93,9 @@
                     }
                     if (this.point.application) {
                         output = output + 'Application: <b>' + this.point.application + '</b> <br>'
+                    }
+                    if (this.point.workflows) {
+                        output = output + 'Workflows: <b>' + this.point.workflows + '</b> <br>'
                     }
                     output = output + "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" + ': <b>' + this.y + '</b> <br> Sample Recieved in: <b>' + this.x + '</b>'
                     return output;
