@@ -77,7 +77,7 @@
 
 
         Highcharts.chart('picard_plot', {
-            chart: {type: 'scatter'},
+            chart: {type: 'scatter', zoomType: 'xy'},
             title: {text: "{{selected_group.lower().capitalize().replace('_', ' ')}}"},
             subtitle: {text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}} over Time"},
             xAxis: {
@@ -103,7 +103,7 @@
             },
             plotOptions: {
                 series: {
-                    connectNulls: true
+                    connectNulls: true, allowPointSelect: true
                 },
                 spline: {
                     marker: {

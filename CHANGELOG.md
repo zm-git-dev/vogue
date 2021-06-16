@@ -2,6 +2,13 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [1.3.1]
+
+### Changed
+- Bioinfo WGS, WES, and TGS view is zoomable
+- Picard HSMetrics' coverage range is increased to 1000X
+
+ 
 ## [1.3.0]
 
 ### Changed
