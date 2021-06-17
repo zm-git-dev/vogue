@@ -7,6 +7,10 @@ This change log will document the notable changes to this project in this file a
 ### Changed
 - Bioinfo WGS, WES, and TGS view is zoomable
 - Picard HSMetrics' coverage range is increased to 1000X
+- Hardcode dependencies and their versions
+
+### Removed
+- multiqc and yapf from depedencies
 
  
 ## [1.3.0]
