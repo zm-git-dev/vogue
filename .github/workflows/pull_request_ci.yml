@@ -65,7 +65,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Install Vogue 
+      # Install Vogue
       - name: Install Vogue
         run: |
           python -m pip install --upgrade pip

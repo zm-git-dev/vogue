@@ -15,7 +15,9 @@ from vogue.commands.load.flowcell import flowcell as flowcell_command
 from vogue.commands.load.sample import sample as sample_command
 from vogue.commands.load.genotype import genotype as genotype_command
 from vogue.commands.load.reagent_label import reagent_labels as reagent_label_command
-from vogue.commands.load.reagent_label_category import reagent_label_categories as reagent_label_category_command
+from vogue.commands.load.reagent_label_category import (
+    reagent_label_categories as reagent_label_category_command,
+)
 
 # Get version and doc decorator
 from vogue import __version__

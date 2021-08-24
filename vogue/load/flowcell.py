@@ -1,18 +1,19 @@
 from vogue.build.flowcell import build_run
 from vogue.constants.lims_constants import MASTER_STEPS_UDFS, INSTRUMENTS
 import logging
+
 LOG = logging.getLogger(__name__)
 
-SEQUENCING_STEPS = MASTER_STEPS_UDFS['sequenced']['steps']
+SEQUENCING_STEPS = MASTER_STEPS_UDFS["sequenced"]["steps"]
 
 
 def load_one(adapter, run):
     """Function to load one lims flowcell into the database"""
-    run_id = run.udf.get('Run ID')
+    run_id = run.udf.get("Run ID")
     if not run_id:
         LOG.warning("Run ID is missing")
         return
-    date, instrument = run_id.split('_')[0:2]
+    date, instrument = run_id.split("_")[0:2]
     instrument_name = INSTRUMENTS.get(instrument)
     if not instrument_name:
         LOG.warning("Could not get instrument name")
@@ -29,6 +30,5 @@ def load_all(adapter, lims):
 
 def load_recent(adapter, lims, the_date):
     """Function to load all lims flowcell into the database"""
-    for run in lims.get_processes(type=SEQUENCING_STEPS,
-                                  last_modified=the_date):
+    for run in lims.get_processes(type=SEQUENCING_STEPS, last_modified=the_date):
         load_one(adapter, run)

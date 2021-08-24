@@ -10,19 +10,18 @@ LOG = logging.getLogger(__name__)
 
 
 @click.command("reagent_labels", short_help="Load reagent_labels into db.")
-@click.option('-a',
-              '--all-reagent_labels',
-              is_flag=True,
-              help='Loads reagent_labels from all flowcells found in LIMS.')
-@click.option('--dry',
-              is_flag=True,
-              help='Load reagent_labels from flowcell or not. (dry-run)')
 @click.option(
-    '-d',
-    '--days',
+    "-a",
+    "--all-reagent_labels",
+    is_flag=True,
+    help="Loads reagent_labels from all flowcells found in LIMS.",
+)
+@click.option("--dry", is_flag=True, help="Load reagent_labels from flowcell or not. (dry-run)")
+@click.option(
+    "-d",
+    "--days",
     type=int,
-    help=
-    'Update only reagent_labels from runs updated in the latest number of days'
+    help="Update only reagent_labels from runs updated in the latest number of days",
 )
 @with_appcontext
 def reagent_labels(all_reagent_labels, dry, days):

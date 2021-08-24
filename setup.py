@@ -12,12 +12,12 @@ setup(
     version=version,
     url="https://github.com/Clinical-Genomics/vogue",
     author="Maya Brandi; Hassan Foroughi Asl",
-    author_email='maya.brandi@scilifelab.se; hassan.foroughi@scilifelab.se',
+    author_email="maya.brandi@scilifelab.se; hassan.foroughi@scilifelab.se",
     install_requires=install_requires,
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     entry_points={
-        'console_scripts': ['vogue=vogue.commands:cli'],
+        "console_scripts": ["vogue=vogue.commands:cli"],
     },
 )

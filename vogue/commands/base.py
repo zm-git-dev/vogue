@@ -16,20 +16,22 @@ from .load import load
 from vogue import __version__
 from vogue.tools.cli_utils import add_doc as doc
 
-LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
 LOG = logging.getLogger(__name__)
 
 
 @click.version_option(__version__)
-@click.group(cls=FlaskGroup,
-             create_app=create_app,
-             add_default_commands=True,
-             invoke_without_command=False,
-             add_version_option=False)
+@click.group(
+    cls=FlaskGroup,
+    create_app=create_app,
+    add_default_commands=True,
+    invoke_without_command=False,
+    add_version_option=False,
+)
 @click.option("-c", "--config", type=click.File(), help="Path to config file")
 @with_appcontext
 def cli(config):
-    """ Main entry point """
+    """Main entry point"""
     if current_app.test:
         return
     configure_app(current_app, config)
