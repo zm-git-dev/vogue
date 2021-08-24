@@ -2,6 +2,18 @@
 
 This change log will document the notable changes to this project in this file and it is following [Semantic Versioning](https://semver.org/)
 
+## [1.4.0]
+### Added
+* bumpversion ci action
+* pypi publish action
+* docker build and publish actions for the app
+* using black for linting
+* deployment actions 
+
+### Removed
+* No longer makes jupyter containers
+
+
 ## [1.3.1]
 
 ### Changed
