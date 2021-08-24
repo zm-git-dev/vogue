@@ -1,10 +1,20 @@
 ---
 
-name: Pull Request Container build
+name: Pull Request Actions
 
 on: [push]
 
 jobs:
+  black-lint:
+    runs-on: ubuntu-latest
+    name: Black
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: psf/black@stable
+        with:
+          black_args: ". --check --line-length 100"
+
   docker-image-push:
     runs-on: ubuntu-latest
     name: Create staging docker image
@@ -35,3 +45,34 @@ jobs:
          file: ./Dockerfile
          push: true
          tags: "clinicalgenomics/vogue-stage:${{steps.get_branch_name.outputs.branch}}, clinicalgenomics/vogue-stage:latest"
+
+  tests-coverage:
+    runs-on: ubuntu-latest
+    name: Test and coveralls
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Check out vogue
+        uses: actions/checkout@v2
+        with:
+          repository: "Clinical-Genomics/vogue"
+
+      - name: Install vogue dependencies
+        run: |
+          pip install -r requirements.txt -r requirements-dev.txt .
+
+      - name: Install coveralls dependencies
+        run: |
+          pip install pytest-cov coveralls
+
+      - name: Test with pytest & Coveralls
+        run: |
+          pytest --cov=vogue/
+          coveralls
+        env:
+          GITHUB: 1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
