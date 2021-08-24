@@ -30,7 +30,6 @@ class Testcase_cli_utils(unittest.TestCase):
 
     def test_json_read(self):
         self.assertEqual(json_read(INVALID_JSON), False)
-
         self.assertIsInstance(json_read(VALID_JSON), dict)
 
         with self.assertLogs("json_read", level="WARNING") as l:
