@@ -19,7 +19,7 @@ def test_find_concentration_amount(database):
         "amount": 322.5,
         "amount-concentration": 11.5,
         "received_date": datetime(year, 12, 1, 0, 0),
-        "received_to_delivered": 22
+        "received_to_delivered": 22,
     }
 
     database.sample.insert_one(sample)
@@ -28,8 +28,8 @@ def test_find_concentration_amount(database):
     results = find_concentration_amount(app.adapter, year)
 
     # THEN assert the results should be equal to expected_result:
-    expected_result = [{'x': 200, 'y': 11.5, 'name': 'ACC2692A1'}]
-    assert results['data'] == expected_result
+    expected_result = [{"x": 200, "y": 11.5, "name": "ACC2692A1"}]
+    assert results["data"] == expected_result
 
 
 def test_find_concentration_defrosts(database):
@@ -44,7 +44,7 @@ def test_find_concentration_defrosts(database):
         "nr_defrosts-concentration": 5.71,
         "lotnr": "20124806",
         "received_date": datetime(year, 12, 1, 0, 0),
-        "received_to_delivered": 13
+        "received_to_delivered": 13,
     }
     database.sample.insert_one(sample)
 
@@ -53,21 +53,17 @@ def test_find_concentration_defrosts(database):
 
     # THEN assert the results should be equal to expected_result:
     expected_result = {
-        '20124806': {
-            'median': [[2, 5.71]],
-            'nr_samples': [[2, 1]],
-            'quartile': [[2, 5.71, 5.71]]
-        }
+        "20124806": {"median": [[2, 5.71]], "nr_samples": [[2, 1]], "quartile": [[2, 5.71, 5.71]]}
     }
-    assert results['data'] == expected_result
+    assert results["data"] == expected_result
 
 
 def test_count_value_per_month(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
     year = 2018
-    y_val = 'count'
-    group_key = 'source'
+    y_val = "count"
+    group_key = "source"
 
     # GIVEN a database  with two sample documents:
     sample = {
@@ -75,7 +71,7 @@ def test_count_value_per_month(database):
         "source": "blood",
         "library_size_post_hyb": 333,
         "received_date": datetime(year, 12, 1, 0, 0),
-        "received_to_delivered": 32
+        "received_to_delivered": 32,
     }
     database.sample.insert_one(sample)
     sample = {
@@ -83,7 +79,7 @@ def test_count_value_per_month(database):
         "source": "blood",
         "library_size_post_hyb": 417,
         "received_date": datetime(year, 12, 1, 0, 0),
-        "received_to_delivered": 32
+        "received_to_delivered": 32,
     }
     database.sample.insert_one(sample)
 
@@ -92,12 +88,7 @@ def test_count_value_per_month(database):
 
     # THEN assert the results should be equal to expected_result:
     expected_result = {
-        'blood': {
-            'data': [
-                None, None, None, None, None, None, None, None, None, None,
-                None, 2
-            ]
-        }
+        "blood": {"data": [None, None, None, None, None, None, None, None, None, None, None, 2]}
     }
     assert results == expected_result
 
@@ -106,8 +97,8 @@ def test_y_val_value_per_month(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
     year = 2018
-    y_val = 'library_size_post_hyb'
-    group_key = 'source'
+    y_val = "library_size_post_hyb"
+    group_key = "source"
 
     # GIVEN a database  with two sample documents:
     sample = {
@@ -115,7 +106,7 @@ def test_y_val_value_per_month(database):
         "source": "blood",
         "library_size_post_hyb": 333,
         "received_date": datetime(year, 12, 1, 0, 0),
-        "received_to_delivered": 32
+        "received_to_delivered": 32,
     }
     database.sample.insert_one(sample)
     sample = {
@@ -123,7 +114,7 @@ def test_y_val_value_per_month(database):
         "source": "blood",
         "library_size_post_hyb": 417,
         "received_date": datetime(year, 12, 1, 0, 0),
-        "received_to_delivered": 32
+        "received_to_delivered": 32,
     }
     database.sample.insert_one(sample)
 
@@ -132,12 +123,7 @@ def test_y_val_value_per_month(database):
 
     # THEN assert the results should be equal to expected_result:
     expected_result = {
-        'blood': {
-            'data': [
-                None, None, None, None, None, None, None, None, None, None,
-                None, 375.0
-            ]
-        }
+        "blood": {"data": [None, None, None, None, None, None, None, None, None, None, None, 375.0]}
     }
     assert results == expected_result
 
@@ -146,7 +132,7 @@ def test_q30_instruments(database):
     app.db = database
     app.adapter = VougeAdapter(database.client, db_name=database.name)
     year = 2017
-    instrument = 'Marie'
+    instrument = "Marie"
 
     ## GIVEN a database  with two flowcell documents with instrument Marie:
     metric = "% Bases >=Q30"
@@ -154,19 +140,15 @@ def test_q30_instruments(database):
         "_id": "170530_ST-E00214_0154_AHJCL5ALXX",
         "instrument": instrument,
         "date": datetime(year, 5, 30, 0, 0),
-        "avg": {
-            metric: 90
-        }
+        "avg": {metric: 90},
     }
     database.flowcell.insert_one(run1)
 
     run2 = {
-        "_id": '171012_ST-E00214_0186_BHCGCKCCXY',
+        "_id": "171012_ST-E00214_0186_BHCGCKCCXY",
         "instrument": instrument,
         "date": datetime(year, 10, 12, 0, 0),
-        "avg": {
-            metric: 80
-        }
+        "avg": {metric: 80},
     }
     database.flowcell.insert_one(run2)
 
@@ -174,7 +156,8 @@ def test_q30_instruments(database):
     results = instrument_info(app.adapter, year, metric)
 
     ## THEN assert the results for Marie should be as expected:
-    expected = [[
-        datetime(2017, 5, 30, 0, 0), 90, '170530_ST-E00214_0154_AHJCL5ALXX'
-    ], [datetime(2017, 10, 12, 0, 0), 80, '171012_ST-E00214_0186_BHCGCKCCXY']]
-    assert results['data'][metric][instrument]['data'] == expected
+    expected = [
+        [datetime(2017, 5, 30, 0, 0), 90, "170530_ST-E00214_0154_AHJCL5ALXX"],
+        [datetime(2017, 10, 12, 0, 0), 80, "171012_ST-E00214_0186_BHCGCKCCXY"],
+    ]
+    assert results["data"][metric][instrument]["data"] == expected

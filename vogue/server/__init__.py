@@ -5,8 +5,17 @@ from pymongo import MongoClient
 import yaml
 
 from vogue.adapter.plugin import VougeAdapter
-from vogue.server.endpoints import covid_blueprint, home_blueprint, common_trends_blueprint, prepps_blueprint, \
-    sequencing_blueprint, qc_blueprint, micro_blueprint, genotype_blueprint, index_blueprint
+from vogue.server.endpoints import (
+    covid_blueprint,
+    home_blueprint,
+    common_trends_blueprint,
+    prepps_blueprint,
+    sequencing_blueprint,
+    qc_blueprint,
+    micro_blueprint,
+    genotype_blueprint,
+    index_blueprint,
+)
 
 from genologics.lims import Lims
 from genologics.config import BASEURI, USERNAME, PASSWORD
@@ -22,7 +31,7 @@ def create_app(test=False):
         return app
 
     try:
-        app.config.from_envvar('VOGUE_CONFIG')
+        app.config.from_envvar("VOGUE_CONFIG")
         configure_app(app)
     except:
         pass
@@ -39,8 +48,8 @@ def configure_app(app, config=None):
     if config:
         app.config = {**app.config, **yaml.safe_load(config)}
 
-    client = MongoClient(app.config['DB_URI'])
-    db_name = app.config['DB_NAME']
+    client = MongoClient(app.config["DB_URI"])
+    db_name = app.config["DB_NAME"]
     app.client = client
     app.db = client[db_name]
     app.adapter = VougeAdapter(client, db_name=db_name)
@@ -54,8 +63,9 @@ def configure_app(app, config=None):
     app.register_blueprint(genotype_blueprint)
     app.register_blueprint(index_blueprint)
 
-    if app.config['DEBUG']:
+    if app.config["DEBUG"]:
         from flask_debugtoolbar import DebugToolbarExtension
+
         toolbar = DebugToolbarExtension(app)
 
     return app

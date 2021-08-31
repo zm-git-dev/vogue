@@ -1,6 +1,6 @@
-'''
+"""
     cli for handling bioinfo collections. Addition and update!
-'''
+"""
 import logging
 import click
 

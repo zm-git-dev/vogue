@@ -3,12 +3,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def load_analysis(adapter,
-                  lims_id,
-                  analysis,
-                  processed=False,
-                  is_sample=False,
-                  dry_run=False):
+def load_analysis(adapter, lims_id, analysis, processed=False, is_sample=False, dry_run=False):
     """Load information for a bioinfo analysis"""
 
     if dry_run:
@@ -18,8 +13,7 @@ def load_analysis(adapter,
         else:
             LOG.info("The sample does not exist in the database")
 
-        LOG.info("Analysis information for sample %s to add/update: \n %s",
-                 lims_id, analysis)
+        LOG.info("Analysis information for sample %s to add/update: \n %s", lims_id, analysis)
         return
 
     if not processed and not is_sample:

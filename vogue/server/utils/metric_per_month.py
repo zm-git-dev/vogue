@@ -1,5 +1,5 @@
 import numpy as np
-from vogue.constants.constants import (TEST_SAMPLES)
+from vogue.constants.constants import TEST_SAMPLES
 
 
 def pipe_value_per_month(year: int, y_val: str, group_key: str = None) -> list:
@@ -30,46 +30,30 @@ def pipe_value_per_month(year: int, y_val: str, group_key: str = None) -> list:
 
         Plot content:
             Number of revieved samples/month during 2017 grouped by priority.
-            """
+    """
 
-    match = {
-        '$match': {
-            'received_date': {
-                '$exists': True
-            },
-            '_id': {
-                '$nin': TEST_SAMPLES
-            }
-        }
-    }
+    match = {"$match": {"received_date": {"$exists": True}, "_id": {"$nin": TEST_SAMPLES}}}
     project = {
-        '$project': {
-            'month': {
-                '$month': '$received_date'
-            },
-            'year': {
-                '$year': '$received_date'
-            }
-        }
+        "$project": {"month": {"$month": "$received_date"}, "year": {"$year": "$received_date"}}
     }
-    match_year = {'$match': {'year': {'$eq': year}}}
-    group = {'$group': {'_id': {'month': '$month'}}}
-    sort = {'$sort': {'_id.month': 1}}
+    match_year = {"$match": {"year": {"$eq": year}}}
+    group = {"$group": {"_id": {"month": "$month"}}}
+    sort = {"$sort": {"_id.month": 1}}
 
     if group_key:  # grouping by group_key
-        match['$match'][group_key] = {'$exists': True}
-        project['$project'][group_key] = 1
-        group['$group']['_id'][group_key] = '$' + group_key
-        sort['$sort']['_id.' + group_key] = 1
+        match["$match"][group_key] = {"$exists": True}
+        project["$project"][group_key] = 1
+        group["$group"]["_id"][group_key] = "$" + group_key
+        sort["$sort"]["_id." + group_key] = 1
 
-    if y_val == 'count':
+    if y_val == "count":
         # count nr samples per month:
-        group['$group'][y_val] = {'$sum': 1}
+        group["$group"][y_val] = {"$sum": 1}
     else:
         # get average of y_val:
-        match['$match'][y_val] = {'$exists': True}
-        project['$project'][y_val] = 1
-        group['$group'][y_val] = {'$push': '$' + y_val}
+        match["$match"][y_val] = {"$exists": True}
+        project["$project"][y_val] = 1
+        group["$group"][y_val] = {"$push": "$" + y_val}
 
     return [match, project, match_year, group, sort]
 
@@ -104,21 +88,21 @@ def reformat_aggregate_results(aggregate_result, y_val, group_key=None):
         plot_data: {'A. baumannii': {'data': [21.96, None, 43.25,...]},
                     'E. coli': {'data': [None, 7.68, ...]},
                                             ...}
-        """
+    """
 
     plot_data = {}
     for group in aggregate_result:
         if group_key:
-            group_name = group['_id'][group_key]
+            group_name = group["_id"][group_key]
         else:
-            group_name = 'all_samples'
-        month = group['_id']['month']
-        if y_val == 'count':
+            group_name = "all_samples"
+        month = group["_id"]["month"]
+        if y_val == "count":
             value = group[y_val]
         else:
             value = np.mean([float(val) for val in group[y_val]])
 
         if group_name not in plot_data:
-            plot_data[group_name] = {'data': [None] * 12}
-        plot_data[group_name]['data'][month - 1] = value
+            plot_data[group_name] = {"data": [None] * 12}
+        plot_data[group_name]["data"][month - 1] = value
     return plot_data

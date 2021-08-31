@@ -1,0 +1,85 @@
+---
+
+name: Pull Request Actions
+
+on: [push]
+
+jobs:
+  black-lint:
+    runs-on: ubuntu-latest
+    name: Black
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: psf/black@stable
+        with:
+          black_args: ". --check --line-length 100"
+
+  docker-image-push:
+    runs-on: ubuntu-latest
+    name: Create staging docker image
+    steps:
+     - name: Check out git repository
+       uses: actions/checkout@v2
+
+     - name: Extract branch name and remove illegal chars
+       id: get_branch_name
+       shell: bash
+       run: echo "##[set-output name=branch;]$(echo "$(tr "/" "-" <<<${GITHUB_REF#refs/heads/})")"
+
+     - name: Login to Docker Hub
+       uses: docker/login-action@v1
+       with:
+         username: ${{ secrets.DOCKER_USERNAME }}
+         password: ${{ secrets.DOCKER_PASSWORD }}
+
+     - name: Set up Docker Buildx
+       id: buildx
+       uses: docker/setup-buildx-action@v1
+
+     - name: Build and push
+       id: docker_build
+       uses: docker/build-push-action@v2
+       with:
+         context: ./
+         file: ./Dockerfile
+         push: true
+         tags: "clinicalgenomics/vogue-stage:${{steps.get_branch_name.outputs.branch}}, clinicalgenomics/vogue-stage:latest"
+
+  pytest_coveralls:
+    name: run PyTest
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6]
+
+    steps:
+      # Checkout Vogue
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      # Setup Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Install Vogue
+      - name: Install Vogue
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+          pip install -e .
+      # Pytest
+      - name: Run Pytest
+        run: |
+          py.test --cov-report=xml --cov=vogue -rsxv tests/*
+      # Run Codecov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          flags: unittests
+          fail_ci_if_error: true
