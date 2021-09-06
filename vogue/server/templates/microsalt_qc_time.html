@@ -79,22 +79,7 @@
             series: [{
                 name: '{{selected_metric}}',
                 data: data
-            },
-                {
-                    name: 'Outliers',
-                    color: Highcharts.getOptions().colors[0],
-                    type: 'scatter',
-                    data: {{ outliers |tojson}},
-                    marker: {
-                        radius: 2,
-                        fillColor: 'white',
-                        lineWidth: 1,
-                        lineColor: Highcharts.getOptions().colors[0]
-                    },
-                    tooltip: {
-                        pointFormat: 'Sample: {point.name} <br/> Value: {point.y}'
-                    }
-                }]
+            }]
         });
 
     </script>
