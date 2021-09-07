@@ -3,6 +3,7 @@ import logging
 from flask import Flask
 from pymongo import MongoClient
 import yaml
+import os
 
 from vogue.adapter.plugin import VougeAdapter
 from vogue.server.endpoints import (
@@ -31,7 +32,10 @@ def create_app(test=False):
         return app
 
     try:
-        app.config.from_envvar("VOGUE_CONFIG")
+        app.config["DB_NAME"] = os.environ.get("DB_NAME")
+        app.config["DB_URI"] = os.environ.get("DB_URI")
+        app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+        app.config["DEBUG"] = os.environ.get("DEBUG")
         configure_app(app)
     except:
         pass
