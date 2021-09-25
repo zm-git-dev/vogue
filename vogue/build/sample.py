@@ -59,17 +59,9 @@ def build_sample(sample: Sample, lims: Lims, adapter) -> dict:
             application_tag, sample.id, lims)
 
     mongo_sample['library_size_pre_hyb'] = get_library_size(
-        application_tag, sample.id, lims, 'TWIST', 'library_size_pre_hyb')
+        sample_id=sample.id, lims=lims, workflow='TWIST', size_steps=['KAPA Library Preparation TWIST v1'])
     mongo_sample['library_size_post_hyb'] = get_library_size(
-        application_tag, sample.id, lims, 'TWIST', 'library_size_post_hyb')
-    if not mongo_sample['library_size_post_hyb']:
-        if not received_at or received_at < dt(2019, 1, 1):
-            mongo_sample['library_size_pre_hyb'] = get_library_size(
-                application_tag, sample.id, lims, 'SureSelect',
-                'library_size_pre_hyb')
-            mongo_sample['library_size_post_hyb'] = get_library_size(
-                application_tag, sample.id, lims, 'SureSelect',
-                'library_size_post_hyb')
+        sample_id=sample.id, lims=lims, workflow='TWIST', size_steps=['Bead Purification TWIST v2', 'Bead Purification TWIST v1'])
 
     for key in list(mongo_sample.keys()):
         if mongo_sample[key] is None:

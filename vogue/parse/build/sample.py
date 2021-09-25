@@ -1,9 +1,12 @@
+from typing import List
+
 from genologics.lims import Lims
 from genologics.entities import Sample, Artifact
 from vogue.constants.lims_constants import MASTER_STEPS_UDFS
 from datetime import time, datetime as dt
 import operator
 import logging
+
 LOG = logging.getLogger(__name__)
 
 
@@ -80,11 +83,11 @@ def get_latest_input_artifact(process_type: str, lims_id: str,
     date_art_list = list(
         set([(a.parent_process.date_run, a) for a in artifacts]))
     if date_art_list:
-        #Sort on date:
+        # Sort on date:
         date_art_list.sort(key=operator.itemgetter(0))
-        #Get latest:
-        dummy, latest_outart = date_art_list[-1]  #get latest
-        #Get the input artifact related to our sample
+        # Get latest:
+        dummy, latest_outart = date_art_list[-1]  # get latest
+        # Get the input artifact related to our sample
         for inart in latest_outart.input_artifact_list():
             if lims_id in [sample.id for sample in inart.samples]:
                 latest_input_artifact = inart
@@ -108,7 +111,7 @@ def get_concentration_and_nr_defrosts(application_tag: str, lims_id: str,
         return {}
 
     if not application_tag[0:6] in MASTER_STEPS_UDFS[
-            'concentration_and_nr_defrosts']['apptags']:
+        'concentration_and_nr_defrosts']['apptags']:
         return {}
 
     lot_nr_steps = MASTER_STEPS_UDFS['concentration_and_nr_defrosts'][
@@ -164,7 +167,7 @@ def get_final_conc_and_amount_dna(application_tag: str, lims_id: str,
         return {}
 
     if not application_tag[0:6] in MASTER_STEPS_UDFS[
-            'final_conc_and_amount_dna']['apptags']:
+        'final_conc_and_amount_dna']['apptags']:
         return {}
 
     return_dict = {}
@@ -210,7 +213,7 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str,
         return {}
 
     if not application_tag[3:5] == MASTER_STEPS_UDFS[
-            'microbial_library_concentration']['apptags']:
+        'microbial_library_concentration']['apptags']:
         return None
 
     concentration_step = MASTER_STEPS_UDFS['microbial_library_concentration'][
@@ -227,41 +230,12 @@ def get_microbial_library_concentration(application_tag: str, lims_id: str,
         return None
 
 
-def get_library_size(app_tag: str, lims_id: str, lims: Lims, workflow: str,
-                     hyb_type: str) -> int:
-    """Getting the udf Size (bp) that in fact is set on the aggregate qc librar validation step.
-
-    But since the same qc protocol is used both for pre-hyb and post-hyb, there is no way to 
-    distiguish from within the aggregation step, wether it is pre-hyb or post-hyb qc. 
-
-    Because of that, we instead search for
-        TWIST: the input artifact of the output artifacts of the steps that are AFTER the 
-        aggregations step:
-            For pre hyb: MASTER_STEPS_UDFS['pre_hyb']['TWIST'].get('size_step')
-            For post hyb: MASTER_STEPS_UDFS['post_hyb']['TWIST'].get('size_step')
-        SureSelect: the output artifacts of the steps that are BEFORE the aggregations step:
-            For pre hyb: MASTER_STEPS_UDFS['pre_hyb']['SureSelect'].get('size_step')
-            For post hyb: MASTER_STEPS_UDFS['post_hyb']['SureSelect'].get('size_step')"""
-
-    size_steps = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_step')
+def get_library_size(sample_id: str, lims: Lims, size_steps: List[str], workflow: str) -> int:
+    """Getting the udf Size (bp) that in fact is set on the aggregate qc librar validation step."""
 
     if workflow == 'TWIST':
-        stage_udfs = MASTER_STEPS_UDFS[hyb_type][workflow].get('stage_udf')
-        out_art = get_output_artifact(size_steps, lims_id, lims, last=True)
+        out_art = get_output_artifact(size_steps, sample_id, lims, last=True)
         if out_art:
-            sample = Sample(lims, id=lims_id)
-            for inart in out_art.parent_process.all_inputs():
-                stage = inart.workflow_stages[0].id
-                if sample in inart.samples and stage in stage_udfs:
-                    size_udf = stage_udfs[stage]
-                    return inart.udf.get(size_udf)
-    elif workflow == 'SureSelect':
-        if not app_tag or app_tag[0:3] not in MASTER_STEPS_UDFS[hyb_type][
-                workflow]['apptags']:
-            return None
-        size_art = get_output_artifact(size_steps, lims_id, lims, last=True)
-        if size_art:
-            size_udf = MASTER_STEPS_UDFS[hyb_type][workflow].get('size_udf')
-            return size_art.udf.get(size_udf)
+            return out_art.udf.get('Size (bp)')
 
     return None
