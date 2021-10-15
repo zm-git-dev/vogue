@@ -238,5 +238,3 @@ def test_get_microbial_library_concentration(lims):
 
     # THEN the concentration should be fetched from A4
     assert concentration == 12
-
-

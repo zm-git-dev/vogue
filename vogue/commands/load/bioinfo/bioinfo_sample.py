@@ -4,8 +4,6 @@
 import logging
 import click
 
-from flask.cli import with_appcontext
-from flask.cli import current_app
 
 from vogue.tools.cli_utils import add_doc as doc
 from vogue.build.bioinfo_analysis import build_bioinfo_sample
@@ -35,8 +33,9 @@ LOG = logging.getLogger(__name__)
     into bioinfo sample collection.
     """
 )
-@with_appcontext
-def bioinfo_sample(dry, analysis_case, load_all):
+@click.pass_context
+def bioinfo_sample(ctx: click.Context, dry, analysis_case, load_all):
+    adapter = ctx.obj["adapter"]
 
     if (not load_all and not analysis_case) or (load_all and analysis_case):
         LOG.error(
@@ -44,7 +43,7 @@ def bioinfo_sample(dry, analysis_case, load_all):
         )
         raise click.Abort()
 
-    current_processed_analysis = current_app.adapter.bioinfo_processed(analysis_case)
+    current_processed_analysis = adapter.bioinfo_processed(analysis_case)
     LOG.info(
         "Loading following samples to bioinfo_samples: %s",
         ", ".join(current_processed_analysis["samples"]),
@@ -55,7 +54,7 @@ def bioinfo_sample(dry, analysis_case, load_all):
             analysis_dict=current_processed_analysis, process_case=True, sample_id=sample
         )
         load_res = load_analysis(
-            adapter=current_app.adapter,
+            adapter=adapter,
             lims_id=sample,
             processed=True,
             is_sample=True,

@@ -1,16 +1,12 @@
-from vogue.server import create_app
-from vogue.server.utils.prepps import find_concentration_defrosts, find_concentration_amount
-from vogue.server.utils.metric_per_month import value_per_month
-from vogue.server.utils.sequencing import instrument_info
-from vogue.adapter.plugin import VougeAdapter
+from vogue.crud.find_plots.prepps import find_concentration_defrosts, find_concentration_amount
+from vogue.crud.find_plots.metric_per_month import value_per_month
+from vogue.crud.find_plots.sequencing import instrument_info
+from vogue.adapter.plugin import VogueAdapter
 from datetime import datetime
-
-app = create_app(test=True)
 
 
 def test_find_concentration_amount(database):
-    app.db = database
-    app.adapter = VougeAdapter(database.client, db_name=database.name)
+    adapter = VogueAdapter(database.client, db_name=database.name)
     year = 2018
 
     # GIVEN a database  with a sample document:
@@ -25,7 +21,7 @@ def test_find_concentration_amount(database):
     database.sample.insert_one(sample)
 
     # WHEN running find_concentration_amount
-    results = find_concentration_amount(app.adapter, year)
+    results = find_concentration_amount(adapter, year)
 
     # THEN assert the results should be equal to expected_result:
     expected_result = [{"x": 200, "y": 11.5, "name": "ACC2692A1"}]
@@ -33,8 +29,7 @@ def test_find_concentration_amount(database):
 
 
 def test_find_concentration_defrosts(database):
-    app.db = database
-    app.adapter = VougeAdapter(database.client, db_name=database.name)
+    adapter = VogueAdapter(database.client, db_name=database.name)
     year = 2018
 
     # GIVEN a database  with a sample document:
@@ -49,7 +44,7 @@ def test_find_concentration_defrosts(database):
     database.sample.insert_one(sample)
 
     # WHEN running find_concentration_defrosts
-    results = find_concentration_defrosts(app.adapter, year)
+    results = find_concentration_defrosts(adapter, year)
 
     # THEN assert the results should be equal to expected_result:
     expected_result = {
@@ -59,8 +54,7 @@ def test_find_concentration_defrosts(database):
 
 
 def test_count_value_per_month(database):
-    app.db = database
-    app.adapter = VougeAdapter(database.client, db_name=database.name)
+    adapter = VogueAdapter(database.client, db_name=database.name)
     year = 2018
     y_val = "count"
     group_key = "source"
@@ -84,7 +78,7 @@ def test_count_value_per_month(database):
     database.sample.insert_one(sample)
 
     # WHEN running value_per_month:
-    results = value_per_month(app.adapter, year, y_val, group_key)
+    results = value_per_month(adapter, year, y_val, group_key)
 
     # THEN assert the results should be equal to expected_result:
     expected_result = {
@@ -94,8 +88,7 @@ def test_count_value_per_month(database):
 
 
 def test_y_val_value_per_month(database):
-    app.db = database
-    app.adapter = VougeAdapter(database.client, db_name=database.name)
+    adapter = VogueAdapter(database.client, db_name=database.name)
     year = 2018
     y_val = "library_size_post_hyb"
     group_key = "source"
@@ -119,7 +112,7 @@ def test_y_val_value_per_month(database):
     database.sample.insert_one(sample)
 
     # WHEN running value_per_month:
-    results = value_per_month(app.adapter, year, y_val, group_key)
+    results = value_per_month(adapter, year, y_val, group_key)
 
     # THEN assert the results should be equal to expected_result:
     expected_result = {
@@ -129,8 +122,7 @@ def test_y_val_value_per_month(database):
 
 
 def test_q30_instruments(database):
-    app.db = database
-    app.adapter = VougeAdapter(database.client, db_name=database.name)
+    adapter = VogueAdapter(database.client, db_name=database.name)
     year = 2017
     instrument = "Marie"
 
@@ -153,7 +145,7 @@ def test_q30_instruments(database):
     database.flowcell.insert_one(run2)
 
     ## WHEN running find_concentration_amount
-    results = instrument_info(app.adapter, year, metric)
+    results = instrument_info(adapter, year, metric)
 
     ## THEN assert the results for Marie should be as expected:
     expected = [

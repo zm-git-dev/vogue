@@ -1,7 +1,6 @@
 import logging
 import click
 from vogue.load.flowcell import load_one, load_all, load_recent
-from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
 
 from vogue.constants.constants import RUN_TYPES
@@ -16,15 +15,16 @@ LOG = logging.getLogger(__name__)
 @click.option(
     "-d", "--days", type=int, help="Update only runs updated in the latest number of days"
 )
-@with_appcontext
-def flowcell(run_id, all_runs, dry, days):
+@click.pass_context
+def flowcell(ctx: click.Context, run_id, all_runs, dry, days):
     """Read and load lims data for a one or all many runs"""
-
-    if not current_app.lims:
+    adapter = ctx.obj["adapter"]
+    lims = ctx.obj["lims"]
+    if not lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
 
-    lims = current_app.lims
+    lims = lims
 
     if days:
         try:
@@ -33,9 +33,9 @@ def flowcell(run_id, all_runs, dry, days):
         except Exception as err:
             LOG.error(err)
             raise click.Abort()
-        load_recent(current_app.adapter, lims, the_date)
+        load_recent(adapter, lims, the_date)
     elif all_runs:
-        load_all(current_app.adapter, lims=lims)
+        load_all(adapter, lims=lims)
     elif run_id:
         runs = []
         for run_type in RUN_TYPES:
@@ -48,4 +48,4 @@ def flowcell(run_id, all_runs, dry, days):
             run = runs[-1]
         else:
             run = runs[0]
-        load_one(current_app.adapter, run=run)
+        load_one(adapter, run=run)

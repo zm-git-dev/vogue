@@ -5,8 +5,6 @@ import logging
 import copy
 import click
 
-from flask.cli import with_appcontext
-from flask.cli import current_app
 
 from vogue.tools.cli_utils import json_read
 from vogue.tools.cli_utils import dict_replace_dot
@@ -75,8 +73,9 @@ within input results file under "samples" key.""",
     analysis model. Analysis types recognize the following keys in the input file: {" ".join(concat_dict_keys(analysis_model.ANALYSIS_SETS,key_name=""))}
         """
 )
-@with_appcontext
+@click.pass_context
 def bioinfo_raw(
+    ctx: click.Context,
     dry,
     analysis_result,
     analysis_type,
@@ -86,6 +85,7 @@ def bioinfo_raw(
     case_analysis_type,
     sample_list,
 ):
+    adapter = ctx.obj["adapter"]
 
     analysis_dict = dict()
 
@@ -144,7 +144,7 @@ def bioinfo_raw(
 
     analysis_dict["sample"] = sample_id
     # Don't process the case
-    current_analysis = current_app.adapter.bioinfo_raw(analysis_case)
+    current_analysis = adapter.bioinfo_raw(analysis_case)
 
     # Don't process the case
     ready_analysis = build_analysis(
@@ -165,7 +165,7 @@ def bioinfo_raw(
     LOG.info("Case %s will be added/updated", analysis_case)
 
     load_analysis(
-        adapter=current_app.adapter,
+        adapter=adapter,
         lims_id=analysis_dict["sample"],
         processed=False,
         is_sample=False,

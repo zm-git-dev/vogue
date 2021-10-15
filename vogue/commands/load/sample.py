@@ -1,7 +1,6 @@
 import logging
 import click
 from vogue.load.sample import load_one, load_all, load_recent, load_one_dry, load_all_dry
-from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
 
 from genologics.entities import Sample
@@ -26,25 +25,27 @@ LOG = logging.getLogger(__name__)
     "-d", "--days", type=int, help="Update only samples updated in the latest number of days"
 )
 @click.option("--dry", is_flag=True, help="Load from sample or not. (dry-run)")
-@with_appcontext
-def sample(sample_lims_id, all_samples, load_from, days, dry):
+@click.pass_context
+def sample(ctx: click.Context, sample_lims_id, all_samples, load_from, days, dry):
     """Read and load lims data for one sample, all samples or the most recently updated samples."""
+    adapter = ctx.obj["adapter"]
+    lims = ctx.obj["lims"]
 
-    if not current_app.lims:
+    if not lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
 
-    lims = current_app.lims
+    lims = lims
 
     if days:
         some_days_ago = date.today() - timedelta(days=days)
         the_date = some_days_ago.strftime("%Y-%m-%dT00:00:00Z")
-        load_recent(current_app.adapter, lims, the_date)
+        load_recent(adapter, lims, the_date)
     elif all_samples:
         if dry:
             load_all_dry()
         else:
-            load_all(current_app.adapter, lims=lims, start_sample=load_from)
+            load_all(adapter, lims=lims, start_sample=load_from)
     elif sample_lims_id:
         lims_sample = Sample(lims, id=sample_lims_id)
         if not lims_sample:
@@ -53,4 +54,4 @@ def sample(sample_lims_id, all_samples, load_from, days, dry):
         if dry:
             load_one_dry(lims_sample)
         else:
-            load_one(current_app.adapter, lims_sample, lims=lims)
+            load_one(adapter, lims_sample, lims=lims)

@@ -28,14 +28,6 @@ class Testcase_cli_utils(unittest.TestCase):
         with self.assertRaises(FileNotFoundError) as e:
             check_file(NO_FILE)
 
-    def test_json_read(self):
-        self.assertEqual(json_read(INVALID_JSON), False)
-        self.assertIsInstance(json_read(VALID_JSON), dict)
-
-        with self.assertLogs("json_read", level="WARNING") as l:
-            logging.getLogger("json_read").warning("Input config is not JSON")
-        self.assertEqual(l.output, ["WARNING:json_read:Input config is not JSON"])
-
     def test_yaml_read(self):
         self.assertEqual(yaml_read(INVALID_YAML), False)
 

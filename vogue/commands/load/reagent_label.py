@@ -1,10 +1,8 @@
 import logging
 import click
 from vogue.load.reagent_label import load_one, load_all, load_recent
-from flask.cli import with_appcontext, current_app
 from datetime import date, timedelta
 
-from vogue.constants.constants import RUN_TYPES
 
 LOG = logging.getLogger(__name__)
 
@@ -23,15 +21,14 @@ LOG = logging.getLogger(__name__)
     type=int,
     help="Update only reagent_labels from runs updated in the latest number of days",
 )
-@with_appcontext
-def reagent_labels(all_reagent_labels, dry, days):
+@click.pass_context
+def reagent_labels(ctx: click.Context, all_reagent_labels, dry, days):
     """Read and load lims data for a one or all many reagent_labels"""
-
-    if not current_app.lims:
+    adapter = ctx.obj["adapter"]
+    lims = ctx.obj["lims"]
+    if not lims:
         LOG.warning("Lims connection failed.")
         raise click.Abort()
-
-    lims = current_app.lims
 
     if days:
         try:
@@ -40,6 +37,6 @@ def reagent_labels(all_reagent_labels, dry, days):
         except Exception as err:
             LOG.error(err)
             raise click.Abort()
-        load_recent(current_app.adapter, lims, the_date)
+        load_recent(adapter, lims, the_date)
     elif all_reagent_labels:
-        load_all(current_app.adapter, lims=lims)
+        load_all(adapter, lims=lims)

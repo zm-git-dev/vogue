@@ -1,1 +1,1 @@
-from .plugin import VougeAdapter
+from .plugin import VogueAdapter

@@ -5,8 +5,6 @@ import logging
 import copy
 import click
 
-from flask.cli import with_appcontext
-from flask.cli import current_app
 
 from vogue.tools.cli_utils import concat_dict_keys
 from vogue.tools.cli_utils import add_doc as doc
@@ -72,8 +70,9 @@ LOG = logging.getLogger(__name__)
     Analysis types recognize the following keys in the input file: {" ".join(concat_dict_keys(analysis_model.ANALYSIS_SETS,key_name=""))}
         """
 )
-@with_appcontext
+@click.pass_context
 def bioinfo_process(
+    ctx: click.Context,
     dry,
     analysis_type,
     analysis_case,
@@ -83,6 +82,7 @@ def bioinfo_process(
     cleanup,
     load_all,
 ):
+    adapter = ctx.obj["adapter"]
 
     if (not load_all and not analysis_case) or (load_all and analysis_case):
         LOG.error(
@@ -101,7 +101,7 @@ def bioinfo_process(
     analysis_dict["workflow_version"] = workflow_version
     analysis_dict["case_analysis_type"] = case_analysis_type
 
-    current_analysis = current_app.adapter.bioinfo_raw(analysis_case)
+    current_analysis = adapter.bioinfo_raw(analysis_case)
 
     if current_analysis is None:
         LOG.info("Raw import for this case does not exist. Load it without processed flag first")
@@ -137,7 +137,7 @@ def bioinfo_process(
             LOG.error("Invalid or badly formatted file(s).")
             raise click.Abort()
 
-    current_analysis = current_app.adapter.bioinfo_processed(analysis_case)
+    current_analysis = adapter.bioinfo_processed(analysis_case)
 
     # Don't process the case
     ready_analysis = build_analysis(
@@ -158,7 +158,7 @@ def bioinfo_process(
     LOG.info("Case %s will be added/updated", analysis_case)
 
     load_analysis(
-        adapter=current_app.adapter,
+        adapter=adapter,
         lims_id=analysis_dict["sample"],
         processed=True,
         is_sample=False,

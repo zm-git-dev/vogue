@@ -2,9 +2,9 @@
 import logging
 
 import click
+from genologics.lims import Lims
 
-from mongo_adapter import get_client
-from vogue.adapter import VougeAdapter
+from vogue.settings import get_vogue_adapter, get_lims
 
 LOG = logging.getLogger(__name__)
 
@@ -26,10 +26,14 @@ from vogue.tools.cli_utils import add_doc as doc
 
 @click.group()
 @click.version_option(version=__version__)
+@click.pass_context
 @doc("Vogue {version}: A trending package".format(version=__version__))
-def load():
+def load(ctx):
     """Main entry point of load commands"""
-    pass
+
+    ctx.ensure_object(dict)
+    ctx.obj["lims"] = get_lims()
+    ctx.obj["adapter"] = get_vogue_adapter()
 
 
 load.add_command(bioinfo_command)

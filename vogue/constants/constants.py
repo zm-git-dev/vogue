@@ -15,7 +15,7 @@ MONTHS = [
     (12, "Dec"),
 ]
 
-THIS_YEAR = date.today().year
+THIS_YEAR: int = date.today().year
 
 TEST_SAMPLES = [
     "SIB603A6",
@@ -204,7 +204,7 @@ TEST_SAMPLES = [
     "SIB255A2",
 ]
 
-YEARS = [str(y) for y in range(2016, THIS_YEAR + 1)]
+YEARS = [y for y in range(2016, THIS_YEAR + 1)]
 
 LANE_UDFS = [
     "Clusters PF R1",

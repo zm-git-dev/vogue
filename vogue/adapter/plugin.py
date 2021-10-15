@@ -1,6 +1,8 @@
 import logging
 
 from mongo_adapter import MongoAdapter
+from pymongo.collection import Collection
+
 from datetime import datetime as dt
 
 LOG = logging.getLogger(__name__)
@@ -21,7 +23,7 @@ def check_dates(analysis_result, current_document):
     return analysis_result
 
 
-class VougeAdapter(MongoAdapter):
+class VogueAdapter(MongoAdapter):
     def setup(self, db_name: str):
         """Setup connection to a database"""
 
@@ -29,7 +31,7 @@ class VougeAdapter(MongoAdapter):
             raise SyntaxError("No client is available")
         self.db = self.client[db_name]
         self.db_name = db_name
-        self.sample_collection = self.db.sample
+        self.sample_collection: Collection = self.db.sample
         self.bioinfo_processed_collection = self.db.bioinfo_processed
         self.bioinfo_raw_collection = self.db.bioinfo_raw
         self.bioinfo_samples_collection = self.db.bioinfo_samples

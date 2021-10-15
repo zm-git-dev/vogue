@@ -19,6 +19,7 @@ LOG = logging.getLogger(__name__)
 @click.group()
 @click.version_option(version=__version__)
 @doc("Vogue {version}: A trending package".format(version=__version__))
+@click.pass_context
 def bioinfo():
     """Main entry point of load commands"""
 

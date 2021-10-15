@@ -1,0 +1,118 @@
+{% block content %}
+<div class="wrapper">
+
+<div class="sidebar">
+<nav class="col-md-2 d-none d-md-block bg-light sidebar ">
+    <ul class="nav flex-column">
+      <br>
+      <br>
+      <br>
+      <br>
+      <li class="nav-item dropright">
+        <a class="nav-link " href="{{ url_for('home') }}">
+          <span data-feather="home"></span>
+          Home <span class="sr-only">(current)</span>
+        </a>
+      </li>
+      <li class="nav-item dropright">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          Common trends
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item btn-sm" href="{{ url_for('turn_around_times') }}">Turnaround
+            Times</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('common_samples') }}">Samples</a>
+        </div>
+      </li>
+      <li class="nav-item dropright">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          Preps
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item btn-sm" href="{{ url_for('microbial')}}">Microbial</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('wgs' ) }}">WGS Illumina
+            PCR-free</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('lucigen' ) }}">Lucigen PCR-free</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('target_enrichment' ) }}">Targeted
+            enrichment</a>
+        </div>
+      </li>
+      <li class="nav-item dropright ">
+        <a class="nav-link" href="#" id="navbarDropdown"  data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          Sequencing
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item btn-sm" href="{{ url_for('runs') }}">Instruments</a>
+        </div>
+      </li>
+      <li class="nav-item dropright">
+        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Bioinfo</a>
+        <ul class="dropdown-menu">
+          <li class="dropdown-item btn-sm dropdown-submenu">
+            <a href="#" data-toggle="dropdown" class="dropdown-toggle">WGS, WES, TGA</a>
+            <ul class="dropdown-menu">
+              <li class="dropdown-item btn-sm">
+                <a class="dropdown-toggle-sub-menue" href="{{ url_for('qc_dna_picard_time') }}">QC over time</a>
+              </li>
+            </ul>
+          </li>
+            <li class="dropdown-item btn-sm dropdown-submenu">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Microbial</a>
+                <ul class="dropdown-menu">
+                  <li class="dropdown-item btn-sm">
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro_strain_st') }}">ST total</a>
+                  </li>
+                  <li class="dropdown-item btn-sm">
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro_qc_time') }}">QC over time</a>
+                  </li>
+                  <li class="dropdown-item btn-sm">
+                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro_untyped') }}">Untyped organisms</a>
+                  </li>
+                  <li class="dropdown-item btn-sm">
+                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro_st_time') }}">ST over time</a>
+                  </li>
+                </ul>
+              </li>
+            <li class="dropdown-item btn-sm dropdown-submenu">
+                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Covid</a>
+                <ul class="dropdown-menu">
+                  <li class="dropdown-item btn-sm">
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('covid_qc_time') }}">QC over time - Box plot</a>
+                  </li>
+                    <li class="dropdown-item btn-sm">
+                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('covid_qc_scatter') }}">QC over time - Scatter plot</a>
+                  </li>
+                </ul>
+              </li>
+        </ul>
+      </li>
+      <li class="nav-item dropright">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Genotypes
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item btn-sm" href="{{ url_for('genotype_plate') }}">Genotype Plate</a>
+          </div>
+        </li>
+        <li class="nav-item dropright">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Index Performance
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item btn-sm" href="{{ url_for('reagent_labels') }}">Average</a>
+            <a class="dropdown-item btn-sm" href="{{ url_for('reagent_label') }}">Per Index</a>
+          </div>
+        </li>
+    </ul>
+  <div class="container sticky-bottom">
+      <small>The database is updated every night.</small>
+  </div>
+</nav>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'layout.html' %}
+{% block body %}
+    {% include 'header.html' %}
+
+    <div class="container-fluid">
+        <div class="row">
+            {% include 'navigation.html' %}
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 col-md-9 ml-sm-auto col-lg-10 px-4">
+                {% include 'header_section.html' %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="btn mb-2 mb-md-0">
+                                <form action="{{ url_for('qc_dna_picard_time' ) }}"
+                                      method="GET">
+                                    <input type="hidden" name="year" value={{ year_of_interest }}>
+                                    <select name="picard_metric" class="form-control form-control-sm"
+                                            placeholder=".form-control-sm" required onchange="this.form.submit()">
+                                        {% for group in DNA_PICARD %}
+                                            <optgroup label="{{ group }}">
+                                            {% for metric in DNA_PICARD[group] %}
+                                                <option value="{{ group }} {{ metric }}" {{ 'selected' if metric == selcted_metric }}>
+                                                    {{ metric.lower().capitalize().replace('_', ' ') }}
+                                                </option>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </div>
+
+                        </div>
+                        <hr>
+                        A subset of the picard qc metricses that are being procued by workflows are visualized here.
+                        Write a request <a href="https://github.com/Clinical-Genomics/vogue/issues/new/choose">here</a>.
+                        if you want to add more data to this plot. <br>
+                        This plot shows <b>{{ selected_group.lower().capitalize().replace('_', ' ') }}</b> over
+                        Time. {{ help_urls[selected_group]['text'] }}
+                        Definitions of specific metrices auch as
+                        (<b>{{ selcted_metric.lower().capitalize().replace('_', ' ') }}</b>) can be found <a
+                            href="{{ help_urls[selected_group]['url'] }}">here</a>. <br><br>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div id="picard_plot"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        var series = []
+        {% if qc_dna_results.data[selcted_metric] is defined %}
+            {% for group in qc_dna_results.data[selcted_metric] %}
+            var data = []
+            {% for result in qc_dna_results.data[selcted_metric][group] %}
+                // in this context january is 0, february 1,..., december 11 thereby result.x-1
+                data.push({
+                    'application': {{ result.application | tojson }},
+                    'workflows': {{ result.workflows | tojson }},
+                    'name': {{result.name | tojson}},
+                    'x': {{result.x-1}},
+                    'y': {{result.y}}
+                })
+            {% endfor %}
+            series.push({
+                name: "{{group}}",
+                data: data,
+                radius: 1,
+                marker: {symbol: 'circle'}})
+            {% endfor %}
+        {% endif %}
+
+
+        Highcharts.chart('picard_plot', {
+            chart: {type: 'scatter', zoomType: 'xy'},
+            title: {text: "{{selected_group.lower().capitalize().replace('_', ' ')}}"},
+            subtitle: {text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}} over Time"},
+            xAxis: {
+                title: {text: 'Date recived'},
+                categories: {{ months | tojson }}
+            },
+            yAxis: {title: {text: "{{selcted_metric.lower().capitalize().replace('_', ' ')}}"}},
+            tooltip: {
+                formatter: function () {
+                    var output = ''
+                    if (this.point.name) {
+                        output = output + 'Sample ID: <b>' + this.point.name + '</b> <br>'
+                    }
+                    if (this.point.application) {
+                        output = output + 'Application: <b>' + this.point.application + '</b> <br>'
+                    }
+                    if (this.point.workflows) {
+                        output = output + 'Workflows: <b>' + this.point.workflows + '</b> <br>'
+                    }
+                    output = output + "{{selcted_metric.lower().capitalize().replace('_', ' ')}}" + ': <b>' + this.y + '</b> <br> Sample Recieved in: <b>' + this.x + '</b>'
+                    return output;
+                }
+            },
+            plotOptions: {
+                series: {
+                    connectNulls: true, allowPointSelect: true
+                },
+                spline: {
+                    marker: {
+                        radius: 1,
+                        lineColor: '#970118',
+                        lineWidth: 1
+                    }
+                }
+            },
+            series:series
+        });
+
+    </script>
+
+{% endblock %}
