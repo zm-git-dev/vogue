@@ -1,8 +1,0 @@
-pandas
-pprintpp
-ipywidgets
-cufflinks
-seaborn
-pyyaml
-pymongo
-chart_studio

@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.6]
+        python-version: [3.7]
 
     steps:
       # Checkout Vogue
@@ -74,7 +74,7 @@ jobs:
       # Pytest
       - name: Run Pytest
         run: |
-          py.test --cov-report=xml --cov=vogue -rsxv tests/*
+          pytest --cov-report=xml --cov=vogue
       # Run Codecov
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1

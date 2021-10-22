@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from genologics.lims import Lims
 from pymongo import MongoClient
@@ -34,6 +33,7 @@ class Settings(BaseSettings):
     host: str = "localhost"
     access_token_expire_minutes: int = 60
     port: int = 8000
+    hmac_key: str = "secret_key"
 
     class Config:
         env_file = str(ENV_FILE)
@@ -43,7 +43,7 @@ settings = Settings()
 
 
 def get_lims() -> Lims:
-    """Temporarily untill we have load from arnold in place """
+    """Temporarily untill we have load from arnold in place"""
     return Lims(settings.lims_base_uri, settings.lims_username, settings.lims_password)
 
 

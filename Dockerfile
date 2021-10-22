@@ -12,6 +12,8 @@ ENV GUNICORN_TIMEOUT=400
 ENV DB_URI="mongodb://localhost:27017/vogue-demo"
 ENV DB_NAME="vogue-demo"
 
+ENV HMAC_KEY = "hmacsecret"
+
 # Copy all project files
 WORKDIR /home/vogue/vogue
 COPY . /home/vogue/vogue
