@@ -86,9 +86,8 @@ Data Flow
 .. raw:: html
 
    <p align="center">
-           <img src="artwork/data_flow.png">
+           <img src="https://user-images.githubusercontent.com/35531751/138457689-3211262f-9ad5-4e01-8e32-40e593f52bc0.png">
    </p>
-
 
 CLI
 ---
