@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from pydantic import BaseModel
 
 from vogue.constants.constants import MONTHS, YEARS, THIS_YEAR
 from vogue.crud.find_plots.home import home_samples, home_customers
@@ -14,7 +13,7 @@ from fastapi import APIRouter, Depends, Request
 router = APIRouter()
 
 
-@router.get("/home")
+@router.get("/")
 async def home(
     request: Request,
     adapter: VogueAdapter = Depends(get_vogue_adapter),

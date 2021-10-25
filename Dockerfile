@@ -37,4 +37,5 @@ CMD gunicorn \
     --log-syslog \
     --access-logfile - \
     --log-level="debug" \
-    vogue.server.auto:app
+    --worker-class=uvicorn.workers.UvicornWorker \
+    vogue.api.api_v1.api:app

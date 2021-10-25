@@ -9,7 +9,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def create_sample(adapter: VogueAdapter, sample: Sample) -> Sample:
+def create_sample(adapter: VogueAdapter, sample: Sample) -> str:
     """Function to load a new sample to the database."""
 
     if find_sample(adapter=adapter, sample_id=sample.id):
