@@ -249,6 +249,26 @@ BIOINFO_HELP_URLS = {
     },
 }
 
+
+DNA_PICARD_SUB_SET = {
+    "PICARD_INSERT_SIZE": [
+        "MEAN_INSERT_SIZE",
+    ],
+    "PICARD_HS_METRIC": [
+        "PCT_TARGET_BASES_10X",
+        "PCT_TARGET_BASES_50X",
+        "PCT_TARGET_BASES_100X",
+        "PCT_TARGET_BASES_250X",
+        "PCT_TARGET_BASES_1000X",
+        "AT_DROPOUT",
+        "GC_DROPOUT",
+        "TOTAL_READS",
+        "PCT_OFF_BAIT",
+        "MEAN_TARGET_COVERAGE",
+        "MEDIAN_TARGET_COVERAGE",
+    ],
+}
+
 DNA_PICARD = {
     "PICARD_INSERT_SIZE": [
         "MEDIAN_INSERT_SIZE",

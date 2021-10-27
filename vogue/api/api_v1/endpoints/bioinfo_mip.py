@@ -9,7 +9,13 @@ from vogue.settings import get_vogue_adapter
 from fastapi import APIRouter, Depends, Request
 
 router = APIRouter()
-from vogue.constants.constants import YEARS, BIOINFO_HELP_URLS, DNA_PICARD, MONTHS, THIS_YEAR
+from vogue.constants.constants import (
+    YEARS,
+    BIOINFO_HELP_URLS,
+    DNA_PICARD_SUB_SET,
+    MONTHS,
+    THIS_YEAR,
+)
 from vogue.crud.find_plots.bioinfo.qc import qc_dna_picard_plot, qc_dna_picard_time_plot
 from vogue import __version__
 
@@ -30,7 +36,7 @@ async def qc_dna_picard_time(
             selected_group=selected_group,
             selcted_metric=selcted_metric,
             qc_dna_results=qc_dna_results,
-            DNA_PICARD=DNA_PICARD,
+            DNA_PICARD=DNA_PICARD_SUB_SET,
             help_urls=BIOINFO_HELP_URLS,
             months=[m[1] for m in MONTHS],
             header="QC over time",
@@ -62,7 +68,7 @@ async def qc_dna_picard(
             X_axis=X_axis,
             groups=list(set([Y_group, X_group])),
             qc_dna_results=qc_dna_results,
-            DNA_PICARD=DNA_PICARD,
+            DNA_PICARD=DNA_PICARD_SUB_SET,
             help_urls=BIOINFO_HELP_URLS,
             header="QC plots",
             version=__version__,

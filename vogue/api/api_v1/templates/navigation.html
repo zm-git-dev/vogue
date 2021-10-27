@@ -48,47 +48,29 @@
           <a class="dropdown-item btn-sm" href="{{ url_for('runs') }}">Instruments</a>
         </div>
       </li>
-      <li class="nav-item dropright">
-        <a href="#" id="menu" data-toggle="dropdown" class="nav-link dropdown-toggle">Bioinfo</a>
-        <ul class="dropdown-menu">
-          <li class="dropdown-item btn-sm dropdown-submenu">
-            <a href="#" data-toggle="dropdown" class="dropdown-toggle">WGS, WES, TGA</a>
-            <ul class="dropdown-menu">
-              <li class="dropdown-item btn-sm">
-                <a class="dropdown-toggle-sub-menue" href="{{ url_for('qc_dna_picard_time') }}">QC over time</a>
-              </li>
-            </ul>
-          </li>
-            <li class="dropdown-item btn-sm dropdown-submenu">
-                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Microbial</a>
-                <ul class="dropdown-menu">
-                  <li class="dropdown-item btn-sm">
-                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro_strain_st') }}">ST total</a>
-                  </li>
-                  <li class="dropdown-item btn-sm">
-                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro_qc_time') }}">QC over time</a>
-                  </li>
-                  <li class="dropdown-item btn-sm">
-                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro_untyped') }}">Untyped organisms</a>
-                  </li>
-                  <li class="dropdown-item btn-sm">
-                      <a class="dropdown-toggle-sub-menue" href="{{ url_for('micro_st_time') }}">ST over time</a>
-                  </li>
-                </ul>
-              </li>
-            <li class="dropdown-item btn-sm dropdown-submenu">
-                <a href="#" data-toggle="dropdown" class="dropdown-toggle">Covid</a>
-                <ul class="dropdown-menu">
-                  <li class="dropdown-item btn-sm">
-                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('covid_qc_time') }}">QC over time - Box plot</a>
-                  </li>
-                    <li class="dropdown-item btn-sm">
-                    <a class="dropdown-toggle-sub-menue" href="{{ url_for('covid_qc_scatter') }}">QC over time - Scatter plot</a>
-                  </li>
-                </ul>
-              </li>
-        </ul>
+
+        <li class="nav-item dropright">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          Bioinfo Microbial
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item btn-sm" href="{{ url_for('micro_qc_time') }}">QC over time</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('micro_untyped') }}"> What we cal this link??</a>
+          <a class="dropdown-item btn-sm" href="{{ url_for('micro_st_time') }}">ST over time</a>
+        </div>
       </li>
+
+        <li class="nav-item dropright">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          Bioinfo Balsamic
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item btn-sm" href="{{ url_for('qc_dna_picard_time') }}">QC over time</a>
+        </div>
+      </li>
+
       <li class="nav-item dropright">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
