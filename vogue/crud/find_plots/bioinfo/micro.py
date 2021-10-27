@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from typing import Literal
 
 import numpy as np
 from vogue.constants.constants import MONTHS
@@ -59,12 +60,14 @@ def microsalt_get_strain_st(adapter, year: int) -> dict:
     return plot_data
 
 
-def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -> dict:
+def microsalt_get_qc_time(
+    adapter, year: int, metric_path: str, category: str, blast_pubmlst: Literal["Passed", "Failed"]
+) -> dict:
     """Build aggregation pipeline to get information for microsalt qc data over time."""
 
     metric = metric_path.split(".")[1]
     pipe = [
-        {"$match": {"microsalt": {"$exists": "True"}}},
+        {"$match": {"microsalt.blast_pubmlst.thresholds": blast_pubmlst}},
         {
             "$lookup": {
                 "from": "sample",
@@ -96,7 +99,6 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -
             }
         },
     ]
-
     aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
     intermediate = {
         result["_id"]["month"]: {metric: result[metric], "samples": result["samples"]}
@@ -125,13 +127,12 @@ def microsalt_get_qc_time(adapter, year: int, metric_path: str, category: str) -
         else:
             box_plots.append([])
         labels.append(m[1])
-    plot_data = {
+    return {
         "outliers": outliers,
         "data": box_plots,
         "labels": labels,
         "mean": round(np.mean(means), 2),
     }
-    return plot_data
 
 
 def get_outliers(month: int, metric: str, samples: list, minimum: float, maximum: float) -> list:
@@ -140,7 +141,7 @@ def get_outliers(month: int, metric: str, samples: list, minimum: float, maximum
     outliers = []
     for sample in samples:
         if minimum > sample[metric] or sample[metric] > maximum:
-            sample_data = {"x": month, "y": sample[metric], "name": sample["id"]}
+            sample_data = {"x": month, "y": round(sample[metric], 2), "name": sample["id"]}
             outliers.append(sample_data)
     return outliers
 
@@ -154,7 +155,13 @@ def calculate_box_points(values: list) -> list:
     inter_quartile_range = third_quartile - first_quartile
     maximum = third_quartile + inter_quartile_range * 1.5
     minimum = first_quartile - inter_quartile_range * 1.5
-    return [minimum, first_quartile, second_quartile, third_quartile, maximum]
+    return [
+        round(minimum, 2),
+        round(first_quartile, 2),
+        round(second_quartile, 2),
+        round(third_quartile, 2),
+        round(maximum, 2),
+    ]
 
 
 def microsalt_get_untyped(adapter, year: int) -> dict:
@@ -175,44 +182,37 @@ def microsalt_get_untyped(adapter, year: int) -> dict:
             "$project": {
                 "month": {"$month": "$sample_info.received_date"},
                 "year": {"$year": "$sample_info.received_date"},
-                "ST": "$microsalt.blast_pubmlst.sequence_type",
+                "ST": "$microsalt.blast_pubmlst.thresholds",
             }
         },
         {"$match": {"year": {"$eq": int(year)}}},
         {"$group": {"_id": {"month": "$month"}, "ST": {"$push": "$ST"}}},
     ]
 
-    intermediate = {}
+    intermediate_passed = {}
+    intermediate_failed = {}
     aggregate_result = adapter.bioinfo_samples_aggregate(pipe)
     for result in aggregate_result:
-        untyped = 0
-        typed = 0
-        untyped_lower_threshold = -9
-        untyped_upper_threshold = -1
+        failed = 0
+        passed = 0
+
         for sequence_type in result["ST"]:
-            try:
-                sequence_type = int(sequence_type)
-                if untyped_lower_threshold < sequence_type < untyped_upper_threshold:
-                    untyped += 1
-                else:
-                    typed += 1
-            except:
-                pass
-        if typed + untyped:
-            fraction = untyped / (typed + untyped)
-        else:
-            fraction = None
-        intermediate[result["_id"]["month"]] = fraction
+            if sequence_type == "Failed":
+                failed += 1
+            elif sequence_type == "Passed":
+                passed += 1
+        intermediate_passed[result["_id"]["month"]] = passed
+        intermediate_failed[result["_id"]["month"]] = failed
 
-    data = []
+    data_passed = []
+    data_failed = []
     labels = []
-    for m in MONTHS:
-        value = intermediate.get(m[0], None)
-        data.append(value)
-        labels.append(m[1])
+    for month in MONTHS:
+        data_passed.append(intermediate_passed.get(month[0]))
+        data_failed.append(intermediate_failed.get(month[0]))
+        labels.append(month[1])
 
-    plot_data = {"data": data, "labels": labels}
-    return plot_data
+    return {"data_passed": data_passed, "data_failed": data_failed, "labels": labels}
 
 
 def microsalt_get_st_time(adapter, year: int) -> dict:

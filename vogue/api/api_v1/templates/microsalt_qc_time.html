@@ -13,7 +13,7 @@
                                 <form action="{{ url_for("micro_qc_time" ) }}"
                                       method="GET">
                                 <input type="hidden" name="year" value={{ year_of_interest }}>
-                                    <select name="qc_metric" class="form-control form-control-sm"
+                                    <select name="metric_path" class="form-control form-control-sm"
                                             placeholder=".form-control-sm" required onchange="this.form.submit()">
                                         {% for group in MICROSALT %}
                                             <optgroup label="{{ group.capitalize().replace('_', ' ') }}">
@@ -44,27 +44,42 @@
 
     <script>
 
-        var data = []
-        {% if results is defined %}
-            var data = {{ results| tojson}}
+        var passed_data = []
+        {% if passed_results.data is defined %}
+            var passed_data = {{ passed_results.data| tojson}}
+        {% endif %}
+
+        var failed_data = []
+        {% if failed_results.data is defined %}
+            var failed_data = {{ failed_results.data| tojson}}
         {% endif %}
 
     Highcharts.chart('qc_time', {
         chart: {type: 'boxplot'},
-        subtitle: {text: '{{MICROSALT[selected_group][selected_metric]}}'},
+        subtitle: {text: '{{MICROSALT[selected_group][selected_metric]}}. <br> Samples are grouped by Passed/Failed MLST Typing.' },
         title: {text: '{{selected_metric.capitalize().replace('_', ' ')}} over time.'},
         xAxis: {
             title: {text: 'Date recived'},
-            categories: {{ categories| tojson }}
+            categories: {{ passed_results.labels| tojson }}
         },
         yAxis: {
             title: {text: 'Average {{selected_metric.capitalize().replace('_', ' ')}}'},
             plotLines: [{
-                value: {{ mean }},
-                color: 'red',
+                value: {{ passed_results.mean }},
+                color: "#089B11",
                 width: 1,
                 label: {
-                    text: 'Mean: {{mean}}',
+                    align: 'center',
+                    style: {
+                        color: 'gray'
+                    }
+                }
+            },
+            {
+                value: {{ failed_results.mean }},
+                color: '#000000',
+                width: 1,
+                label: {
                     align: 'center',
                     style: {
                         color: 'gray'
@@ -79,19 +94,36 @@
             }
         },
         series: [{
-            name: '{{selected_metric}}',
-            data: data
-        },
-            {
-                name: 'Outliers',
-                color: Highcharts.getOptions().colors[0],
+            name: 'Passed Samples',
+            data: passed_data,
+            color: "#089B11"
+        },{
+            name: 'Failed Samples',
+            data: failed_data,
+            color: '#000000'
+        },{
+                name: 'Passed Samples Outliers',
                 type: 'scatter',
-                data: {{ outliers |tojson}},
+                data: {{ passed_results.outliers |tojson}},
                 marker: {
                     radius: 2,
                     fillColor: 'white',
                     lineWidth: 1,
-                    lineColor: Highcharts.getOptions().colors[0]
+                    lineColor: "#089B11"
+                },
+                tooltip: {
+                    pointFormat: 'Sample: {point.name} <br/> Value: {point.y}'
+                }
+            },
+        {
+                name: 'Failed Samples Outliers',
+                type: 'scatter',
+                data: {{ failed_results.outliers |tojson}},
+                marker: {
+                    radius: 2,
+                    fillColor: 'white',
+                    lineWidth: 1,
+                    lineColor: "#000000"
                 },
                 tooltip: {
                     pointFormat: 'Sample: {point.name} <br/> Value: {point.y}'

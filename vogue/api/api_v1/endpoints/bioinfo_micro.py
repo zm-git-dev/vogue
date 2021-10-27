@@ -51,16 +51,18 @@ async def micro_qc_time(
     year: int = THIS_YEAR,
     adapter: VogueAdapter = Depends(get_vogue_adapter),
 ):
-    results = microsalt_get_qc_time(adapter, year=year, metric_path=metric_path, category="mic")
-
+    passed_results = microsalt_get_qc_time(
+        adapter, year=year, metric_path=metric_path, category="mic", blast_pubmlst="Passed"
+    )
+    failed_results = microsalt_get_qc_time(
+        adapter, year=year, metric_path=metric_path, category="mic", blast_pubmlst="Failed"
+    )
     return templates.TemplateResponse(
         "microsalt_qc_time.html",
         context=dict(
             request=request,
-            results=results["data"],
-            outliers=results["outliers"],
-            categories=results["labels"],
-            mean=results["mean"],
+            passed_results=passed_results,
+            failed_results=failed_results,
             selected_group=metric_path.split(".")[0],
             selected_metric=metric_path.split(".")[1],
             header="Microsalt",
@@ -84,7 +86,8 @@ def micro_untyped(
         "microsalt_untyped.html",
         context=dict(
             request=request,
-            results=results["data"],
+            results_passed=results["data_passed"],
+            results_failed=results["data_failed"],
             categories=results["labels"],
             header="Microsalt",
             version=__version__,
