@@ -38,87 +38,13 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="prepped_to_sequenced_tag"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="prepped_to_sequenced_prio"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="sequenced_to_delivered_tag"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div id="sequenced_to_delivered_prio"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 </div>
 
 <script>
-    var series = []
-    {% for name in data_prio.sequenced_to_delivered %}
-    series.push({
-        name: "{{name}}",
-        data: {{ data_prio.sequenced_to_delivered[name].data | tojson }},
-        marker: { symbol: 'circle' }})
-    {% endfor %}
-
-    Highcharts.chart('sequenced_to_delivered_prio', {
-        chart: { type: 'areaspline' },
-        title: { text: 'Time from sequenced to delivered' },
-        subtitle: {text: 'Grouped by priority'},
-        xAxis: { categories: {{ months| tojson }}},
-        yAxis: { title: { text: 'Average Days' }},
-        tooltip: {
-        valueDecimals: 0,
-        shared: true,
-        valueSuffix: ' days'
-    },
-        plotOptions: { areaspline: { fillOpacity: 0.2 } },
-        series: series});
 
 
-    var series = []
-    {% for name in data_prio.prepped_to_sequenced %}
-    series.push({
-        name: "{{name}}",
-        data: {{ data_prio.prepped_to_sequenced[name].data | tojson }},
-        marker: { symbol: 'circle' }})
-    {% endfor %}
-
-    Highcharts.chart('prepped_to_sequenced_prio', {
-        chart: { type: 'areaspline' },
-        title: { text: 'Time from prepped to sequenced' },
-        subtitle: {text: 'Grouped by priority'},
-        xAxis: { categories: {{ months | tojson }}},
-        yAxis: { title: { text: 'Average Days'}},
-        tooltip: {
-        valueDecimals: 0,
-        shared: true,
-        valueSuffix: ' days'
-    },
-        plotOptions: { areaspline: { fillOpacity: 0.2 } },
-        series: series});
 
     var series = []
     {% for name in data_prio.received_to_prepped %}
@@ -164,50 +90,6 @@
         plotOptions: { areaspline: { fillOpacity: 0.2 } },
         series: series});
 
-    var series = []
-    {% for name in data_cat.sequenced_to_delivered %}
-    series.push({
-        name: "{{name}}",
-        data: {{ data_cat.sequenced_to_delivered[name].data | tojson }},
-        marker: { symbol: 'circle' }})
-    {% endfor %}
-
-    Highcharts.chart('sequenced_to_delivered_tag', {
-        chart: { type: 'areaspline' },
-        title: { text: 'Time from sequenced to delivered' },
-        subtitle: {text: 'Grouped by application tag category'},
-        xAxis: { categories: {{ months| tojson }}},
-        yAxis: { title: { text: 'Average Days'}},
-        tooltip: {
-        valueDecimals: 0,
-        shared: true,
-        valueSuffix: ' days'
-    },
-        plotOptions: { areaspline: { fillOpacity: 0.2 } },
-        series: series});
-
-
-    var series = []
-    {% for name in data_cat.prepped_to_sequenced %}
-    series.push({
-        name: "{{name}}",
-        data: {{ data_cat.prepped_to_sequenced[name].data | tojson }},
-        marker: { symbol: 'circle' }})
-    {% endfor %}
-
-    Highcharts.chart('prepped_to_sequenced_tag', {
-        chart: { type: 'areaspline' },
-        title: { text: 'Time from prepped to sequenced' },
-        subtitle: {text: 'Grouped by application tag category'},
-        xAxis: { categories: {{ months| tojson }}},
-        yAxis: { title: { text: 'Average Days'}},
-        tooltip: {
-        valueDecimals: 0,
-        shared: true,
-        valueSuffix: ' days'
-    },
-        plotOptions: { areaspline: { fillOpacity: 0.2 } },
-        series: series});
 
     var series = []
     {% for name in data_cat.received_to_prepped %}
