@@ -66,6 +66,7 @@ def test_count_value_per_month(database):
         "library_size_post_hyb": 333,
         "received_date": datetime(year, 12, 1, 0, 0),
         "received_to_delivered": 32,
+        "received_to_prepped": 10,
     }
     database.sample.insert_one(sample)
     sample = {
@@ -74,6 +75,7 @@ def test_count_value_per_month(database):
         "library_size_post_hyb": 417,
         "received_date": datetime(year, 12, 1, 0, 0),
         "received_to_delivered": 32,
+        "received_to_prepped": 10,
     }
     database.sample.insert_one(sample)
 
@@ -100,6 +102,7 @@ def test_y_val_value_per_month(database):
         "library_size_post_hyb": 333,
         "received_date": datetime(year, 12, 1, 0, 0),
         "received_to_delivered": 32,
+        "received_to_prepped": 10,
     }
     database.sample.insert_one(sample)
     sample = {
@@ -108,6 +111,7 @@ def test_y_val_value_per_month(database):
         "library_size_post_hyb": 417,
         "received_date": datetime(year, 12, 1, 0, 0),
         "received_to_delivered": 32,
+        "received_to_prepped": 10,
     }
     database.sample.insert_one(sample)
 

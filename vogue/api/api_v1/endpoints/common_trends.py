@@ -17,21 +17,35 @@ def turn_around_times(
     request: Request, year: int = THIS_YEAR, adapter: VogueAdapter = Depends(get_vogue_adapter)
 ):
 
-    y_vals = [
-        "received_to_delivered",
-        "received_to_prepped",
-        "prepped_to_sequenced",
-        "sequenced_to_delivered",
-    ]
-    results_grouped_by_prio = {}
-    results_grouped_by_cat = {}
-    for y_val in y_vals:
-        results_grouped_by_prio[y_val] = value_per_month(
-            adapter=adapter, year=year, y_val=y_val, group_key="priority"
-        )
-        results_grouped_by_cat[y_val] = value_per_month(
-            adapter=adapter, year=year, y_val=y_val, group_key="category"
-        )
+    results_grouped_by_prio = {
+        "received_to_delivered": value_per_month(
+            adapter=adapter, year=year, y_val="received_to_delivered", group_key="priority"
+        ),
+        "received_to_prepped": value_per_month(
+            adapter=adapter,
+            year=year,
+            y_val="received_to_prepped",
+            group_key="priority",
+        ),
+    }
+
+    results_grouped_by_cat = {
+        "received_to_delivered": value_per_month(
+            adapter=adapter, year=year, y_val="received_to_delivered", group_key="category"
+        ),
+        "received_to_prepped": value_per_month(
+            adapter=adapter,
+            year=year,
+            y_val="received_to_prepped",
+            group_key="category",
+        ),
+    }
+    results_grouped_by_cat["received_to_prepped"].pop("cov", None)
+    results_grouped_by_cat["received_to_prepped"].pop("rml", None)
+    results_grouped_by_cat["received_to_prepped"].pop("NA", None)
+    results_grouped_by_prio["received_to_prepped"].pop("cov", None)
+    results_grouped_by_prio["received_to_prepped"].pop("rml", None)
+    results_grouped_by_prio["received_to_prepped"].pop("NA", None)
 
     return templates.TemplateResponse(
         "turn_around_times.html",

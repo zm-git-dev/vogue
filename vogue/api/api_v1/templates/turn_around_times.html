@@ -56,6 +56,12 @@
 
     Highcharts.chart('received_to_prepped_prio', {
         chart: { type: 'areaspline' },
+        legend: {
+            align: 'right',
+            verticalAlign: 'top',
+            layout: 'vertical',
+            x: 0,
+            y: 100},
         title: { text: 'Time from received to prepped' },
         subtitle: {text: 'Grouped by priority'},
         xAxis: { categories: {{ months| tojson }}},
@@ -78,6 +84,12 @@
 
     Highcharts.chart('received_to_delivered_prio', {
         chart: { type: 'areaspline' },
+        legend: {
+            align: 'right',
+            verticalAlign: 'top',
+            layout: 'vertical',
+            x: 0,
+            y: 100},
         title: { text: 'Time from received to delivered' },
         subtitle: {text: 'Grouped by priority'},
         xAxis: { categories: {{ months | tojson }}},
@@ -101,6 +113,12 @@
 
     Highcharts.chart('received_to_prepped_tag', {
         chart: { type: 'areaspline' },
+        legend: {
+            align: 'right',
+            verticalAlign: 'top',
+            layout: 'vertical',
+            x: 0,
+            y: 100},
         title: { text: 'Time from received to prepped' },
         subtitle: {text: 'Grouped by application tag category'},
         xAxis: { categories: {{ months | tojson }}},
@@ -123,6 +141,12 @@
 
     Highcharts.chart('received_to_delivered_tag', {
         chart: { type: 'areaspline' },
+        legend: {
+            align: 'right',
+            verticalAlign: 'top',
+            layout: 'vertical',
+            x: 0,
+            y: 100},
         title: { text: 'Time from received to delivered' },
         subtitle: {text: 'Grouped by application tag category'},
         xAxis: { categories: {{ months | tojson }}},

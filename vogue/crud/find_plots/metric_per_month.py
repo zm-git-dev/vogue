@@ -32,7 +32,14 @@ def pipe_value_per_month(year: int, y_val: str, group_key: str = None) -> list:
             Number of revieved samples/month during 2017 grouped by priority.
     """
 
-    match = {"$match": {"received_date": {"$exists": True}, "_id": {"$nin": TEST_SAMPLES}}}
+    match = {
+        "$match": {
+            "received_date": {"$exists": True},
+            "_id": {"$nin": TEST_SAMPLES},
+            "received_to_prepped": {"$gt": -1},
+            "received_to_delivered": {"$gt": -1},
+        },
+    }
     project = {
         "$project": {"month": {"$month": "$received_date"}, "year": {"$year": "$received_date"}}
     }
