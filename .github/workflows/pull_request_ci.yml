@@ -46,40 +46,31 @@ jobs:
          push: true
          tags: "clinicalgenomics/vogue-stage:${{steps.get_branch_name.outputs.branch}}, clinicalgenomics/vogue-stage:latest"
 
-  pytest_coveralls:
-    name: run PyTest
-    runs-on: ubuntu-18.04
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: [3.8]
-
+  tests-coverage:
+    runs-on: ubuntu-latest
+    name: Test and coveralls
     steps:
-      # Checkout Vogue
-      - name: Git checkout
-        uses: actions/checkout@v2
-
-      # Setup Python
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.8"
 
-      # Install Vogue
-      - name: Install Vogue
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements-dev.txt
-          pip install -e .
-      # Pytest
-      - name: Run Pytest
-        run: |
-          pytest --cov-report=xml --cov=vogue
-      # Run Codecov
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+      - name: Check out vogue
+        uses: actions/checkout@v2
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          flags: unittests
-          fail_ci_if_error: true
+          repository: "Clinical-Genomics/vogue"
+
+      - name: Install vogue dependencies
+        run: |
+          pip install -r requirements.txt -r requirements-dev.txt .
+      - name: Install coveralls dependencies
+        run: |
+          pip install pytest-cov coveralls
+      - name: Test with pytest & Coveralls
+        run: |
+          pytest --cov=genotype_api/
+          coveralls
+        env:
+          GITHUB: 1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
