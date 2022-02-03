@@ -68,7 +68,7 @@ jobs:
           pip install pytest-cov coveralls
       - name: Test with pytest & Coveralls
         run: |
-          pytest --cov=genotype_api/
+          pytest --cov=vogue/
           coveralls
         env:
           GITHUB: 1
