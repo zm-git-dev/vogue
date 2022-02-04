@@ -36,7 +36,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: "clinicalgenomics/vogue:${{github.event.release.tag_name}}, clinicalgenomics/vogue:latest"
+          tags: "clinicalgenomics/vogue:${{github.event.release.tag_name}}, clinicalgenomics/vogue:latest, clinicalgenomics/vogue-stage:master, clinicalgenomics/vogue-stage:latest"
 
   build-n-publish:
     name: Build and publish Python distribution to PyPI
